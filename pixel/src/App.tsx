@@ -1,24 +1,24 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import { Layout } from './components/Layout';
+import { CanvasProvider } from './context/CanvasContext';
+import { WalletProvider } from './context/WalletContext';
+import HomePage from '././pages/HomePage';
+import HelpModal from './components/HelpModal';
 
 function App() {
+  const [showInitialHelp, setShowInitialHelp] = useState(true);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <WalletProvider>
+      <CanvasProvider>
+        <Layout>
+          <HomePage />
+          {showInitialHelp && (
+            <HelpModal onClose={() => setShowInitialHelp(false)} />
+          )}
+        </Layout>
+      </CanvasProvider>
+    </WalletProvider>
   );
 }
 

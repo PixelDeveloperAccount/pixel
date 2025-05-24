@@ -2,17 +2,31 @@ import React, { useState } from 'react';
 import { Menu, Palette, Github, Twitter, BookOpen, MessageCircle, Copy, Check, MousePointer, Clock } from 'lucide-react';
 import UserInfo from './UserInfo';
 import ConnectButton from './ConnectButton';
+import { useCanvas } from '../context/CanvasContext';
 
 const CONTRACT_ADDRESS = "0x1234567890abcdef1234567890abcdef12345678";
 
 const Sidebar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const { totalPixelsPlaced, startTime, favoriteColor } = useCanvas();
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(CONTRACT_ADDRESS);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const formatTimeSince = (date: Date) => {
+    const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (days > 0) return `${days}d ${hours % 24}h`;
+    if (hours > 0) return `${hours}h ${minutes % 60}m`;
+    if (minutes > 0) return `${minutes}m ${seconds % 60}s`;
+    return `${seconds}s`;
   };
 
   return (
@@ -63,14 +77,14 @@ const Sidebar: React.FC = () => {
                     <MousePointer className="h-5 w-5" />
                     <span>Total Pixels Placed:</span>
                   </div>
-                  <span className="font-medium text-gray-900">1,234</span>
+                  <span className="font-medium text-gray-900">{totalPixelsPlaced}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2 text-gray-600">
                     <Clock className="h-5 w-5" />
-                    <span>Time Spent:</span>
+                    <span>Session start:</span>
                   </div>
-                  <span className="font-medium text-gray-900">2.5 hours</span>
+                  <span className="font-medium text-gray-900">{formatTimeSince(startTime)}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2 text-gray-600">
@@ -78,8 +92,17 @@ const Sidebar: React.FC = () => {
                     <span>Favorite Color:</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <div className="w-5 h-5 rounded-full bg-indigo-600"></div>
-                    <span className="font-medium text-gray-900">#4F46E5</span>
+                    {favoriteColor ? (
+                      <>
+                        <div 
+                          className="w-5 h-5 rounded-full" 
+                          style={{ backgroundColor: favoriteColor }}
+                        />
+                        <span className="font-medium text-gray-900">{favoriteColor}</span>
+                      </>
+                    ) : (
+                      <span className="text-gray-500">None yet</span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -125,10 +148,9 @@ const Sidebar: React.FC = () => {
                 </a>
               </div>
             </div>
-
-            <div className="mt-4">
+            <div className="mt-4">       
               <ConnectButton />
-            </div>
+            </div>   
           </div>
         </div>
       </div>

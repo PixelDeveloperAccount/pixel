@@ -21,6 +21,9 @@ interface CanvasContextType {
   setIsPlacingPixel: (value: boolean) => void;
   selectedPosition: { x: number, y: number } | null;
   setSelectedPosition: (pos: { x: number, y: number } | null) => void;
+  totalPixelsPlaced: number;
+  startTime: Date;
+  favoriteColor: string | null;
 }
 
 const CanvasContext = createContext<CanvasContextType | undefined>(undefined);
@@ -34,6 +37,8 @@ export const CanvasProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isPlacingPixel, setIsPlacingPixel] = useState(false);
   const [selectedPosition, setSelectedPosition] = useState<{ x: number, y: number } | null>(null);
+  const [startTime] = useState<Date>(new Date());
+  const [favoriteColor, setFavoriteColor] = useState<string | null>(null);
   const canvasSize = 1000;
   
   // fetch the initial canvas state from the backend
@@ -102,7 +107,16 @@ export const CanvasProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     } catch (error) {
       console.error("Error placing pixel:", error);
     }
+
+  const colorCounts = pixels.reduce((acc, pixel) => {
+      acc[pixel.color] = (acc[pixel.color] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const mostUsedColor = Object.entries(colorCounts).reduce((a, b) => 
+      (a[1] > b[1] ? a : b))[0];
     
+    setFavoriteColor(mostUsedColor);
     setIsPlacingPixel(false);
     setSelectedPosition(null);
   };
@@ -121,7 +135,10 @@ export const CanvasProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       isPlacingPixel,
       setIsPlacingPixel,
       selectedPosition,
-      setSelectedPosition
+      setSelectedPosition,
+      totalPixelsPlaced: pixels.length,
+      startTime,
+      favoriteColor
     }}>
       {children}
     </CanvasContext.Provider>

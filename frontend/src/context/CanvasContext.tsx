@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { io, Socket } from "socket.io-client";
 
 interface Pixel {
   x: number;
@@ -10,7 +11,7 @@ interface CanvasContextType {
   pixels: Pixel[];
   selectedColor: string;
   setSelectedColor: (color: string) => void;
-  placePixel: (x: number, y: number, color: string) => void;
+  placePixel: (x: number, y: number, color: string) => Promise<void>;
   scale: number;
   setScale: React.Dispatch<React.SetStateAction<number>>;
   position: { x: number; y: number };
@@ -24,6 +25,8 @@ interface CanvasContextType {
 
 const CanvasContext = createContext<CanvasContextType | undefined>(undefined);
 
+const BACKEND_URL = "http://localhost:3001";
+
 export const CanvasProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [pixels, setPixels] = useState<Pixel[]>([]);
   const [selectedColor, setSelectedColor] = useState('#FF0000');
@@ -33,6 +36,48 @@ export const CanvasProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [selectedPosition, setSelectedPosition] = useState<{ x: number, y: number } | null>(null);
   const canvasSize = 1000;
   
+  // fetch the initial canvas state from the backend
+  useEffect(() => {
+    async function fetchInitialCanvas() {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/canvas`);
+        const data = await response.json();
+        setPixels(data.pixels || []);
+      } catch (error) {
+        console.error("Failed to fetch canvas state:", error);
+      }
+    }
+    fetchInitialCanvas();
+  }, []);
+
+  // handle WebSocket connection
+  useEffect(() => {
+    const socket: Socket = io(BACKEND_URL);
+
+    socket.on('connect', () => {
+      console.log('✅ Connected to backend via WebSocket');
+    });
+
+    socket.on('new_pixel', (newPixel: Pixel) => {
+      setPixels(prevPixels => {
+        const existingPixelIndex = prevPixels.findIndex(
+          (p) => p.x === newPixel.x && p.y === newPixel.y
+        );
+        if (existingPixelIndex !== -1) {
+          const updatedPixels = [...prevPixels];
+          updatedPixels[existingPixelIndex] = newPixel;
+          return updatedPixels;
+        } else {
+          return [...prevPixels, newPixel];
+        }
+      });
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+  
   useEffect(() => {
     setPosition({
       x: window.innerWidth / 2 - (canvasSize / 2) * scale,
@@ -40,17 +85,22 @@ export const CanvasProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     });
   }, []);
   
-  const placePixel = (x: number, y: number, color: string) => {
-    const existingPixelIndex = pixels.findIndex(
-      (pixel) => pixel.x === x && pixel.y === y
-    );
-    
-    if (existingPixelIndex !== -1) {
-      const updatedPixels = [...pixels];
-      updatedPixels[existingPixelIndex] = { ...updatedPixels[existingPixelIndex], color };
-      setPixels(updatedPixels);
-    } else {
-      setPixels([...pixels, { x, y, color }]);
+  const placePixel = async (x: number, y: number, color: string) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/place-pixel`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ x, y, color }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to place pixel');
+      }
+      
+    } catch (error) {
+      console.error("Error placing pixel:", error);
     }
     
     setIsPlacingPixel(false);

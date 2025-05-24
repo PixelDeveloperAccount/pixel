@@ -273,7 +273,7 @@ const Canvas: React.FC = () => {
         onWheel={handleWheel}
       />
       
-      {!isPlacingPixel && connected && (
+      {!isPlacingPixel && (
         <button
           onClick={() => setIsPlacingPixel(true)}
           className="fixed bottom-4 left-1/2 transform -translate-x-1/2 flex items-center space-x-2 bg-indigo-600 text-white px-5 py-3 text-lg rounded-lg shadow-lg hover:bg-indigo-700 transition-colors font-['Jersey_15']"

@@ -27,7 +27,9 @@ const ColorPalette: React.FC = () => {
     startCooldown, 
     pixelsRemaining,
     isOnCooldown,
-    cooldownTime
+    cooldownTime,
+    connected,
+    tokenBalance
   } = useWallet();
 
   const [timeLeft, setTimeLeft] = useState(cooldownTime);
@@ -41,6 +43,13 @@ const ColorPalette: React.FC = () => {
       return () => clearInterval(interval);
     }
   }, [isOnCooldown, cooldownTime]);
+
+  useEffect(() => {
+    if (connected && tokenBalance >= 5000) {
+      setTimeLeft(0);
+    }
+  }, [connected, tokenBalance]);
+
 
   if (!isPlacingPixel) return null;
 
@@ -79,7 +88,7 @@ const ColorPalette: React.FC = () => {
               />
             ))}
           </div>
-          {isOnCooldown && (
+          {isOnCooldown && (!connected || tokenBalance < 5000) && (
             <div className="absolute inset-0 flex items-center justify-center bg-white">
               <div className="flex items-center space-x-2 text-gray-900 font-['Jersey_15'] text-lg">
                 <Timer className="w-6 h-6 animate-pulse" />
@@ -90,7 +99,7 @@ const ColorPalette: React.FC = () => {
         </div>
 
         <div className="flex items-center space-x-2 ml-4">
-          {!isOnCooldown && (
+          {(!isOnCooldown || (connected && tokenBalance >= 5000)) && (
             <button
               onClick={handleConfirm}
               disabled={!selectedPosition}

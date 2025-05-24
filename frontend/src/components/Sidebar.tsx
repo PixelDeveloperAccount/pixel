@@ -112,7 +112,7 @@ const Sidebar: React.FC = () => {
               <h3 className="text-xl font-semibold mb-3 text-gray-900 font-['Jersey_15']">Social</h3>
               <div className="grid grid-cols-2 gap-3 font-['Jersey_15'] text-base">
                 <a 
-                  href="https://github.com" 
+                  href="https://github.com/PixelDeveloperAccount/pixel" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"

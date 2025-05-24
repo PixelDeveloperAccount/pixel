@@ -4,6 +4,9 @@ import {
   useConnection,
 } from '@solana/wallet-adapter-react';
 
+// Replace with your actual token mint
+const TOKEN_MINT = '';
+
 interface WalletContextType {
   connected: boolean;
   walletAddress: string | null;
@@ -28,7 +31,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const walletAddress = publicKey?.toBase58() || null;
 
   const [balance, setBalance] = useState(0);
-  const [tokenBalance, setTokenBalance] = useState(0); // not used yet
+  const [tokenBalance, setTokenBalance] = useState(0);
   const [pixelsRemaining, setPixelsRemaining] = useState(0);
   const [isOnCooldown, setIsOnCooldown] = useState(false);
   const [cooldownTime, setCooldownTime] = useState(0);
@@ -43,12 +46,25 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   useEffect(() => {
     if (connected && publicKey) {
+      // Fetch SOL balance
       connection.getBalance(publicKey).then(lamports => {
         const sol = lamports / 1e9;
         setBalance(sol);
         setPixelsRemaining(calculateQuota(sol));
         setCooldownTime(calculateCooldown(sol));
       });
+
+      // Fetch token balance from backend
+      (async () => {
+        try {
+          const response = await fetch(`http://localhost:3001/api/owns-token/${walletAddress}?mint=${TOKEN_MINT}`);
+          const data = await response.json();
+          setTokenBalance(data.tokenBalance || 0);
+        } catch (error) {
+          console.error('Error fetching token balance:', error);
+          setTokenBalance(0);
+        }
+      })();
     }
   }, [connected, publicKey, connection]);
 

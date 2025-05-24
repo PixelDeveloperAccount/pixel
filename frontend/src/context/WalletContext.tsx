@@ -1,4 +1,8 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import {
+  useWallet as useSolanaWallet,
+  useConnection,
+} from '@solana/wallet-adapter-react';
 
 interface WalletContextType {
   connected: boolean;
@@ -18,10 +22,13 @@ interface WalletContextType {
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
 
 export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [connected, setConnected] = useState(false);
-  const [walletAddress, setWalletAddress] = useState<string | null>(null);
+  const { publicKey, connected, connect, disconnect } = useSolanaWallet();
+  const { connection } = useConnection();
+
+  const walletAddress = publicKey?.toBase58() || null;
+
   const [balance, setBalance] = useState(0);
-  const [tokenBalance, setTokenBalance] = useState(0);
+  const [tokenBalance, setTokenBalance] = useState(0); // not used yet
   const [pixelsRemaining, setPixelsRemaining] = useState(0);
   const [isOnCooldown, setIsOnCooldown] = useState(false);
   const [cooldownTime, setCooldownTime] = useState(0);
@@ -34,28 +41,23 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     return Math.max(15, 60 - Math.floor(balance / 10) * 5);
   };
 
+  useEffect(() => {
+    if (connected && publicKey) {
+      connection.getBalance(publicKey).then(lamports => {
+        const sol = lamports / 1e9;
+        setBalance(sol);
+        setPixelsRemaining(calculateQuota(sol));
+        setCooldownTime(calculateCooldown(sol));
+      });
+    }
+  }, [connected, publicKey, connection]);
+
   const connectWallet = () => {
-    const randomBalance = Math.floor(Math.random() * 1000) / 10;
-    const randomTokens = Math.floor(Math.random() * 1000000);
-    const randomAddress = `solana${Math.random().toString(36).substring(2, 15)}`;
-    
-    setTimeout(() => {
-      setConnected(true);
-      setWalletAddress(randomAddress);
-      setBalance(randomBalance);
-      setTokenBalance(randomTokens);
-      setPixelsRemaining(calculateQuota(randomBalance));
-      setCooldownTime(calculateCooldown(randomBalance));
-    }, 500);
+    connect().catch(console.error);
   };
 
   const disconnectWallet = () => {
-    setConnected(false);
-    setWalletAddress(null);
-    setBalance(0);
-    setTokenBalance(0);
-    setPixelsRemaining(0);
-    setIsOnCooldown(false);
+    disconnect();
   };
 
   const decrementPixels = () => {
@@ -65,7 +67,6 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const startCooldown = () => {
     if (!isOnCooldown && connected) {
       setIsOnCooldown(true);
-      
       let timeLeft = cooldownTime;
       const interval = setInterval(() => {
         timeLeft -= 1;

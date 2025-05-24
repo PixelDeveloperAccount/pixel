@@ -125,11 +125,11 @@ const Sidebar: React.FC = () => {
                 </a>
               </div>
             </div>
-          </div>
-        </div>
 
-        <div className="p-4 border-t border-gray-100">
-          <ConnectButton />
+            <div className="mt-4">
+              <ConnectButton />
+            </div>
+          </div>
         </div>
       </div>
     </>

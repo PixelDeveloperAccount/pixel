@@ -28,6 +28,21 @@ const Canvas: React.FC = () => {
   const [hoveredPixel, setHoveredPixel] = useState<{ x: number, y: number } | null>(null);
   const [showHelp, setShowHelp] = useState(false);
 
+  const boundPosition = (newPosition: { x: number, y: number }) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return newPosition;
+
+    const maxPanX = canvas.width;
+    const maxPanY = canvas.height;
+    const minPanX = -canvasSize * scale;
+    const minPanY = -canvasSize * scale;
+
+    return {
+      x: Math.min(maxPanX, Math.max(minPanX, newPosition.x)),
+      y: Math.min(maxPanY, Math.max(minPanY, newPosition.y))
+    };
+  };
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -155,11 +170,12 @@ const Canvas: React.FC = () => {
       const dx = e.clientX - startDragPosition.x;
       const dy = e.clientY - startDragPosition.y;
       
-      setPosition(prev => ({
-        x: prev.x + dx,
-        y: prev.y + dy
-      }));
+      const newPosition = boundPosition({
+        x: position.x + dx,
+        y: position.y + dy
+      });
       
+      setPosition(newPosition);
       setStartDragPosition({ x: e.clientX, y: e.clientY });
     } else {
       const rect = canvas.getBoundingClientRect();
@@ -210,10 +226,12 @@ const Canvas: React.FC = () => {
       const newScreenX = mouseX - worldX * newScale;
       const newScreenY = mouseY - worldY * newScale;
       
-      setPosition({
+      const boundedPosition = boundPosition({
         x: newScreenX,
         y: newScreenY
       });
+      
+      setPosition(boundedPosition);
       setScale(newScale);
     }
   };

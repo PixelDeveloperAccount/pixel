@@ -61,9 +61,9 @@ const ColorPalette: React.FC = () => {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 p-4 bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-1px_rgba(0,0,0,0.06)]">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <div className="relative flex-1 overflow-x-auto py-2">
-          <div className="flex gap-1 min-w-max">
+      <div className="max-w-7xl mx-auto flex items-center">
+        <div className="flex-1 flex justify-center relative">
+          <div className="flex gap-1">
             {colors.map((color) => (
               <button
                 key={color}
@@ -81,8 +81,8 @@ const ColorPalette: React.FC = () => {
           </div>
           {isOnCooldown && (
             <div className="absolute inset-0 flex items-center justify-center bg-white">
-              <div className="flex items-center space-x-2 text-gray-900 font-medium">
-                <Timer className="w-5 h-5 animate-pulse" />
+              <div className="flex items-center space-x-2 text-gray-900 font-['Jersey_15'] text-lg">
+                <Timer className="w-6 h-6 animate-pulse" />
                 <span>{timeLeft}s</span>
               </div>
             </div>
@@ -94,20 +94,20 @@ const ColorPalette: React.FC = () => {
             <button
               onClick={handleConfirm}
               disabled={!selectedPosition}
-              className={`p-2 rounded-full transition-colors ${
+              className={`p-3 rounded-full transition-colors ${
                 selectedPosition
                   ? 'bg-gray-100 hover:bg-gray-200 text-gray-900'
                   : 'bg-gray-100 text-gray-400 cursor-not-allowed'
               }`}
             >
-              <Check className="w-6 h-6" />
+              <Check className="w-7 h-7" />
             </button>
           )}
           <button
             onClick={handleCancel}
-            className="p-2 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-full transition-colors"
+            className="p-3 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-full transition-colors"
           >
-            <X className="w-6 h-6" />
+            <X className="w-7 h-7" />
           </button>
         </div>
       </div>

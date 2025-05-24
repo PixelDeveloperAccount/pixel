@@ -10,19 +10,19 @@ const Header: React.FC = () => {
     <header className="backdrop-blur-md bg-gray-900/80 shadow-md py-3 px-4 sm:px-6">
       <div className="container mx-auto flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <Palette className="text-purple-400 h-6 w-6" />
-          <h1 className="text-xl font-bold">PixelChain</h1>
+          <Palette className="text-purple-400 h-7 w-7" />
+          <h1 className="text-2xl font-bold font-['Jersey_15']">PixelChain</h1>
         </div>
         
         <div className="flex items-center space-x-4">
           {connected ? (
-            <div className="hidden sm:flex items-center space-x-4 text-sm text-gray-300">
+            <div className="hidden sm:flex items-center space-x-4 text-base text-gray-300 font-['Jersey_15']">
               <div className="flex items-center space-x-1">
-                <MousePointer className="h-4 w-4" />
+                <MousePointer className="h-5 w-5" />
                 <span>Pixels: 5 available</span>
               </div>
               <div className="flex items-center space-x-1">
-                <Wallet className="h-4 w-4" />
+                <Wallet className="h-5 w-5" />
                 <span>Balance: 100 SOL</span>
               </div>
             </div>

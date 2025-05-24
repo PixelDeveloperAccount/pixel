@@ -27,36 +27,36 @@ const UserInfo: React.FC = () => {
   if (!connected) {
     return (
       <div className="bg-gray-50 rounded-lg p-4">
-        <p className="text-gray-500 text-sm text-center">Connect wallet to see your info</p>
+        <p className="text-gray-500 text-lg text-center font-['Jersey_15']">Connect wallet to see your info</p>
       </div>
     );
   }
   
   return (
     <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-      <h3 className="text-lg font-semibold text-gray-900">Your Info</h3>
+      <h3 className="text-xl font-semibold text-gray-900 font-['Jersey_15']">Your Info</h3>
       
-      <div className="space-y-3">
+      <div className="space-y-3 font-['Jersey_15'] text-base">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2 text-gray-600">
-            <Coins className="h-4 w-4" />
-            <span className="text-sm">PIXEL Balance:</span>
+            <Coins className="h-5 w-5" />
+            <span>PIXEL Balance:</span>
           </div>
-          <span className="text-sm font-medium text-gray-900">{tokenBalance.toLocaleString()}</span>
+          <span className="font-medium text-gray-900">{tokenBalance.toLocaleString()}</span>
         </div>
         
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2 text-gray-600">
-            <MousePointer className="h-4 w-4" />
-            <span className="text-sm">Available Pixels:</span>
+            <MousePointer className="h-5 w-5" />
+            <span>Available Pixels:</span>
           </div>
-          <span className="text-sm font-medium text-gray-900">{pixelsRemaining} / {pixelQuota}</span>
+          <span className="font-medium text-gray-900">{pixelsRemaining} / {pixelQuota}</span>
         </div>
         
         {isOnCooldown && (
           <div className="flex items-center justify-center space-x-2 text-orange-600 mt-2">
-            <Timer className="h-4 w-4" />
-            <span className="text-sm font-medium">{timeLeft}s</span>
+            <Timer className="h-5 w-5" />
+            <span className="font-medium">{timeLeft}s</span>
           </div>
         )}
       </div>

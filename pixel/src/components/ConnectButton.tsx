@@ -12,13 +12,13 @@ const ConnectButton: React.FC = () => {
   return (
     <button
       onClick={connected ? disconnectWallet : connectWallet}
-      className={`w-full flex items-center justify-center space-x-2 px-4 py-3 rounded-lg transition-all ${
+      className={`w-full flex items-center justify-center space-x-2 px-5 py-3 rounded-lg transition-all text-lg font-['Jersey_15'] ${
         connected 
           ? 'bg-green-600 hover:bg-green-700 text-white' 
           : 'bg-indigo-600 hover:bg-indigo-700 text-white'
       }`}
     >
-      <Wallet className="h-4 w-4" />
+      <Wallet className="h-5 w-5" />
       <span>
         {connected 
           ? shortenAddress(walletAddress || '') 
@@ -28,4 +28,4 @@ const ConnectButton: React.FC = () => {
   );
 };
 
-export default ConnectButton
+export default ConnectButton;

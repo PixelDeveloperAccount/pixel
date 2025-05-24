@@ -35,42 +35,68 @@ const Canvas: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    ctx.fillStyle = '#ffffff';
+    // Fill the entire canvas with the specified background color
+    ctx.fillStyle = '#333333';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+    // Draw white border around the grid area
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(
+      position.x - 1,
+      position.y - 1,
+      canvasSize * scale + 2,
+      canvasSize * scale + 2
+    );
+
+    // Draw the white grid area
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(
+      position.x,
+      position.y,
+      canvasSize * scale,
+      canvasSize * scale
+    );
+
+    // Draw grid lines
+    ctx.strokeStyle = '#e5e7eb';
+    ctx.lineWidth = 0.5;
+    
     const startX = Math.floor(-position.x / scale);
     const startY = Math.floor(-position.y / scale);
     const endX = Math.ceil((canvas.width - position.x) / scale);
     const endY = Math.ceil((canvas.height - position.y) / scale);
 
-    ctx.strokeStyle = '#e5e7eb';
-    ctx.lineWidth = 0.5;
-    
     for (let x = startX; x <= endX; x++) {
       const screenX = position.x + x * scale;
-      ctx.beginPath();
-      ctx.moveTo(screenX, 0);
-      ctx.lineTo(screenX, canvas.height);
-      ctx.stroke();
+      if (screenX >= position.x && screenX <= position.x + canvasSize * scale) {
+        ctx.beginPath();
+        ctx.moveTo(screenX, position.y);
+        ctx.lineTo(screenX, position.y + canvasSize * scale);
+        ctx.stroke();
+      }
     }
     
     for (let y = startY; y <= endY; y++) {
       const screenY = position.y + y * scale;
-      ctx.beginPath();
-      ctx.moveTo(0, screenY);
-      ctx.lineTo(canvas.width, screenY);
-      ctx.stroke();
+      if (screenY >= position.y && screenY <= position.y + canvasSize * scale) {
+        ctx.beginPath();
+        ctx.moveTo(position.x, screenY);
+        ctx.lineTo(position.x + canvasSize * scale, screenY);
+        ctx.stroke();
+      }
     }
 
+    // Draw placed pixels
     pixels.forEach(({ x, y, color }) => {
       const screenX = position.x + x * scale;
       const screenY = position.y + y * scale;
       
       if (
-        screenX + scale >= 0 && 
-        screenX <= canvas.width && 
-        screenY + scale >= 0 && 
-        screenY <= canvas.height
+        screenX + scale >= position.x && 
+        screenX <= position.x + canvasSize * scale && 
+        screenY + scale >= position.y && 
+        screenY <= position.y + canvasSize * scale
       ) {
         ctx.fillStyle = color;
         ctx.fillRect(screenX, screenY, scale, scale);
@@ -97,7 +123,7 @@ const Canvas: React.FC = () => {
       ctx.lineWidth = 2;
       ctx.strokeRect(screenX, screenY, scale, scale);
     }
-  }, [pixels, scale, position, hoveredPixel, selectedPosition, selectedColor, isPlacingPixel]);
+  }, [pixels, scale, position, hoveredPixel, selectedPosition, selectedColor, isPlacingPixel, canvasSize]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -147,7 +173,11 @@ const Canvas: React.FC = () => {
         gridX >= 0 && 
         gridX < canvasSize && 
         gridY >= 0 && 
-        gridY < canvasSize
+        gridY < canvasSize &&
+        x >= position.x &&
+        x <= position.x + canvasSize * scale &&
+        y >= position.y &&
+        y <= position.y + canvasSize * scale
       ) {
         setHoveredPixel({ x: gridX, y: gridY });
       } else {
@@ -164,7 +194,7 @@ const Canvas: React.FC = () => {
     e.preventDefault();
     
     const delta = e.deltaY > 0 ? 0.9 : 1.1;
-    const newScale = Math.max(1, Math.min(50, scale * delta));
+    const newScale = Math.max(0.1, Math.min(50, scale * delta));
     
     if (newScale !== scale) {
       const canvas = canvasRef.current;
@@ -191,25 +221,26 @@ const Canvas: React.FC = () => {
   return (
     <div 
       ref={containerRef}
-      className="absolute inset-0 overflow-hidden bg-white"
+      className="absolute inset-0 overflow-hidden"
+      style={{ backgroundColor: '#333333' }}
       onContextMenu={(e) => e.preventDefault()}
     >
-      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 flex items-center space-x-4 bg-gray-900/10 text-gray-900 px-4 py-2 rounded-lg shadow-lg backdrop-blur-sm z-10">
+      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 flex items-center space-x-4 bg-white px-4 py-2 rounded-lg shadow-lg z-10">
         {hoveredPixel && isPlacingPixel && (
-          <div className="text-sm">
+          <div className="text-base text-gray-900 font-['Jersey_15']">
             ({hoveredPixel.x}, {hoveredPixel.y})
           </div>
         )}
-        <div className="text-sm">
+        <div className="text-base text-gray-900 font-['Jersey_15']">
           {Math.round(scale * 10) / 10}x
         </div>
       </div>
 
       <button
         onClick={() => setShowHelp(true)}
-        className="absolute top-4 right-4 z-50 p-2 rounded-lg bg-gray-900/10 hover:bg-gray-900/20 transition-colors backdrop-blur-sm text-gray-900"
+        className="absolute top-4 right-4 z-50 p-2 rounded-lg bg-white hover:bg-gray-100 transition-colors text-gray-900"
       >
-        <HelpCircle className="h-6 w-6" />
+        <HelpCircle className="h-7 w-7" />
       </button>
 
       {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
@@ -227,9 +258,9 @@ const Canvas: React.FC = () => {
       {!isPlacingPixel && connected && (
         <button
           onClick={() => setIsPlacingPixel(true)}
-          className="fixed bottom-4 left-1/2 transform -translate-x-1/2 flex items-center space-x-2 bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-indigo-700 transition-colors"
+          className="fixed bottom-4 left-1/2 transform -translate-x-1/2 flex items-center space-x-2 bg-indigo-600 text-white px-5 py-3 text-lg rounded-lg shadow-lg hover:bg-indigo-700 transition-colors font-['Jersey_15']"
         >
-          <MousePointer className="w-4 h-4" />
+          <MousePointer className="w-5 h-5" />
           <span>Place Pixel</span>
         </button>
       )}

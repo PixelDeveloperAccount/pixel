@@ -19,9 +19,9 @@ const Sidebar: React.FC = () => {
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-gray-900/10 hover:bg-gray-900/20 transition-colors backdrop-blur-sm text-gray-900"
+        className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-white hover:bg-gray-100 transition-colors text-gray-900"
       >
-        <Menu className="h-6 w-6" />
+        <Menu className="h-7 w-7" />
       </button>
 
       <div className={`fixed top-0 left-0 h-full w-72 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-40 flex flex-col ${
@@ -29,14 +29,14 @@ const Sidebar: React.FC = () => {
       }`}>
         <div className="flex items-center justify-center p-6 border-b border-gray-100">
           <div className="flex items-center space-x-2">
-            <Palette className="text-indigo-600 h-6 w-6" />
-            <h1 className="text-xl font-bold text-gray-900">PIXEL</h1>
+            <Palette className="text-indigo-600 h-7 w-7" />
+            <h1 className="text-2xl font-bold text-gray-900 font-['Jersey_15']">PIXEL</h1>
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto">
           <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-white">
-            <code className="text-sm text-gray-600 flex-1 font-mono truncate">
+            <code className="text-base text-gray-600 flex-1 font-mono truncate font-['Jersey_15']">
               {CONTRACT_ADDRESS}
             </code>
             <button
@@ -45,9 +45,9 @@ const Sidebar: React.FC = () => {
               title="Copy address"
             >
               {copied ? (
-                <Check className="w-4 h-4 text-green-500" />
+                <Check className="w-5 h-5 text-green-500" />
               ) : (
-                <Copy className="w-4 h-4" />
+                <Copy className="w-5 h-5" />
               )}
             </button>
           </div>
@@ -56,29 +56,29 @@ const Sidebar: React.FC = () => {
             <UserInfo />
             
             <div className="bg-gray-50 rounded-lg p-4">
-              <h3 className="text-lg font-semibold mb-3 text-gray-900">Stats</h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-sm">
+              <h3 className="text-xl font-semibold mb-3 text-gray-900 font-['Jersey_15']">Stats</h3>
+              <div className="space-y-3 font-['Jersey_15'] text-base">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2 text-gray-600">
-                    <MousePointer className="h-4 w-4" />
+                    <MousePointer className="h-5 w-5" />
                     <span>Total Pixels Placed:</span>
                   </div>
                   <span className="font-medium text-gray-900">1,234</span>
                 </div>
-                <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2 text-gray-600">
-                    <Clock className="h-4 w-4" />
+                    <Clock className="h-5 w-5" />
                     <span>Time Spent:</span>
                   </div>
                   <span className="font-medium text-gray-900">2.5 hours</span>
                 </div>
-                <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2 text-gray-600">
-                    <Palette className="h-4 w-4" />
+                    <Palette className="h-5 w-5" />
                     <span>Favorite Color:</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <div className="w-4 h-4 rounded-full bg-indigo-600"></div>
+                    <div className="w-5 h-5 rounded-full bg-indigo-600"></div>
                     <span className="font-medium text-gray-900">#4F46E5</span>
                   </div>
                 </div>
@@ -86,8 +86,8 @@ const Sidebar: React.FC = () => {
             </div>
 
             <div className="bg-gray-50 rounded-lg p-4">
-              <h3 className="text-lg font-semibold mb-3 text-gray-900">Social</h3>
-              <div className="grid grid-cols-2 gap-3">
+              <h3 className="text-xl font-semibold mb-3 text-gray-900 font-['Jersey_15']">Social</h3>
+              <div className="grid grid-cols-2 gap-3 font-['Jersey_15'] text-base">
                 <a 
                   href="https://github.com" 
                   target="_blank" 
@@ -95,7 +95,7 @@ const Sidebar: React.FC = () => {
                   className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
                 >
                   <Github className="h-5 w-5" />
-                  <span className="text-sm">GitHub</span>
+                  <span>GitHub</span>
                 </a>
                 <a 
                   href="https://twitter.com" 
@@ -104,7 +104,7 @@ const Sidebar: React.FC = () => {
                   className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
                 >
                   <Twitter className="h-5 w-5" />
-                  <span className="text-sm">Twitter</span>
+                  <span>Twitter</span>
                 </a>
                 <a 
                   href="https://t.me" 
@@ -113,7 +113,7 @@ const Sidebar: React.FC = () => {
                   className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
                 >
                   <MessageCircle className="h-5 w-5" />
-                  <span className="text-sm">Telegram</span>
+                  <span>Telegram</span>
                 </a>
                 <a 
                   href="/docs" 
@@ -121,7 +121,7 @@ const Sidebar: React.FC = () => {
                   className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
                 >
                   <BookOpen className="h-5 w-5" />
-                  <span className="text-sm">Docs</span>
+                  <span>Docs</span>
                 </a>
               </div>
             </div>

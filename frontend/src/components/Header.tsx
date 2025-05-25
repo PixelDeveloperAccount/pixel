@@ -4,7 +4,7 @@ import { useWallet } from '../context/WalletContext';
 import ConnectButton from './ConnectButton';
 
 const Header: React.FC = () => {
-  const { connected } = useWallet();
+  const { connected, tokenBalance, pixelQuota } = useWallet();
 
   return (
     <header className="backdrop-blur-md bg-gray-900/80 shadow-md py-3 px-4 sm:px-6">
@@ -15,18 +15,18 @@ const Header: React.FC = () => {
         </div>
         
         <div className="flex items-center space-x-4">
-          {connected ? (
-            <div className="hidden sm:flex items-center space-x-4 text-base text-gray-300 font-['Jersey_15']">
-              <div className="flex items-center space-x-1">
-                <MousePointer className="h-5 w-5" />
-                <span>Pixels: 5 available</span>
-              </div>
+          <div className="hidden sm:flex items-center space-x-4 text-base text-gray-300 font-['Jersey_15']">
+            <div className="flex items-center space-x-1">
+              <MousePointer className="h-5 w-5" />
+              <span>Pixels: {pixelQuota} available</span>
+            </div>
+            {connected && (
               <div className="flex items-center space-x-1">
                 <Wallet className="h-5 w-5" />
-                <span>Balance: 100 SOL</span>
+                <span>Tokens: {tokenBalance.toLocaleString()}</span>
               </div>
-            </div>
-          ) : null}
+            )}
+          </div>
           <ConnectButton />
         </div>
       </div>

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import {
   useWallet as useSolanaWallet,
   useConnection,
@@ -32,16 +32,28 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const [balance, setBalance] = useState(0);
   const [tokenBalance, setTokenBalance] = useState(0);
-  const [pixelsRemaining, setPixelsRemaining] = useState(0);
+  const [pixelsRemaining, setPixelsRemaining] = useState(1);
   const [isOnCooldown, setIsOnCooldown] = useState(false);
-  const [cooldownTime, setCooldownTime] = useState(0);
+  const [cooldownTime, setCooldownTime] = useState(300);
+  const cooldownIntervalRef = useRef<number>();
 
-  const calculateQuota = (balance: number) => {
-    return Math.floor(5 + (balance / 10));
+  const calculateQuota = (tokens: number) => {
+    if (!connected) return 1;
+    return Math.max(1, Math.floor(tokens / 5000)); 
   };
 
-  const calculateCooldown = (balance: number) => {
-    return Math.max(15, 60 - Math.floor(balance / 10) * 5);
+  const calculateCooldown = (tokens: number) => {
+    if (!connected) return 300; 
+    const reduction = Math.floor(tokens / 10000) * 10; 
+    return Math.max(60, 300 - reduction); 
+  };
+
+  const clearCooldown = () => {
+    if (cooldownIntervalRef.current) {
+      clearInterval(cooldownIntervalRef.current);
+      cooldownIntervalRef.current = undefined;
+    }
+    setIsOnCooldown(false);
   };
 
   useEffect(() => {
@@ -74,22 +86,33 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const disconnectWallet = () => {
     disconnect();
+    setPixelsRemaining(1);
+    setCooldownTime(300);
+    clearCooldown();
   };
 
   const decrementPixels = () => {
-    setPixelsRemaining(prev => Math.max(0, prev - 1));
+    setPixelsRemaining(prev => {
+      const newValue = Math.max(0, prev - 1);
+      // Only start cooldown if all pixels are used
+      if (newValue === 0) {
+        startCooldown();
+      }
+      return newValue;
+    });
   };
 
   const startCooldown = () => {
-    if (!isOnCooldown && connected) {
+    if (!isOnCooldown) {
       setIsOnCooldown(true);
+      
       let timeLeft = cooldownTime;
-      const interval = setInterval(() => {
+      cooldownIntervalRef.current = window.setInterval(() => {
         timeLeft -= 1;
         if (timeLeft <= 0) {
-          clearInterval(interval);
-          setIsOnCooldown(false);
-          setPixelsRemaining(calculateQuota(balance));
+          clearCooldown();
+          const quota = connected ? calculateQuota(tokenBalance) : 1;
+          setPixelsRemaining(quota);
         }
       }, 1000);
     }

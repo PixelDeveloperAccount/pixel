@@ -50,7 +50,7 @@ function App() {
                     // }
 
                     // Base classes for the toast - updated for compactness
-                    const baseToastClasses = "bg-white text-gray-800 p-2.5 rounded-md shadow-md flex items-center border border-gray-200 font-['Jersey_15'] text-xl min-w-[220px] max-w-xs";
+                    const baseToastClasses = "bg-white text-gray-800 p-2.5 rounded-md shadow-md flex items-center border border-gray-200 font-['Pixelify_Sans'] text-l min-w-[220px] max-w-xs";
                     // Animation classes based on visibility
                     const animationClasses = t.visible
                       ? 'animate-enter' // react-hot-toast provides these classes for transitions

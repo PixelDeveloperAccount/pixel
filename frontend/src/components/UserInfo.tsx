@@ -38,7 +38,7 @@ const UserInfo: React.FC = () => {
       
       <div className="space-y-3 font-['Jersey_15'] text-base">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2 text-gray-600">
+          <div className="flex items-center space-x-2 text-gray-900">
             <img 
               src="https://unpkg.com/pixelarticons@1.8.1/svg/wallet.svg" 
               alt="Menu" 
@@ -50,7 +50,7 @@ const UserInfo: React.FC = () => {
         </div>
         
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2 text-gray-600">
+          <div className="flex items-center space-x-2 text-gray-900">
             <img 
               src="https://unpkg.com/pixelarticons@1.8.1/svg/checkbox-on.svg" 
               alt="Menu" 

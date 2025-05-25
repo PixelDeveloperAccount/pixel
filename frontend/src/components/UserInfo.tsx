@@ -27,16 +27,16 @@ const UserInfo: React.FC = () => {
   if (!connected) {
     return (
       <div className="bg-gray-50 rounded-lg p-4">
-        <p className="text-gray-500 text-lg text-center font-['Jersey_15']">Connect wallet to see your info</p>
+        <p className="text-gray-500 text-lg text-center font-['Pixelify_Sans']">Connect wallet to see your info</p>
       </div>
     );
   }
   
   return (
     <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-      <h3 className="text-xl font-semibold text-gray-900 font-['Jersey_15']">Your Info</h3>
+      <h3 className="text-xl font-semibold text-gray-900 font-['Pixelify_Sans']">Your Info</h3>
       
-      <div className="space-y-3 font-['Jersey_15'] text-base">
+      <div className="space-y-3 font-['Pixelify_Sans'] text-base">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2 text-gray-900">
             <img 

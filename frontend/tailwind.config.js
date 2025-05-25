@@ -7,7 +7,7 @@ export default {
         '16': 'repeat(16, minmax(0, 1fr))',
       },
       fontFamily: {
-        sans: ['Jersey 15', 'sans-serif'],
+        sans: ['"Pixelify Sans"', 'sans-serif'],
       },
     },
   },

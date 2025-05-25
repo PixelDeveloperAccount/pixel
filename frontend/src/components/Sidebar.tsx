@@ -58,17 +58,12 @@ const Sidebar: React.FC = () => {
         </div>
 
         <div className="flex-1 overflow-y-auto">
-<<<<<<< HEAD
-          <div className="p-4 border-b border-gray-100">
+          <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-white">
             <code
               onClick={handleCopy}
               title="Click to copy contract address"
               className="text-base text-gray-700 w-full block text-center font-mono truncate font-['Jersey_15'] cursor-pointer hover:text-indigo-600 transition-colors py-2"
             >
-=======
-          <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-white">
-            <code className="text-base text-gray-600 flex-1 font-mono truncate font-['Pixelify_Sans']">
->>>>>>> 30f8e4202370949929bfc5bedd8bbc36b7d5c673
               {CONTRACT_ADDRESS}
             </code>
           </div>
@@ -128,19 +123,11 @@ const Sidebar: React.FC = () => {
             </div>
 
             <div className="bg-gray-50 rounded-lg p-4">
-<<<<<<< HEAD
-              <h3 className="text-xl font-semibold mb-3 text-gray-900 font-['Jersey_15']">Social</h3>
-              <div className="grid grid-cols-2 gap-3 font-['Jersey_15'] text-base">
-                <a
-                  href="https://github.com/PixelDeveloperAccount/pixel"
-                  target="_blank"
-=======
               <h3 className="text-xl font-semibold mb-3 text-gray-900 font-['Pixelify_Sans']">Social</h3>
               <div className="grid grid-cols-2 gap-3 font-['Pixelify_Sans'] text-base">
                 <a 
                   href="https://github.com/PixelDeveloperAccount/pixel" 
                   target="_blank" 
->>>>>>> 30f8e4202370949929bfc5bedd8bbc36b7d5c673
                   rel="noopener noreferrer"
                   className="flex items-center space-x-2 text-gray-900 hover:text-gray-600 transition-colors"
                 >

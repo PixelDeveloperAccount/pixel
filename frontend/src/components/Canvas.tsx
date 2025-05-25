@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useCanvas } from '../context/CanvasContext';
 import { useWallet } from '../context/WalletContext';
-import { MousePointer, HelpCircle } from 'lucide-react';
+import { MousePointer } from 'lucide-react';
 import HelpModal from './HelpModal';
 
 const Canvas: React.FC = () => {
@@ -256,9 +256,13 @@ const Canvas: React.FC = () => {
 
       <button
         onClick={() => setShowHelp(true)}
-        className="absolute top-4 right-4 z-50 p-2 rounded-lg bg-white hover:bg-gray-100 transition-colors text-gray-900"
+        className="absolute top-4 right-4 z-50 p-2 rounded-lg bg-white hover:bg-gray-100 transition-colors text-gray-900 shadow-lg"
       >
-        <HelpCircle className="h-7 w-7" />
+        <img 
+          src="https://unpkg.com/pixelarticons@1.8.1/svg/info-box.svg" 
+          alt="Help" 
+          className="h-7 w-7" 
+        />
       </button>
 
       {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
@@ -278,7 +282,11 @@ const Canvas: React.FC = () => {
           onClick={() => setIsPlacingPixel(true)}
           className="fixed bottom-4 left-1/2 transform -translate-x-1/2 flex items-center space-x-2 bg-indigo-600 text-white px-5 py-3 text-lg rounded-lg shadow-lg hover:bg-indigo-700 transition-colors font-['Jersey_15']"
         >
-          <MousePointer className="w-5 h-5" />
+          <img 
+          src="https://unpkg.com/pixelarticons@1.8.1/svg/add-box.svg" 
+          alt="Place" 
+          className="h-7 w-7 filter brightness-0 invert" 
+        />
           <span>Place Pixel</span>
         </button>
       )}

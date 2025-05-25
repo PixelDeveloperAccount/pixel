@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, Palette, Github, Twitter, BookOpen, MessageCircle, Copy, Check, MousePointer, Clock } from 'lucide-react';
+import { Palette, Github, Twitter, BookOpen, MessageCircle, Check, MousePointer, Clock } from 'lucide-react';
 import UserInfo from './UserInfo';
 import ConnectButton from './ConnectButton';
 import { useCanvas } from '../context/CanvasContext';
@@ -33,9 +33,17 @@ const Sidebar: React.FC = () => {
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-white hover:bg-gray-100 transition-colors text-gray-900"
+        // MODIFIED: Both the background and shadow are now conditional.
+        // The hover effect is also slightly changed for when the sidebar is open.
+        className={`fixed top-4 left-4 z-50 p-2 rounded-lg transition-all duration-300 text-gray-900 ${
+          !isOpen ? 'bg-white shadow-lg hover:bg-gray-100' : 'hover:bg-gray-900/10'
+        }`}
       >
-        <Menu className="h-7 w-7" />
+        <img 
+          src="https://unpkg.com/pixelarticons@1.8.1/svg/menu.svg" 
+          alt="Menu" 
+          className="h-7 w-7" 
+        />
       </button>
 
       <div className={`fixed top-0 left-0 h-full w-72 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-40 flex flex-col ${
@@ -61,7 +69,11 @@ const Sidebar: React.FC = () => {
               {copied ? (
                 <Check className="w-5 h-5 text-green-500" />
               ) : (
-                <Copy className="w-5 h-5" />
+                <img 
+                  src="https://unpkg.com/pixelarticons@1.8.1/svg/copy.svg" 
+                  alt="Copy" 
+                  className="h-5 w-5" 
+                />
               )}
             </button>
           </div>

@@ -7,7 +7,7 @@ const StatusBar: React.FC = () => {
   
   return (
     <footer className="backdrop-blur-md bg-gray-900/80 border-t border-gray-700 py-3 px-4 text-base text-gray-400">
-      <div className="container mx-auto flex justify-between items-center font-['Jersey_15']">
+      <div className="container mx-auto flex justify-between items-center font-['Pixelify_Sans']">
         <div className="flex items-center space-x-4">
           <div className="flex items-center">
             <div className="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></div>

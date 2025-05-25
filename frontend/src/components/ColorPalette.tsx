@@ -90,7 +90,7 @@ const ColorPalette: React.FC = () => {
           </div>
           {isOnCooldown && (!connected || tokenBalance < 5000) && (
             <div className="absolute inset-0 flex items-center justify-center bg-white">
-              <div className="flex items-center space-x-2 text-gray-900 font-['Jersey_15'] text-lg">
+              <div className="flex items-center space-x-2 text-gray-900 font-['Pixelify_Sans'] text-lg">
                 <img 
                   src="https://unpkg.com/pixelarticons@1.8.1/svg/clock.svg" 
                   alt="Place" 

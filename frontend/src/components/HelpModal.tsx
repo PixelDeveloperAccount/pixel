@@ -9,9 +9,9 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white rounded-xl shadow-xl p-6 max-w-lg w-full mx-4">
-        <h2 className="text-3xl font-bold text-gray-900 mb-4 font-['Jersey_15']">Welcome to PIXEL</h2>
+        <h2 className="text-3xl font-bold text-gray-900 mb-4 font-['Pixelify_Sans']">Welcome to PIXEL</h2>
         
-        <div className="space-y-4 text-gray-600 font-['Jersey_15'] text-lg">
+        <div className="space-y-4 text-gray-600 font-['Pixelify_Sans'] text-lg">
           <div>
             <h3 className="font-semibold text-gray-900 mb-2 text-xl">Controls</h3>
             <ul className="list-disc list-inside space-y-2">
@@ -47,7 +47,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
 
         <button
           onClick={onClose}
-          className="mt-6 w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors font-['Jersey_15'] text-lg"
+          className="mt-6 w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors font-['Pixelify_Sans'] text-lg"
         >
           Let's Start!
         </button>

@@ -245,11 +245,11 @@ const Canvas: React.FC = () => {
     >
       <div className="absolute top-4 left-1/2 transform -translate-x-1/2 flex items-center space-x-4 bg-white px-4 py-2 rounded-lg shadow-lg z-10">
         {hoveredPixel && isPlacingPixel && (
-          <div className="text-base text-gray-900 font-['Jersey_15']">
+          <div className="text-base text-gray-900 font-['Pixelify_Sans']">
             ({hoveredPixel.x}, {hoveredPixel.y})
           </div>
         )}
-        <div className="text-base text-gray-900 font-['Jersey_15']">
+        <div className="text-base text-gray-900 font-['Pixelify_Sans']">
           {Math.round(scale * 10) / 10}x
         </div>
       </div>
@@ -280,7 +280,7 @@ const Canvas: React.FC = () => {
       {!isPlacingPixel && (
         <button
           onClick={() => setIsPlacingPixel(true)}
-          className="fixed bottom-4 left-1/2 transform -translate-x-1/2 flex items-center space-x-2 bg-indigo-600 text-white px-5 py-3 text-lg rounded-lg shadow-lg hover:bg-indigo-700 transition-colors font-['Jersey_15']"
+          className="fixed bottom-4 left-1/2 transform -translate-x-1/2 flex items-center space-x-2 bg-indigo-600 text-white px-5 py-3 text-lg rounded-lg shadow-lg hover:bg-indigo-700 transition-colors font-['Pixelify_Sans']"
         >
           <img 
           src="https://unpkg.com/pixelarticons@1.8.1/svg/add-box.svg" 

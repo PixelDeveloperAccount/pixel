@@ -50,13 +50,13 @@ const Sidebar: React.FC = () => {
         <div className="flex items-center justify-center p-6 border-b border-gray-100">
           <div className="flex items-center space-x-2">
             <Palette className="text-indigo-600 h-7 w-7" />
-            <h1 className="text-2xl font-bold text-gray-900 font-['Jersey_15']">PIXEL</h1>
+            <h1 className="text-2xl font-bold text-gray-900 font-['Pixelify_Sans']">PIXEL</h1>
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto">
           <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-white">
-            <code className="text-base text-gray-600 flex-1 font-mono truncate font-['Jersey_15']">
+            <code className="text-base text-gray-600 flex-1 font-mono truncate font-['Pixelify_Sans']">
               {CONTRACT_ADDRESS}
             </code>
             <button
@@ -80,8 +80,8 @@ const Sidebar: React.FC = () => {
             <UserInfo />
             
             <div className="bg-gray-50 rounded-lg p-4">
-              <h3 className="text-xl font-semibold mb-3 text-gray-900 font-['Jersey_15']">Stats</h3>
-              <div className="space-y-3 font-['Jersey_15'] text-base">
+              <h3 className="text-xl font-semibold mb-3 text-gray-900 font-['Pixelify_Sans']">Stats</h3>
+              <div className="space-y-3 font-['Pixelify_Sans'] text-base">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2 text-gray-900">
                     <img 
@@ -131,8 +131,8 @@ const Sidebar: React.FC = () => {
             </div>
 
             <div className="bg-gray-50 rounded-lg p-4">
-              <h3 className="text-xl font-semibold mb-3 text-gray-900 font-['Jersey_15']">Social</h3>
-              <div className="grid grid-cols-2 gap-3 font-['Jersey_15'] text-base">
+              <h3 className="text-xl font-semibold mb-3 text-gray-900 font-['Pixelify_Sans']">Social</h3>
+              <div className="grid grid-cols-2 gap-3 font-['Pixelify_Sans'] text-base">
                 <a 
                   href="https://github.com/PixelDeveloperAccount/pixel" 
                   target="_blank" 

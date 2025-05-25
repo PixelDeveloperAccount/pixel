@@ -25,8 +25,9 @@ const Canvas: React.FC = () => {
   
   const [isDragging, setIsDragging] = useState(false);
   const [startDragPosition, setStartDragPosition] = useState({ x: 0, y: 0 });
-  const [hoveredPixel, setHoveredPixel] = useState<{ x: number, y: number } | null>(null);
   const [showHelp, setShowHelp] = useState(false);
+  const [targetPosition, setTargetPosition] = useState<{ x: number, y: number } | null>(null);
+  const animationRef = useRef<number>();
 
   const boundPosition = (newPosition: { x: number, y: number }) => {
     const canvas = canvasRef.current;
@@ -42,6 +43,45 @@ const Canvas: React.FC = () => {
       y: Math.min(maxPanY, Math.max(minPanY, newPosition.y))
     };
   };
+
+  const animate = () => {
+    if (!targetPosition) return;
+    
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    
+    const targetScreenX = centerX - targetPosition.x * scale;
+    const targetScreenY = centerY - targetPosition.y * scale;
+    
+    const dx = targetScreenX - position.x;
+    const dy = targetScreenY - position.y;
+    
+    if (Math.abs(dx) < 1 && Math.abs(dy) < 1) {
+      setPosition({ x: targetScreenX, y: targetScreenY });
+      setTargetPosition(null);
+      return;
+    }
+    
+    const newX = position.x + dx * 0.1;
+    const newY = position.y + dy * 0.1;
+    
+    setPosition({ x: newX, y: newY });
+    animationRef.current = requestAnimationFrame(animate);
+  };
+
+  useEffect(() => {
+    if (targetPosition) {
+      animationRef.current = requestAnimationFrame(animate);
+    }
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [targetPosition, position]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -117,28 +157,32 @@ const Canvas: React.FC = () => {
         ctx.fillRect(screenX, screenY, scale, scale);
       }
     });
-    
-    if (hoveredPixel && isPlacingPixel) {
-      const screenX = position.x + hoveredPixel.x * scale;
-      const screenY = position.y + hoveredPixel.y * scale;
-      
-      ctx.strokeStyle = '#6366f1';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(screenX, screenY, scale, scale);
-    }
 
-    if (selectedPosition) {
-      const screenX = position.x + selectedPosition.x * scale;
-      const screenY = position.y + selectedPosition.y * scale;
-      
-      ctx.fillStyle = selectedColor;
-      ctx.fillRect(screenX, screenY, scale, scale);
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    
+    const gridX = Math.floor((centerX - position.x) / scale);
+    const gridY = Math.floor((centerY - position.y) / scale);
+    
+    if (
+      gridX >= 0 && 
+      gridX < canvasSize && 
+      gridY >= 0 && 
+      gridY < canvasSize
+    ) {
+      const screenX = position.x + gridX * scale;
+      const screenY = position.y + gridY * scale;
       
       ctx.strokeStyle = '#6366f1';
       ctx.lineWidth = 2;
       ctx.strokeRect(screenX, screenY, scale, scale);
+      
+      if (selectedColor && isPlacingPixel) {
+        ctx.fillStyle = selectedColor;
+        ctx.fillRect(screenX, screenY, scale, scale);
+      }
     }
-  }, [pixels, scale, position, hoveredPixel, selectedPosition, selectedColor, isPlacingPixel, canvasSize]);
+  }, [pixels, scale, position, selectedColor, isPlacingPixel, canvasSize]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -153,31 +197,15 @@ const Canvas: React.FC = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+
   const handleMouseDown = (e: React.MouseEvent) => {
     if (e.button === 2) {
       setIsDragging(true);
       setStartDragPosition({ x: e.clientX, y: e.clientY });
-    } else if (e.button === 0 && isPlacingPixel && hoveredPixel) {
-      setSelectedPosition(hoveredPixel);
-    }
-  };
+    } else if (e.button === 0) {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    if (isDragging) {
-      const dx = e.clientX - startDragPosition.x;
-      const dy = e.clientY - startDragPosition.y;
-      
-      const newPosition = boundPosition({
-        x: position.x + dx,
-        y: position.y + dy
-      });
-      
-      setPosition(newPosition);
-      setStartDragPosition({ x: e.clientX, y: e.clientY });
-    } else {
       const rect = canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
@@ -189,16 +217,28 @@ const Canvas: React.FC = () => {
         gridX >= 0 && 
         gridX < canvasSize && 
         gridY >= 0 && 
-        gridY < canvasSize &&
-        x >= position.x &&
-        x <= position.x + canvasSize * scale &&
-        y >= position.y &&
-        y <= position.y + canvasSize * scale
+        gridY < canvasSize
       ) {
-        setHoveredPixel({ x: gridX, y: gridY });
-      } else {
-        setHoveredPixel(null);
+        setTargetPosition({ x: gridX, y: gridY });
+        if (isPlacingPixel) {
+          setSelectedPosition({ x: gridX, y: gridY });
+        }
       }
+    }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (isDragging) {
+      const dx = e.clientX - startDragPosition.x;
+      const dy = e.clientY - startDragPosition.y;
+      
+      const newPosition = boundPosition({
+        x: position.x + dx,
+        y: position.y + dy
+      });
+      
+      setPosition(newPosition);
+      setStartDragPosition({ x: e.clientX, y: e.clientY });
     }
   };
 
@@ -216,15 +256,14 @@ const Canvas: React.FC = () => {
       const canvas = canvasRef.current;
       if (!canvas) return;
       
-      const rect = canvas.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
       
-      const worldX = (mouseX - position.x) / scale;
-      const worldY = (mouseY - position.y) / scale;
+      const worldX = (centerX - position.x) / scale;
+      const worldY = (centerY - position.y) / scale;
       
-      const newScreenX = mouseX - worldX * newScale;
-      const newScreenY = mouseY - worldY * newScale;
+      const newScreenX = centerX - worldX * newScale;
+      const newScreenY = centerY - worldY * newScale;
       
       const boundedPosition = boundPosition({
         x: newScreenX,
@@ -244,12 +283,7 @@ const Canvas: React.FC = () => {
       onContextMenu={(e) => e.preventDefault()}
     >
       <div className="absolute top-4 left-1/2 transform -translate-x-1/2 flex items-center space-x-4 bg-white px-4 py-2 rounded-lg shadow-lg z-10">
-        {hoveredPixel && isPlacingPixel && (
-          <div className="text-base text-gray-900 font-['Pixelify_Sans']">
-            ({hoveredPixel.x}, {hoveredPixel.y})
-          </div>
-        )}
-        <div className="text-base text-gray-900 font-['Pixelify_Sans']">
+        <div className="text-base text-gray-900">
           {Math.round(scale * 10) / 10}x
         </div>
       </div>

@@ -91,7 +91,11 @@ const ColorPalette: React.FC = () => {
           {isOnCooldown && (!connected || tokenBalance < 5000) && (
             <div className="absolute inset-0 flex items-center justify-center bg-white">
               <div className="flex items-center space-x-2 text-gray-900 font-['Jersey_15'] text-lg">
-                <Timer className="w-6 h-6 animate-pulse" />
+                <img 
+                  src="https://unpkg.com/pixelarticons@1.8.1/svg/clock.svg" 
+                  alt="Place" 
+                  className="h-6 w-6" 
+                />
                 <span>{timeLeft}s</span>
               </div>
             </div>
@@ -109,14 +113,22 @@ const ColorPalette: React.FC = () => {
                   : 'bg-gray-100 text-gray-400 cursor-not-allowed'
               }`}
             >
-              <Check className="w-7 h-7" />
+              <img 
+                src="https://unpkg.com/pixelarticons@1.8.1/svg/check.svg" 
+                alt="Place" 
+                className="h-7 w-7" 
+              />
             </button>
           )}
           <button
             onClick={handleCancel}
             className="p-3 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-full transition-colors"
           >
-            <X className="w-7 h-7" />
+            <img 
+              src="https://unpkg.com/pixelarticons@1.8.1/svg/close.svg" 
+              alt="Place" 
+              className="h-7 w-7" 
+            />
           </button>
         </div>
       </div>

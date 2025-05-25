@@ -39,7 +39,11 @@ const UserInfo: React.FC = () => {
       <div className="space-y-3 font-['Jersey_15'] text-base">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2 text-gray-600">
-            <Coins className="h-5 w-5" />
+            <img 
+              src="https://unpkg.com/pixelarticons@1.8.1/svg/wallet.svg" 
+              alt="Menu" 
+              className="h-6 w-6" 
+            />
             <span>PIXEL Balance:</span>
           </div>
           <span className="font-medium text-gray-900">{tokenBalance.toLocaleString()}</span>
@@ -47,7 +51,11 @@ const UserInfo: React.FC = () => {
         
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2 text-gray-600">
-            <MousePointer className="h-5 w-5" />
+            <img 
+              src="https://unpkg.com/pixelarticons@1.8.1/svg/checkbox-on.svg" 
+              alt="Menu" 
+              className="h-6 w-6" 
+            />
             <span>Available Pixels:</span>
           </div>
           <span className="font-medium text-gray-900">{pixelsRemaining} / {pixelQuota}</span>

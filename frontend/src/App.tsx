@@ -37,9 +37,6 @@ function App() {
             <CanvasProvider>
               <Layout>
                 <HomePage />
-                {showInitialHelp && (
-                  <HelpModal onClose={() => setShowInitialHelp(false)} />
-                )}
               </Layout>
             </CanvasProvider>
           </WalletProvider>

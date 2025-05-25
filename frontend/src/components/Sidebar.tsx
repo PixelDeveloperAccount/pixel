@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Palette, Github, Twitter, BookOpen, MessageCircle, Check, MousePointer, Clock } from 'lucide-react';
+import { Palette, Check } from 'lucide-react';
 import UserInfo from './UserInfo';
 import ConnectButton from './ConnectButton';
 import { useCanvas } from '../context/CanvasContext';
@@ -33,8 +33,6 @@ const Sidebar: React.FC = () => {
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        // MODIFIED: Both the background and shadow are now conditional.
-        // The hover effect is also slightly changed for when the sidebar is open.
         className={`fixed top-4 left-4 z-50 p-2 rounded-lg transition-all duration-300 text-gray-900 ${
           !isOpen ? 'bg-white shadow-lg hover:bg-gray-100' : 'hover:bg-gray-900/10'
         }`}
@@ -85,22 +83,34 @@ const Sidebar: React.FC = () => {
               <h3 className="text-xl font-semibold mb-3 text-gray-900 font-['Jersey_15']">Stats</h3>
               <div className="space-y-3 font-['Jersey_15'] text-base">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2 text-gray-600">
-                    <MousePointer className="h-5 w-5" />
+                  <div className="flex items-center space-x-2 text-gray-900">
+                    <img 
+                      src="https://unpkg.com/pixelarticons@1.8.1/svg/drag-and-drop.svg" 
+                      alt="Place" 
+                      className="h-6 w-6" 
+                    />
                     <span>Total Pixels Placed:</span>
                   </div>
                   <span className="font-medium text-gray-900">{totalPixelsPlaced}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2 text-gray-600">
-                    <Clock className="h-5 w-5" />
+                  <div className="flex items-center space-x-2 text-gray-900">
+                    <img 
+                      src="https://unpkg.com/pixelarticons@1.8.1/svg/clock.svg" 
+                      alt="Place" 
+                      className="h-6 w-6" 
+                    />
                     <span>Session start:</span>
                   </div>
                   <span className="font-medium text-gray-900">{formatTimeSince(startTime)}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2 text-gray-600">
-                    <Palette className="h-5 w-5" />
+                  <div className="flex items-center space-x-2 text-gray-900">
+                    <img 
+                      src="https://unpkg.com/pixelarticons@1.8.1/svg/paint-bucket.svg" 
+                      alt="Place" 
+                      className="h-6 w-6" 
+                    />
                     <span>Favorite Color:</span>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -113,7 +123,7 @@ const Sidebar: React.FC = () => {
                         <span className="font-medium text-gray-900">{favoriteColor}</span>
                       </>
                     ) : (
-                      <span className="text-gray-500">None yet</span>
+                      <span className="text-gray-500">NONE</span>
                     )}
                   </div>
                 </div>
@@ -127,35 +137,51 @@ const Sidebar: React.FC = () => {
                   href="https://github.com/PixelDeveloperAccount/pixel" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+                  className="flex items-center space-x-2 text-gray-900 hover:text-gray-600 transition-colors"
                 >
-                  <Github className="h-5 w-5" />
+                  <img 
+                      src="https://unpkg.com/pixelarticons@1.8.1/svg/github.svg" 
+                      alt="Place" 
+                      className="h-6 w-6" 
+                    />
                   <span>GitHub</span>
                 </a>
                 <a 
                   href="https://twitter.com" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+                  className="flex items-center space-x-2 text-gray-900 hover:text-gray-600 transition-colors"
                 >
-                  <Twitter className="h-5 w-5" />
+                  <img 
+                      src="https://unpkg.com/pixelarticons@1.8.1/svg/user.svg" 
+                      alt="Place" 
+                      className="h-6 w-6" 
+                    />
                   <span>Twitter</span>
                 </a>
                 <a 
                   href="https://t.me" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+                  className="flex items-center space-x-2 text-gray-900 hover:text-gray-600 transition-colors"
                 >
-                  <MessageCircle className="h-5 w-5" />
+                  <img 
+                      src="https://unpkg.com/pixelarticons@1.8.1/svg/chat.svg" 
+                      alt="Place" 
+                      className="h-6 w-6" 
+                    />
                   <span>Telegram</span>
                 </a>
                 <a 
                   href="/docs" 
                   target="_blank"
-                  className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+                  className="flex items-center space-x-2 text-gray-900 hover:text-gray-600 transition-colors"
                 >
-                  <BookOpen className="h-5 w-5" />
+                  <img 
+                      src="https://unpkg.com/pixelarticons@1.8.1/svg/book-open.svg" 
+                      alt="Place" 
+                      className="h-6 w-6" 
+                    />
                   <span>Docs</span>
                 </a>
               </div>

@@ -38,7 +38,7 @@ interface CanvasContextType {
 
 const CanvasContext = createContext<CanvasContextType | undefined>(undefined);
 
-const BACKEND_URL = "http://localhost:3001";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
 
 export const CanvasProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { walletAddress } = useWallet();

@@ -69,7 +69,8 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       // Fetch token balance from backend
       (async () => {
         try {
-          const response = await fetch(`http://localhost:3001/api/owns-token/${walletAddress}?mint=${TOKEN_MINT}`);
+          const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+    const response = await fetch(`${backendUrl}/api/owns-token/${walletAddress}?mint=${TOKEN_MINT}`);
           const data = await response.json();
           setTokenBalance(data.tokenBalance || 0);
         } catch (error) {

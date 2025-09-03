@@ -64,7 +64,8 @@ const UserColors: React.FC = () => {
     
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:3001/api/pixels-by-wallet/${walletAddress}`);
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+    const response = await fetch(`${backendUrl}/api/pixels-by-wallet/${walletAddress}`);
       if (response.ok) {
         const data = await response.json();
         

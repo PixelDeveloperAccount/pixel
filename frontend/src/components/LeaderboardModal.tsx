@@ -31,7 +31,8 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
   useEffect(() => {
     const fetchLeaderboard = async (type: string) => {
       try {
-        const response = await fetch(`http://localhost:3001/api/leaderboard/${type}`);
+        const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+    const response = await fetch(`${backendUrl}/api/leaderboard/${type}`);
         if (response.ok) {
           const data = await response.json();
           setLeaderboards(prev => ({

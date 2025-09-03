@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { io, Socket } from "socket.io-client";
 import { useWallet } from './WalletContext';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 
 interface Pixel {
   x: number;

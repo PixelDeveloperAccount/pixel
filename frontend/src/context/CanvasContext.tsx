@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { io, Socket } from "socket.io-client";
 import { useWallet } from './WalletContext';
+import { toast } from 'react-toastify';
 
 interface Pixel {
   x: number;
@@ -111,20 +112,36 @@ export const CanvasProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }, []);
   
   const placePixel = async (x: number, y: number, color: string) => {
+    if (!walletAddress) {
+      toast.error('Please connect your wallet first');
+      return;
+    }
+
     try {
-      const response = await fetch(`${BACKEND_URL}/api/place-pixel`, {
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+      const response = await fetch(`${backendUrl}/api/place-pixel`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ x, y, color, walletAddress: walletAddress }),
+        body: JSON.stringify({
+          x,
+          y,
+          color,
+          walletAddress,
+        }),
       });
-      if (!response.ok) {
-        throw new Error('Failed to place pixel');
+
+      if (response.ok) {
+        const newPixel = { x, y, color, walletAddress, timestamp: Date.now() };
+        setPixels(prev => [...prev, newPixel]);
+        toast.success('Pixel placed successfully!');
+      } else {
+        toast.error('Failed to place pixel');
       }
     } catch (error) {
-      console.error("Error placing pixel:", error);
-      alert('Could not place pixel. The server may be down.'); // NEW: Inform user of placement failure
+      console.error('Error placing pixel:', error);
+      toast.error('Error placing pixel');
     }
 
     const colorCounts = pixels.reduce((acc, pixel) => {

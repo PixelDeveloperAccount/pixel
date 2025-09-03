@@ -9,8 +9,10 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+// Redis configuration for production
+const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
 const redisClient = createClient({
-  url: 'redis://redis:6379'
+  url: redisUrl
 });
 
 redisClient.on('error', (err) => console.log('Redis Client Error', err));
@@ -23,14 +25,27 @@ connectRedis();
 
 const app = express();
 const server = http.createServer(app);
+
+// CORS configuration for production
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'https://your-domain.vercel.app', // Replace with your actual domain
+  process.env.FRONTEND_URL // Add this environment variable
+].filter(Boolean) as string[];
+
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST"]
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
-app.use(cors());
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
 app.use(express.json());
 
 const HELIUS_API_KEY = process.env.HELIUS_API_KEY; 

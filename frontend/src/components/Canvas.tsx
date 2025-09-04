@@ -30,6 +30,15 @@ const Canvas: React.FC = () => {
   const [canvasReady, setCanvasReady] = useState(false);
   const [hoverPosition, setHoverPosition] = useState<{ x: number, y: number } | null>(null);
   const animationRef = useRef<number>();
+  const zoomAnimationRef = useRef<number>();
+  const [isZoomAnimating, setIsZoomAnimating] = useState(false);
+  const [zoomAnimationStart, setZoomAnimationStart] = useState<{
+    scale: number;
+    position: { x: number; y: number };
+    targetScale: number;
+    targetPosition: { x: number; y: number };
+    startTime: number;
+  } | null>(null);
 
   // Sound effects
   const playPixelClickSound = () => {
@@ -81,6 +90,44 @@ const Canvas: React.FC = () => {
     animationRef.current = requestAnimationFrame(animate);
   };
 
+  const animateZoom = () => {
+    if (!zoomAnimationStart) return;
+    
+    const currentTime = Date.now();
+    const elapsed = currentTime - zoomAnimationStart.startTime;
+    const duration = 800; // Animation duration in milliseconds
+    
+    if (elapsed >= duration) {
+      // Animation complete
+      setScale(zoomAnimationStart.targetScale);
+      setPosition(zoomAnimationStart.targetPosition);
+      setZoomAnimationStart(null);
+      setIsZoomAnimating(false);
+      return;
+    }
+    
+    // Easing function for smooth animation (ease-out)
+    const progress = elapsed / duration;
+    const easedProgress = 1 - Math.pow(1 - progress, 3);
+    
+    // Interpolate scale
+    const currentScale = zoomAnimationStart.scale + 
+      (zoomAnimationStart.targetScale - zoomAnimationStart.scale) * easedProgress;
+    
+    // Interpolate position
+    const currentPosition = {
+      x: zoomAnimationStart.position.x + 
+        (zoomAnimationStart.targetPosition.x - zoomAnimationStart.position.x) * easedProgress,
+      y: zoomAnimationStart.position.y + 
+        (zoomAnimationStart.targetPosition.y - zoomAnimationStart.position.y) * easedProgress
+    };
+    
+    setScale(currentScale);
+    setPosition(currentPosition);
+    
+    zoomAnimationRef.current = requestAnimationFrame(animateZoom);
+  };
+
   useEffect(() => {
     if (targetPosition) {
       animationRef.current = requestAnimationFrame(animate);
@@ -91,6 +138,17 @@ const Canvas: React.FC = () => {
       }
     };
   }, [targetPosition, position]);
+
+  useEffect(() => {
+    if (zoomAnimationStart) {
+      zoomAnimationRef.current = requestAnimationFrame(animateZoom);
+    }
+    return () => {
+      if (zoomAnimationRef.current) {
+        cancelAnimationFrame(zoomAnimationRef.current);
+      }
+    };
+  }, [zoomAnimationStart]);
 
   // Close the pixel info modal whenever the color palette (placement mode) opens
   useEffect(() => {
@@ -334,15 +392,24 @@ const Canvas: React.FC = () => {
 
   const handleResetView = () => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas || isZoomAnimating) return;
+    
     const targetScale = 0.8;
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
     const newX = centerX - (canvasSize / 2) * targetScale;
     const newY = centerY - (canvasSize / 2) * targetScale;
     const boundedPosition = boundPosition({ x: newX, y: newY });
-    setPosition(boundedPosition);
-    setScale(targetScale);
+    
+    // Start smooth zoom animation
+    setZoomAnimationStart({
+      scale: scale,
+      position: position,
+      targetScale: targetScale,
+      targetPosition: boundedPosition,
+      startTime: Date.now()
+    });
+    setIsZoomAnimating(true);
   };
 
   return (

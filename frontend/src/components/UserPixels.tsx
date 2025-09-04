@@ -13,8 +13,6 @@ const UserPixels: React.FC = () => {
   const { walletAddress, connected } = useWallet();
   const { pixels, startTime } = useCanvas();
   const [userPixels, setUserPixels] = useState<UserPixel[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [lastRefreshTime, setLastRefreshTime] = useState<Date>(new Date());
   const [newPixelsCount, setNewPixelsCount] = useState(0);
   const autoRefreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastPixelCountRef = useRef<number>(0);
@@ -34,7 +32,6 @@ const UserPixels: React.FC = () => {
       // Set up auto-refresh interval (every 10 seconds)
       autoRefreshIntervalRef.current = setInterval(() => {
         fetchUserPixels();
-        setLastRefreshTime(new Date());
       }, 10000); // 10 seconds
 
       return () => {
@@ -61,7 +58,6 @@ const UserPixels: React.FC = () => {
         const newPixels = currentPixelCount - lastPixelCountRef.current;
         setNewPixelsCount(newPixels);
         fetchUserPixels();
-        setLastRefreshTime(new Date());
         lastPixelCountRef.current = currentPixelCount;
         
         // Clear new pixels indicator after 3 seconds
@@ -73,7 +69,6 @@ const UserPixels: React.FC = () => {
   const fetchUserPixels = async () => {
     if (!walletAddress) return;
     
-    setLoading(true);
     try {
       const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
       const response = await fetch(`${backendUrl}/api/pixels-by-wallet/${walletAddress}`);
@@ -86,19 +81,9 @@ const UserPixels: React.FC = () => {
       }
     } catch (error) {
       console.error('Error fetching user pixels:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
-  const formatTimeAgo = (date: Date) => {
-    const now = new Date();
-    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-    
-    if (diffInSeconds < 60) return `${diffInSeconds}s ago`;
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
-    return `${Math.floor(diffInSeconds / 3600)}h ago`;
-  };
 
   const formatTimeSince = (date: Date) => {
     const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
@@ -127,14 +112,6 @@ const UserPixels: React.FC = () => {
         <h3 className="text-lg font-semibold text-gray-900">Your Pixels</h3>
       </div>
       
-      {/* Auto-refresh status */}
-      <div className="flex items-center justify-between mb-2 text-xs text-gray-500">
-        <div className="flex items-center space-x-1">
-          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-          <span>Auto-refreshing every 10 seconds</span>
-        </div>
-        <span>Last update: {formatTimeAgo(lastRefreshTime)}</span>
-      </div>
       
       <div className="flex items-center justify-between mb-2">
         <div className="text-sm text-gray-600">

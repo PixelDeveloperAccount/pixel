@@ -411,7 +411,7 @@ const Canvas: React.FC = () => {
 
       {clickedPixel && !isPlacingPixel && (
         <div 
-          className="fixed bg-white/95 backdrop-blur-sm shadow-xl rounded-xl p-6 z-50 text-base min-w-[400px] relative"
+          className="absolute bg-white/95 backdrop-blur-sm shadow-xl rounded-xl p-6 z-50 text-base min-w-[400px] inline-block relative max-w-[90vw]"
           style={{
             bottom: '12px',
             left: '50%',

@@ -327,6 +327,19 @@ const Canvas: React.FC = () => {
     }
   };
 
+  const handleResetView = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const targetScale = 0.8;
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const newX = centerX - (canvasSize / 2) * targetScale;
+    const newY = centerY - (canvasSize / 2) * targetScale;
+    const boundedPosition = boundPosition({ x: newX, y: newY });
+    setPosition(boundedPosition);
+    setScale(targetScale);
+  };
+
   return (
     <div 
       ref={containerRef}
@@ -341,6 +354,18 @@ const Canvas: React.FC = () => {
       </div>
 
       <div className="absolute top-4 right-4 z-50 flex items-center space-x-2">
+        <button
+          onClick={handleResetView}
+          className="p-2 rounded-lg bg-white hover:bg-gray-100 transition-colors text-gray-900 shadow-lg"
+          aria-label="Reset zoom"
+          title="Reset zoom"
+        >
+          <img 
+            src="https://unpkg.com/pixelarticons@1.8.1/svg/zoom-out.svg" 
+            alt="Reset zoom" 
+            className="h-7 w-7" 
+          />
+        </button>
         <button
           onClick={() => setShowLeaderboard(true)}
           className="p-2 rounded-lg bg-white hover:bg-gray-100 transition-colors text-gray-900 shadow-lg"

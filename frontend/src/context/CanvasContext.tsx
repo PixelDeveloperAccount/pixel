@@ -47,7 +47,7 @@ export const CanvasProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [canvasStatus, setCanvasStatus] = useState<CanvasStatus>('loading');
   
   const [selectedColor, setSelectedColor] = useState('#FF0000');
-  const [scale, setScale] = useState(1);
+  const [scale, setScale] = useState(0.8);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isPlacingPixel, setIsPlacingPixel] = useState(false);
   const [selectedPosition, setSelectedPosition] = useState<{ x: number, y: number } | null>(null);

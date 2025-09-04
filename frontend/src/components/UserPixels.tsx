@@ -114,8 +114,7 @@ const UserPixels: React.FC = () => {
       </div>
       
       
-      <div className="flex items-center justify-between mb-2">
-        <ConnectButton />
+      <div className="flex items-center justify-end mb-2">
         {newPixelsCount > 0 && (
           <div className="flex items-center space-x-1 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium animate-pulse">
             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
@@ -138,7 +137,7 @@ const UserPixels: React.FC = () => {
       </div>
       
       {/* Total Pixels Info */}
-      <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+      <div className="flex items-center justify-between p-2 bg-gray-50 rounded mb-3">
         <div className="flex items-center space-x-2 text-gray-700">
           <img
             src="https://unpkg.com/pixelarticons@1.8.1/svg/checkbox-on.svg"
@@ -149,6 +148,9 @@ const UserPixels: React.FC = () => {
         </div>
         <span className="text-sm font-medium text-gray-900">{userPixels.length}</span>
       </div>
+      
+      {/* Connect Button */}
+      <ConnectButton />
     </div>
   );
 };

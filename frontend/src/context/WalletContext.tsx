@@ -3,6 +3,7 @@ import {
   useWallet as useSolanaWallet,
   useConnection,
 } from '@solana/wallet-adapter-react';
+import toast from 'react-hot-toast';
 
 // Replace with your actual token mint
 const TOKEN_MINT = '';
@@ -107,6 +108,20 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     localStorage.removeItem('pixel-cooldown');
   };
 
+  // Toast notifications for wallet connection/disconnection
+  useEffect(() => {
+    if (connected && walletAddress) {
+      toast.success(`Wallet connected! ${walletAddress.slice(0, 8)}...${walletAddress.slice(-8)}`, {
+        duration: 3000,
+        style: {
+          background: '#10B981',
+          color: '#fff',
+          fontFamily: 'Pixelify Sans, sans-serif',
+        },
+      });
+    }
+  }, [connected, walletAddress]);
+
   useEffect(() => {
     if (connected && publicKey) {
       // Fetch SOL balance
@@ -137,11 +152,23 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const disconnectWallet = () => {
+    const wasConnected = connected;
     disconnect();
     setPixelsRemaining(1);
     setCooldownTime(5);
     clearCooldown();
     localStorage.removeItem('pixel-cooldown');
+    
+    if (wasConnected) {
+      toast.success('Wallet disconnected!', {
+        duration: 3000,
+        style: {
+          background: '#EF4444',
+          color: '#fff',
+          fontFamily: 'Pixelify Sans, sans-serif',
+        },
+      });
+    }
   };
 
   const decrementPixels = () => {

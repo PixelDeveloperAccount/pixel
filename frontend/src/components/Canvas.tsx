@@ -311,12 +311,14 @@ const Canvas: React.FC = () => {
           return;
         }
 
+        // Play click sound for any valid pixel click
+        playPixelClickSound();
+        
         // Check if there's a pixel at this position
         const pixel = pixels.find(p => p.x === gridX && p.y === gridY);
         if (!isPlacingPixel) {
           if (pixel) {
             setClickedPixel(pixel);
-            playPixelClickSound();
           } else {
             // Show modal for empty cells too
             setClickedPixel({ x: gridX, y: gridY, color: '#ffffff', walletAddress: null });
@@ -326,9 +328,6 @@ const Canvas: React.FC = () => {
         setTargetPosition({ x: gridX, y: gridY });
         // Always set selected position on click to show solid highlight
         setSelectedPosition({ x: gridX, y: gridY });
-        if (isPlacingPixel) {
-          playPixelClickSound();
-        }
       }
     }
   };

@@ -52,9 +52,9 @@ const Sidebar: React.FC = () => {
             <div
               onClick={handleCopy}
               title="Click to copy contract address"
-              className="flex items-center justify-between p-2 bg-gray-50 rounded cursor-pointer hover:bg-gray-100 transition-colors font-['Pixelify_Sans']"
+              className="flex items-center justify-between p-2 bg-gray-50 rounded cursor-pointer hover:bg-gray-100 transition-colors"
             >
-              <div className="flex items-center space-x-2 text-gray-700">
+              <div className="flex items-center space-x-2 text-gray-700 font-['Pixelify_Sans']">
                 <img
                   src="https://unpkg.com/pixelarticons@1.8.1/svg/copy.svg"
                   alt="Contract Address"
@@ -62,9 +62,9 @@ const Sidebar: React.FC = () => {
                 />
                 <span className="text-sm">CA:</span>
               </div>
-              <code className="text-sm font-medium text-gray-900 truncate">
+              <span className="text-sm font-medium text-gray-900 truncate font-['Pixelify_Sans']">
                 {CONTRACT_ADDRESS}
-              </code>
+              </span>
             </div>
           </div>
 

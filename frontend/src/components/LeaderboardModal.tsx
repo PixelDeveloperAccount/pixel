@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Trophy, Palette, Clock, Map } from 'lucide-react';
+import { X, Trophy, Palette, Clock, Map, User, Users, Globe, BarChart3 } from 'lucide-react';
 
 interface LeaderboardEntry {
   walletAddress: string;
@@ -12,19 +12,27 @@ interface LeaderboardModalProps {
 }
 
 const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
-  const [activeTab, setActiveTab] = useState('pixels');
+  const [activeTab, setActiveTab] = useState('players');
+  const [activeTimeframe, setActiveTimeframe] = useState('today');
   const [leaderboards, setLeaderboards] = useState<Record<string, LeaderboardEntry[]>>({
-    pixels: [],
-    colors: [],
-    session: [],
-    territory: []
+    players: [],
+    regions: [],
+    countries: [],
+    alliances: []
   });
 
   const tabs = [
-    { id: 'pixels', name: 'Pixel Masters', icon: Palette, description: 'Most pixels placed' },
-    { id: 'colors', name: 'Color Artists', icon: Palette, description: 'Most diverse color usage' },
-    { id: 'session', name: 'Session Kings', icon: Clock, description: 'Longest active sessions' },
-    { id: 'territory', name: 'Land Lords', icon: Map, description: 'Largest territories claimed' }
+    { id: 'players', name: 'Players', icon: User, description: 'Top players by pixels painted' },
+    { id: 'regions', name: 'Regions', icon: Map, description: 'Top regions by pixels painted' },
+    { id: 'countries', name: 'Countries', icon: Globe, description: 'Top countries by pixels painted' },
+    { id: 'alliances', name: 'Alliances', icon: Users, description: 'Top alliances by pixels painted' }
+  ];
+
+  const timeframes = [
+    { id: 'today', name: 'Today' },
+    { id: 'week', name: 'Week' },
+    { id: 'month', name: 'Month' },
+    { id: 'alltime', name: 'All time' }
   ];
 
   // Fetch leaderboard data from backend
@@ -51,21 +59,16 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
     };
 
     // Fetch all leaderboard types
-    const types = ['pixels', 'colors', 'session', 'territory'];
+    const types = ['players', 'regions', 'countries', 'alliances'];
     types.forEach(type => fetchLeaderboard(type));
   }, []);
 
-  const formatValue = (value: number, type: string) => {
-    switch (type) {
-      case 'session':
-        return `${Math.floor(value / 60)}m ${value % 60}s`;
-      case 'territory':
-        return `${value} pixels`;
-      case 'colors':
-        return `${value} colors`;
-      default:
-        return value.toString();
-    }
+  const formatValue = (value: number) => {
+    return value.toLocaleString();
+  };
+
+  const formatWalletAddress = (address: string) => {
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
   const getRankIcon = (rank: number) => {
@@ -86,8 +89,8 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
       <div className="bg-white rounded-xl shadow-xl p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-3xl font-bold text-gray-900 font-['Pixelify_Sans'] flex items-center space-x-3">
-            <Trophy className="h-8 w-8 text-yellow-500" />
-            <span>Leaderboards</span>
+            <BarChart3 className="h-8 w-8 text-indigo-600" />
+            <span>Leaderboard</span>
           </h2>
           <button
             onClick={onClose}
@@ -98,14 +101,14 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex flex-wrap gap-2 mb-6">
+        <div className="flex flex-wrap gap-2 mb-4">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors font-['Pixelify_Sans'] ${
                 activeTab === tab.id
-                  ? 'bg-indigo-600 text-white'
+                  ? 'bg-indigo-600 text-white border-b-2 border-indigo-600'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
@@ -115,43 +118,56 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
           ))}
         </div>
 
-        {/* Active Tab Description */}
-        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-          <p className="text-gray-600 font-['Pixelify_Sans'] text-lg">
-            {tabs.find(tab => tab.id === activeTab)?.description}
-          </p>
+        {/* Timeframe Navigation */}
+        <div className="flex flex-wrap gap-2 mb-6">
+          {timeframes.map((timeframe) => (
+            <button
+              key={timeframe.id}
+              onClick={() => setActiveTimeframe(timeframe.id)}
+              className={`px-4 py-2 rounded-lg transition-colors font-['Pixelify_Sans'] ${
+                activeTimeframe === timeframe.id
+                  ? 'bg-indigo-600 text-white border-b-2 border-indigo-600'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              {timeframe.name}
+            </button>
+          ))}
         </div>
 
         {/* Leaderboard Content */}
         <div className="overflow-y-auto max-h-[400px]">
-          <div className="space-y-3">
+          <div className="space-y-2">
             {leaderboards[activeTab]?.map((entry) => (
               <div
                 key={entry.walletAddress}
-                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
               >
                 <div className="flex items-center space-x-4">
-                  <div className="text-2xl font-bold text-gray-400 w-12 text-center">
-                    {getRankIcon(entry.rank)}
+                  <div className="text-lg font-bold text-gray-400 w-8 text-center">
+                    {entry.rank}
                   </div>
                   <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
+                    <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
                       {entry.walletAddress.slice(2, 4).toUpperCase()}
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900 font-['Pixelify_Sans']">
-                        {entry.walletAddress}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Rank #{entry.rank}
+                      <p className="font-medium text-gray-900 font-['Pixelify_Sans'] text-sm">
+                        {formatWalletAddress(entry.walletAddress)}
                       </p>
                     </div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-indigo-600 font-['Pixelify_Sans']">
-                    {formatValue(entry.value, activeTab)}
-                  </p>
+                <div className="flex items-center space-x-3">
+                  <div className="text-right">
+                    <p className="text-lg font-bold text-gray-900 font-['Pixelify_Sans']">
+                      {formatValue(entry.value)}
+                    </p>
+                    <p className="text-xs text-gray-500">Pixels painted</p>
+                  </div>
+                  <button className="px-3 py-1 bg-indigo-600 text-white text-xs rounded hover:bg-indigo-700 transition-colors font-['Pixelify_Sans']">
+                    Visit
+                  </button>
                 </div>
               </div>
             ))}

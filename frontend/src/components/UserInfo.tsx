@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Coins, MousePointer, Timer } from 'lucide-react';
 import { useWallet } from '../context/WalletContext';
-import ConnectButton from './ConnectButton';
 
 const UserInfo: React.FC = () => {
   const { 
@@ -17,8 +16,7 @@ const UserInfo: React.FC = () => {
     return (
       <div className="bg-white rounded-lg shadow-lg p-4">
         <h3 className="text-xl font-semibold text-gray-900 font-['Pixelify_Sans'] mb-4">Your Info</h3>
-        <p className="text-gray-500 text-center font-['Pixelify_Sans'] mb-4">Connect wallet to see your info</p>
-        <ConnectButton />
+        <p className="text-gray-500 text-center font-['Pixelify_Sans']">Connect wallet to see your info</p>
       </div>
     );
   }

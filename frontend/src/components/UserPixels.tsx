@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useWallet } from '../context/WalletContext';
 import { useCanvas } from '../context/CanvasContext';
+import ConnectButton from './ConnectButton';
 
 interface UserPixel {
   x: number;
@@ -114,9 +115,7 @@ const UserPixels: React.FC = () => {
       
       
       <div className="flex items-center justify-between mb-2">
-        <div className="text-sm text-gray-600">
-          Wallet: {walletAddress?.slice(0, 8)}...{walletAddress?.slice(-8)}
-        </div>
+        <ConnectButton />
         {newPixelsCount > 0 && (
           <div className="flex items-center space-x-1 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium animate-pulse">
             <div className="w-2 h-2 bg-green-500 rounded-full"></div>

@@ -92,6 +92,13 @@ const Canvas: React.FC = () => {
     };
   }, [targetPosition, position]);
 
+  // Close the pixel info modal whenever the color palette (placement mode) opens
+  useEffect(() => {
+    if (isPlacingPixel) {
+      setClickedPixel(null);
+    }
+  }, [isPlacingPixel]);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || !canvasReady) return;
@@ -227,7 +234,8 @@ const Canvas: React.FC = () => {
           setClickedPixel(pixel);
           playPixelClickSound();
         } else {
-          setClickedPixel(null);
+          // Show modal for empty cells too
+          setClickedPixel({ x: gridX, y: gridY, color: '#ffffff', walletAddress: null });
         }
         
         setTargetPosition({ x: gridX, y: gridY });
@@ -412,17 +420,29 @@ const Canvas: React.FC = () => {
           <div className="space-y-3">
             {/* Pixel Info */}
             <div className="flex items-center space-x-3">
-              <div 
-                className="w-8 h-8 rounded border-2 border-gray-300 shadow-sm"
-                style={{ backgroundColor: clickedPixel.color }}
-              />
+              {clickedPixel.walletAddress ? (
+                <div 
+                  className="w-8 h-8 rounded border-2 border-gray-300 shadow-sm"
+                  style={{ backgroundColor: clickedPixel.color }}
+                />
+              ) : (
+                <div 
+                  className="w-8 h-8 rounded border-2 border-dashed border-gray-300 bg-gray-50"
+                />
+              )}
               <div>
                 <p className="font-semibold text-gray-900">
                   Pixel: {clickedPixel.x}, {clickedPixel.y}
                 </p>
-                <p className="text-sm text-gray-600">
-                  Color: {clickedPixel.color.toUpperCase()}
-                </p>
+                {clickedPixel.walletAddress ? (
+                  <p className="text-sm text-gray-600">
+                    Color: {clickedPixel.color.toUpperCase()}
+                  </p>
+                ) : (
+                  <p className="text-sm text-gray-500">
+                    Not painted yet
+                  </p>
+                )}
               </div>
             </div>
             
@@ -455,7 +475,7 @@ const Canvas: React.FC = () => {
       
       {!isPlacingPixel && (
         <button
-          onClick={() => setIsPlacingPixel(true)}
+          onClick={() => { setIsPlacingPixel(true); setClickedPixel(null); }}
           className="fixed bottom-4 left-1/2 transform -translate-x-1/2 flex items-center space-x-2 bg-indigo-600 text-white px-5 py-3 text-lg rounded-lg shadow-lg hover:bg-indigo-700 transition-colors font-['Pixelify_Sans']"
         >
           <img 

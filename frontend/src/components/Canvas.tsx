@@ -253,6 +253,15 @@ const Canvas: React.FC = () => {
     }
   }, [pixels, position, scale, selectedPosition, hoverPosition, isPlacingPixel, canvasSize, canvasReady]);
 
+  // Check if this is the user's first visit and show help modal
+  useEffect(() => {
+    const hasVisitedBefore = localStorage.getItem('pixel-app-visited');
+    if (!hasVisitedBefore) {
+      setShowHelp(true);
+      localStorage.setItem('pixel-app-visited', 'true');
+    }
+  }, []);
+
   // Force initial render
   useEffect(() => {
     const canvas = canvasRef.current;

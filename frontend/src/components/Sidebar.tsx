@@ -60,7 +60,6 @@ const Sidebar: React.FC = () => {
                   alt="Contract Address"
                   className="h-4 w-4"
                 />
-                <span className="text-sm">CA:</span>
               </div>
               <span className="text-sm font-medium text-gray-900 truncate font-['Pixelify_Sans']">
                 {CONTRACT_ADDRESS}

@@ -70,33 +70,32 @@ const ColorPalette: React.FC = () => {
       <div className="max-w-7xl mx-auto flex items-center">
         <div className="flex-1 flex justify-center relative">
           <div className="flex items-center gap-2">
-            {/* Eyedropper Tool */}
+            {/* Color Picker Tool */}
             <div className="relative">
               <button
-                onClick={() => !isOnCooldown && setIsEyedropperMode(!isEyedropperMode)}
+                onClick={() => {
+                  if (!isOnCooldown) {
+                    setIsEyedropperMode(!isEyedropperMode);
+                    // Clear selected color when activating eyedropper mode
+                    if (!isEyedropperMode) {
+                      setSelectedColor('');
+                    }
+                  }
+                }}
                 disabled={isOnCooldown}
                 className={`w-8 h-8 rounded-md border-2 border-gray-300 cursor-pointer transition-all flex items-center justify-center ${
                   isEyedropperMode
                     ? 'ring-2 ring-indigo-600 scale-110 bg-indigo-50' 
                     : 'hover:scale-105 bg-white'
                 } ${isOnCooldown ? 'opacity-50 cursor-not-allowed' : ''}`}
-                aria-label="Eyedropper tool - click to sample colors from canvas"
-                title="Eyedropper tool - click to sample colors from canvas"
+                aria-label="Color picker tool - click to sample colors from canvas"
+                title="Color picker tool - click to sample colors from canvas"
               >
-                <svg 
-                  width="16" 
-                  height="16" 
-                  viewBox="0 0 24 24" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  strokeWidth="2" 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round"
-                  className={isEyedropperMode ? 'text-indigo-600' : 'text-gray-600'}
-                >
-                  <path d="M2 22l4-4h3l2-2-3-3 2-2 3 3 2-2-3-3 2-2 3 3 2-2-3-3 2-2"/>
-                  <path d="M9.5 2.5L12 5l-5 5-2.5-2.5L9.5 2.5z"/>
-                </svg>
+                <img 
+                  src="https://unpkg.com/pixelarticons@1.8.1/svg/drop.svg" 
+                  alt="Color picker" 
+                  className={`h-4 w-4 ${isEyedropperMode ? 'opacity-100' : 'opacity-60'}`}
+                />
               </button>
               {isEyedropperMode && (
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-indigo-600 rounded-full"></div>
@@ -118,7 +117,13 @@ const ColorPalette: React.FC = () => {
                       : 'hover:scale-105'
                   } ${color === '#ffffff' ? 'ring-1 ring-gray-200' : ''}`}
                   style={{ backgroundColor: color }}
-                  onClick={() => !isOnCooldown && setSelectedColor(color)}
+                  onClick={() => {
+                    if (!isOnCooldown) {
+                      setSelectedColor(color);
+                      // Clear eyedropper mode when selecting a predefined color
+                      setIsEyedropperMode(false);
+                    }
+                  }}
                   aria-label={`Select color ${color}`}
                 />
               ))}

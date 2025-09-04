@@ -120,12 +120,12 @@ const Canvas: React.FC = () => {
       canvasSize * scale + 2
     );
 
-    // Draw grid background (white)
-    ctx.fillStyle = '#ffffff';
+    // Draw grid background (very light grey)
+    ctx.fillStyle = '#fafafa';
     ctx.fillRect(position.x, position.y, canvasSize * scale, canvasSize * scale);
     
-    // Draw grid lines (grey)
-    ctx.strokeStyle = '#cccccc';
+    // Draw grid lines (faint grey)
+    ctx.strokeStyle = '#f0f0f0';
     ctx.lineWidth = 1;
     const gridSize = scale;
 
@@ -154,10 +154,7 @@ const Canvas: React.FC = () => {
       ctx.fillStyle = pixel.color;
       ctx.fillRect(pixelX, pixelY, scale, scale);
 
-      // Draw pixel border
-      ctx.strokeStyle = '#222222';
-      ctx.lineWidth = 0.5;
-      ctx.strokeRect(pixelX, pixelY, scale, scale);
+      // No pixel border - removed for cleaner look
     });
 
     // Draw hover position indicator (always visible when hovering)

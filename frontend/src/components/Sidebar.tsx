@@ -52,15 +52,13 @@ const Sidebar: React.FC = () => {
             <div
               onClick={handleCopy}
               title="Click to copy contract address"
-              className="flex items-center justify-between p-2 bg-gray-50 rounded cursor-pointer hover:bg-gray-100 transition-colors"
+              className="flex items-center p-2 bg-gray-50 rounded cursor-pointer hover:bg-gray-100 transition-colors"
             >
-              <div className="flex items-center space-x-2 text-gray-700 font-['Pixelify_Sans']">
-                <img
-                  src="https://unpkg.com/pixelarticons@1.8.1/svg/copy.svg"
-                  alt="Contract Address"
-                  className="h-4 w-4"
-                />
-              </div>
+              <img
+                src="https://unpkg.com/pixelarticons@1.8.1/svg/copy.svg"
+                alt="Contract Address"
+                className="h-5 w-5 mr-3"
+              />
               <span className="text-sm font-medium text-gray-900 truncate font-['Pixelify_Sans']">
                 {CONTRACT_ADDRESS}
               </span>

@@ -12,20 +12,20 @@ interface LeaderboardModalProps {
 }
 
 const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
-  const [activeTab, setActiveTab] = useState('players');
+  const [activeTab, setActiveTab] = useState('pixels');
   const [activeTimeframe, setActiveTimeframe] = useState('today');
   const [leaderboards, setLeaderboards] = useState<Record<string, LeaderboardEntry[]>>({
-    players: [],
-    regions: [],
-    countries: [],
-    alliances: []
+    pixels: [],
+    colours: [],
+    territory: [],
+    timeplayed: []
   });
 
   const tabs = [
-    { id: 'players', name: 'Players', icon: User, description: 'Top players by pixels painted' },
-    { id: 'regions', name: 'Regions', icon: Map, description: 'Top regions by pixels painted' },
-    { id: 'countries', name: 'Countries', icon: Globe, description: 'Top countries by pixels painted' },
-    { id: 'alliances', name: 'Alliances', icon: Users, description: 'Top alliances by pixels painted' }
+    { id: 'pixels', name: 'Pixels', icon: Palette, description: 'Total pixels per user' },
+    { id: 'colours', name: 'Colours', icon: Palette, description: 'Overall most used colours on canvas' },
+    { id: 'territory', name: 'Territory', icon: Map, description: 'Most pixels linked together per user' },
+    { id: 'timeplayed', name: 'Time Played', icon: Clock, description: 'Longest time spent on canvas' }
   ];
 
   const timeframes = [
@@ -59,12 +59,39 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
     };
 
     // Fetch all leaderboard types
-    const types = ['players', 'regions', 'countries', 'alliances'];
+    const types = ['pixels', 'colours', 'territory', 'timeplayed'];
     types.forEach(type => fetchLeaderboard(type));
   }, []);
 
-  const formatValue = (value: number) => {
-    return value.toLocaleString();
+  const formatValue = (value: number, type: string) => {
+    switch (type) {
+      case 'timeplayed':
+        const hours = Math.floor(value / 3600);
+        const minutes = Math.floor((value % 3600) / 60);
+        if (hours > 0) {
+          return `${hours}h ${minutes}m`;
+        }
+        return `${minutes}m`;
+      case 'territory':
+        return `${value.toLocaleString()} pixels`;
+      case 'colours':
+        return `${value} colours`;
+      default:
+        return value.toLocaleString();
+    }
+  };
+
+  const getValueLabel = (type: string) => {
+    switch (type) {
+      case 'timeplayed':
+        return 'Time played';
+      case 'territory':
+        return 'Territory size';
+      case 'colours':
+        return 'Colours used';
+      default:
+        return 'Pixels painted';
+    }
   };
 
   const formatWalletAddress = (address: string) => {
@@ -161,9 +188,9 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
                 <div className="flex items-center space-x-3">
                   <div className="text-right">
                     <p className="text-lg font-bold text-gray-900 font-['Pixelify_Sans']">
-                      {formatValue(entry.value)}
+                      {formatValue(entry.value, activeTab)}
                     </p>
-                    <p className="text-xs text-gray-500">Pixels painted</p>
+                    <p className="text-xs text-gray-500">{getValueLabel(activeTab)}</p>
                   </div>
                   <button className="px-3 py-1 bg-indigo-600 text-white text-xs rounded hover:bg-indigo-700 transition-colors font-['Pixelify_Sans']">
                     Visit

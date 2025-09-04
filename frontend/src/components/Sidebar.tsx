@@ -52,7 +52,7 @@ const Sidebar: React.FC = () => {
             <code
               onClick={handleCopy}
               title="Click to copy contract address"
-              className="text-base text-gray-700 w-full block text-center font-mono truncate font-['Pixelify_Sans'] cursor-pointer hover:text-indigo-600 transition-colors py-2"
+              className="text-base text-gray-700 w-full block text-center font-mono truncate cursor-pointer hover:text-indigo-600 transition-colors py-2"
             >
               {CONTRACT_ADDRESS}
             </code>

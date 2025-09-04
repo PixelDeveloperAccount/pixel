@@ -230,12 +230,14 @@ const Canvas: React.FC = () => {
       ) {
         // Check if there's a pixel at this position
         const pixel = pixels.find(p => p.x === gridX && p.y === gridY);
-        if (pixel) {
-          setClickedPixel(pixel);
-          playPixelClickSound();
-        } else {
-          // Show modal for empty cells too
-          setClickedPixel({ x: gridX, y: gridY, color: '#ffffff', walletAddress: null });
+        if (!isPlacingPixel) {
+          if (pixel) {
+            setClickedPixel(pixel);
+            playPixelClickSound();
+          } else {
+            // Show modal for empty cells too
+            setClickedPixel({ x: gridX, y: gridY, color: '#ffffff', walletAddress: null });
+          }
         }
         
         setTargetPosition({ x: gridX, y: gridY });
@@ -407,11 +409,11 @@ const Canvas: React.FC = () => {
         onWheel={handleWheel}
       />
 
-      {clickedPixel && (
+      {clickedPixel && !isPlacingPixel && (
         <div 
-          className="fixed bg-white/95 backdrop-blur-sm shadow-lg rounded-lg p-4 z-50 text-sm min-w-[280px]"
+          className="fixed bg-white/95 backdrop-blur-sm shadow-xl rounded-xl p-6 z-50 text-base min-w-[400px]"
           style={{
-            bottom: '120px',
+            bottom: '12px',
             left: '50%',
             transform: 'translateX(-50%)',
             pointerEvents: 'auto'
@@ -422,24 +424,24 @@ const Canvas: React.FC = () => {
             <div className="flex items-center space-x-3">
               {clickedPixel.walletAddress ? (
                 <div 
-                  className="w-8 h-8 rounded border-2 border-gray-300 shadow-sm"
+                  className="w-10 h-10 rounded border-2 border-gray-300 shadow-sm"
                   style={{ backgroundColor: clickedPixel.color }}
                 />
               ) : (
                 <div 
-                  className="w-8 h-8 rounded border-2 border-dashed border-gray-300 bg-gray-50"
+                  className="w-10 h-10 rounded border-2 border-dashed border-gray-300 bg-gray-50"
                 />
               )}
               <div>
-                <p className="font-semibold text-gray-900">
+                <p className="font-semibold text-gray-900 text-lg">
                   Pixel: {clickedPixel.x}, {clickedPixel.y}
                 </p>
                 {clickedPixel.walletAddress ? (
-                  <p className="text-sm text-gray-600">
+                  <p className="text-base text-gray-600">
                     Color: {clickedPixel.color.toUpperCase()}
                   </p>
                 ) : (
-                  <p className="text-sm text-gray-500">
+                  <p className="text-base text-gray-500">
                     Not painted yet
                   </p>
                 )}
@@ -449,10 +451,10 @@ const Canvas: React.FC = () => {
             {/* Wallet Info */}
             {clickedPixel.walletAddress && (
               <div className="pt-2 border-t border-gray-200">
-                <p className="text-sm text-gray-700">
+                <p className="text-base text-gray-700">
                   <span className="font-medium">Painted by:</span>
                 </p>
-                <p className="text-xs text-gray-600 font-mono">
+                <p className="text-base text-gray-600 font-mono">
                   {clickedPixel.walletAddress.slice(0, 8)}...{clickedPixel.walletAddress.slice(-8)}
                 </p>
               </div>

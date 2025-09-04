@@ -185,16 +185,11 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <div className="text-right">
-                    <p className="text-lg font-bold text-gray-900 font-['Pixelify_Sans']">
-                      {formatValue(entry.value, activeTab)}
-                    </p>
-                    <p className="text-xs text-gray-500">{getValueLabel(activeTab)}</p>
-                  </div>
-                  <button className="px-3 py-1 bg-indigo-600 text-white text-xs rounded hover:bg-indigo-700 transition-colors font-['Pixelify_Sans']">
-                    Visit
-                  </button>
+                <div className="text-right">
+                  <p className="text-lg font-bold text-gray-900 font-['Pixelify_Sans']">
+                    {formatValue(entry.value, activeTab)}
+                  </p>
+                  <p className="text-xs text-gray-500">{getValueLabel(activeTab)}</p>
                 </div>
               </div>
             ))}

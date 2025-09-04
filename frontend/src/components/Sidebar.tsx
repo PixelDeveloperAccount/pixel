@@ -60,10 +60,10 @@ const Sidebar: React.FC = () => {
                   alt="Contract Address"
                   className="h-4 w-4"
                 />
-                <span className="text-sm">Contract:</span>
+                <span className="text-sm">CA:</span>
               </div>
-              <code className="text-sm font-medium text-gray-900 font-mono">
-                {CONTRACT_ADDRESS.slice(0, 8)}...{CONTRACT_ADDRESS.slice(-8)}
+              <code className="text-sm font-medium text-gray-900 font-mono truncate">
+                {CONTRACT_ADDRESS}
               </code>
             </div>
           </div>

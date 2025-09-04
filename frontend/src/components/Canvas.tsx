@@ -160,7 +160,7 @@ const Canvas: React.FC = () => {
       const selectedX = position.x + selectedPosition.x * scale;
       const selectedY = position.y + selectedPosition.y * scale;
 
-      ctx.strokeStyle = '#ffffff';
+      ctx.strokeStyle = '#000000';
       ctx.lineWidth = 3;
       ctx.strokeRect(selectedX - 1, selectedY - 1, scale + 2, scale + 2);
     }

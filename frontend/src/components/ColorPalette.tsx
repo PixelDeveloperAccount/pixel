@@ -32,6 +32,13 @@ const ColorPalette: React.FC = () => {
     tokenBalance
   } = useWallet();
 
+  // Clear any previously selected color whenever the palette visibility or cooldown overlay changes
+  useEffect(() => {
+    if (isPlacingPixel || isOnCooldown || !isPlacingPixel) {
+      setSelectedColor('');
+    }
+  }, [isPlacingPixel, isOnCooldown, setSelectedColor]);
+
 
   if (!isPlacingPixel) return null;
 
@@ -88,9 +95,9 @@ const ColorPalette: React.FC = () => {
           {(!isOnCooldown || (connected && tokenBalance >= 5000)) && (
             <button
               onClick={handleConfirm}
-              disabled={!selectedPosition}
+              disabled={!selectedPosition || !selectedColor}
               className={`p-3 rounded-full transition-colors ${
-                selectedPosition
+                selectedPosition && selectedColor
                   ? 'bg-gray-100 hover:bg-gray-200 text-gray-900'
                   : 'bg-gray-100 text-gray-400 cursor-not-allowed'
               }`}

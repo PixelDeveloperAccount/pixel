@@ -1,7 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useCanvas } from '../context/CanvasContext';
 import { useWallet } from '../context/WalletContext';
-import { MousePointer } from 'lucide-react';
 import HelpModal from './HelpModal';
 import LeaderboardModal from './LeaderboardModal';
 
@@ -10,13 +9,11 @@ const Canvas: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { 
     pixels, 
-    selectedColor, 
     scale, 
     setScale,
     position,
     setPosition,
     canvasSize,
-    placePixel,
     isPlacingPixel,
     setIsPlacingPixel,
     selectedPosition,
@@ -161,17 +158,17 @@ const Canvas: React.FC = () => {
       const hoverX = position.x + hoverPosition.x * scale;
       const hoverY = position.y + hoverPosition.y * scale;
 
-      ctx.strokeStyle = '#000000';
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.4)';
       ctx.lineWidth = 2;
       ctx.strokeRect(hoverX - 1, hoverY - 1, scale + 2, scale + 2);
     }
 
-    // Draw selected position indicator (only when placing pixel)
-    if (selectedPosition && isPlacingPixel) {
+    // Draw selected position indicator (solid black)
+    if (selectedPosition) {
       const selectedX = position.x + selectedPosition.x * scale;
       const selectedY = position.y + selectedPosition.y * scale;
 
-      ctx.strokeStyle = '#ff0000';
+      ctx.strokeStyle = '#000000';
       ctx.lineWidth = 3;
       ctx.strokeRect(selectedX - 1, selectedY - 1, scale + 2, scale + 2);
     }
@@ -234,8 +231,9 @@ const Canvas: React.FC = () => {
         }
         
         setTargetPosition({ x: gridX, y: gridY });
+        // Always set selected position on click to show solid highlight
+        setSelectedPosition({ x: gridX, y: gridY });
         if (isPlacingPixel) {
-          setSelectedPosition({ x: gridX, y: gridY });
           playPixelClickSound();
         }
       }

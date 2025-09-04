@@ -17,7 +17,11 @@ const Canvas: React.FC = () => {
     isPlacingPixel,
     setIsPlacingPixel,
     selectedPosition,
-    setSelectedPosition
+    setSelectedPosition,
+    isEyedropperMode,
+    setIsEyedropperMode,
+    sampleColor,
+    setSelectedColor
   } = useCanvas();
   const { connected } = useWallet();
   
@@ -283,6 +287,17 @@ const Canvas: React.FC = () => {
         gridY >= 0 && 
         gridY < canvasSize
       ) {
+        // Handle eyedropper mode
+        if (isEyedropperMode) {
+          const sampledColor = sampleColor(gridX, gridY);
+          if (sampledColor) {
+            setSelectedColor(sampledColor);
+            setIsEyedropperMode(false);
+            playPixelClickSound();
+          }
+          return;
+        }
+
         // Check if there's a pixel at this position
         const pixel = pixels.find(p => p.x === gridX && p.y === gridY);
         if (!isPlacingPixel) {
@@ -465,7 +480,7 @@ const Canvas: React.FC = () => {
 
       <canvas
         ref={canvasRef}
-        className={`cursor-${isPlacingPixel ? 'crosshair' : 'default'}`}
+        className={`cursor-${isEyedropperMode ? 'crosshair' : isPlacingPixel ? 'crosshair' : 'default'}`}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}

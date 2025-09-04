@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { Check, X, Timer } from 'lucide-react';
+import React, { useEffect } from 'react';
 import { useCanvas } from '../context/CanvasContext';
 import { useWallet } from '../context/WalletContext';
 
@@ -19,7 +18,9 @@ const ColorPalette: React.FC = () => {
     setIsPlacingPixel,
     selectedPosition,
     setSelectedPosition,
-    placePixel
+    placePixel,
+    isEyedropperMode,
+    setIsEyedropperMode
   } = useCanvas();
 
   const { 
@@ -38,6 +39,13 @@ const ColorPalette: React.FC = () => {
       setSelectedColor('');
     }
   }, [isPlacingPixel, isOnCooldown, setSelectedColor]);
+
+  // Clear eyedropper mode when placing pixels or on cooldown
+  useEffect(() => {
+    if (isPlacingPixel || isOnCooldown) {
+      setIsEyedropperMode(false);
+    }
+  }, [isPlacingPixel, isOnCooldown, setIsEyedropperMode]);
 
 
   if (!isPlacingPixel) return null;
@@ -62,21 +70,35 @@ const ColorPalette: React.FC = () => {
       <div className="max-w-7xl mx-auto flex items-center">
         <div className="flex-1 flex justify-center relative">
           <div className="flex items-center gap-2">
-            {/* Custom Color Picker */}
+            {/* Eyedropper Tool */}
             <div className="relative">
-              <input
-                type="color"
-                value={selectedColor}
-                onChange={(e) => !isOnCooldown && setSelectedColor(e.target.value)}
+              <button
+                onClick={() => !isOnCooldown && setIsEyedropperMode(!isEyedropperMode)}
                 disabled={isOnCooldown}
-                className={`w-8 h-8 rounded-md border-2 border-gray-300 cursor-pointer transition-all ${
-                  selectedColor && !colors.includes(selectedColor)
-                    ? 'ring-2 ring-indigo-600 scale-110' 
-                    : 'hover:scale-105'
+                className={`w-8 h-8 rounded-md border-2 border-gray-300 cursor-pointer transition-all flex items-center justify-center ${
+                  isEyedropperMode
+                    ? 'ring-2 ring-indigo-600 scale-110 bg-indigo-50' 
+                    : 'hover:scale-105 bg-white'
                 } ${isOnCooldown ? 'opacity-50 cursor-not-allowed' : ''}`}
-                aria-label="Select custom color"
-              />
-              {selectedColor && !colors.includes(selectedColor) && (
+                aria-label="Eyedropper tool - click to sample colors from canvas"
+                title="Eyedropper tool - click to sample colors from canvas"
+              >
+                <svg 
+                  width="16" 
+                  height="16" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                  className={isEyedropperMode ? 'text-indigo-600' : 'text-gray-600'}
+                >
+                  <path d="M2 22l4-4h3l2-2-3-3 2-2 3 3 2-2-3-3 2-2 3 3 2-2-3-3 2-2"/>
+                  <path d="M9.5 2.5L12 5l-5 5-2.5-2.5L9.5 2.5z"/>
+                </svg>
+              </button>
+              {isEyedropperMode && (
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-indigo-600 rounded-full"></div>
               )}
             </div>

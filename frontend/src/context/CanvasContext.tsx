@@ -34,6 +34,10 @@ interface CanvasContextType {
   // NEW: Expose the canvas status and a retry function to the rest of the app
   canvasStatus: CanvasStatus;
   loadCanvas: () => void;
+  // Eyedropper functionality
+  isEyedropperMode: boolean;
+  setIsEyedropperMode: (value: boolean) => void;
+  sampleColor: (x: number, y: number) => string | null;
 }
 
 const CanvasContext = createContext<CanvasContextType | undefined>(undefined);
@@ -53,6 +57,7 @@ export const CanvasProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [selectedPosition, setSelectedPosition] = useState<{ x: number, y: number } | null>(null);
   const [startTime] = useState<Date>(new Date());
   const [favoriteColor, setFavoriteColor] = useState<string | null>(null);
+  const [isEyedropperMode, setIsEyedropperMode] = useState(false);
   const canvasSize = 1000;
   
   // NEW: Extracted the fetching logic into a useCallback so we can call it manually to retry
@@ -153,6 +158,12 @@ export const CanvasProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setIsPlacingPixel(false);
     setSelectedPosition(null);
   };
+
+  // Function to sample color from a pixel at given coordinates
+  const sampleColor = (x: number, y: number): string | null => {
+    const pixel = pixels.find(p => p.x === x && p.y === y);
+    return pixel ? pixel.color : null;
+  };
   
   return (
     <CanvasContext.Provider value={{
@@ -173,7 +184,10 @@ export const CanvasProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       startTime,
       favoriteColor,
       canvasStatus,
-      loadCanvas
+      loadCanvas,
+      isEyedropperMode,
+      setIsEyedropperMode,
+      sampleColor
     }}>
       {children}
     </CanvasContext.Provider>

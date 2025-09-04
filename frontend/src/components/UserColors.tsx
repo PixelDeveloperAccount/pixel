@@ -100,6 +100,9 @@ const UserColors: React.FC = () => {
     return null;
   }
 
+  // Get top 5 colors
+  const topColors = userColors.slice(0, 5);
+
   return (
     <div className="bg-white rounded-lg shadow-lg p-4">
       <div className="flex justify-between items-center mb-3">
@@ -107,33 +110,30 @@ const UserColors: React.FC = () => {
         <span className="text-sm text-gray-500">{userColors.length} colors used</span>
       </div>
       
-      <div className="space-y-2">
-        {userColors.map((colorData, index) => (
-          <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded hover:bg-gray-100 transition-colors">
-            <div className="flex items-center space-x-3">
-              <div 
-                className="w-6 h-6 rounded border border-gray-300 shadow-sm"
-                style={{ backgroundColor: colorData.color }}
-              />
-              <span className="text-sm text-gray-700 font-medium">
-                {colorData.color.toUpperCase()}
+      <div className="flex flex-wrap gap-2 justify-center">
+        {topColors.map((colorData, index) => (
+          <div 
+            key={index} 
+            className="relative w-12 h-12 rounded border-2 border-gray-300 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+            style={{ backgroundColor: colorData.color }}
+            title={`${colorData.color.toUpperCase()} - ${colorData.count} pixel${colorData.count > 1 ? 's' : ''}`}
+          >
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-xs font-bold text-white drop-shadow-lg">
+                {colorData.count}
               </span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <span className="text-xs text-gray-500">
-                {colorData.count} pixel{colorData.count > 1 ? 's' : ''}
-              </span>
-              <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
             </div>
           </div>
         ))}
       </div>
       
-      <div className="mt-3 pt-2 border-t border-gray-200">
-        <div className="text-xs text-gray-500 text-center">
-          Most used: <span className="font-medium">{userColors[0]?.color.toUpperCase()}</span>
+      {userColors.length > 5 && (
+        <div className="mt-3 pt-2 border-t border-gray-200">
+          <div className="text-xs text-gray-500 text-center">
+            Showing top 5 of {userColors.length} colors
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

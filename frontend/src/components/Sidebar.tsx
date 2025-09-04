@@ -1,7 +1,6 @@
 import React from 'react';
 import { Palette } from 'lucide-react';
 import UserInfo from './UserInfo';
-import ConnectButton from './ConnectButton';
 import UserPixels from './UserPixels';
 import UserColors from './UserColors';
 import toast from 'react-hot-toast'; // Ensure toast is imported
@@ -127,9 +126,6 @@ const Sidebar: React.FC = () => {
                   <span>Docs</span>
                 </a>
               </div>
-            </div>
-            <div className="mt-4">
-              <ConnectButton />
             </div>
           </div>
         </div>

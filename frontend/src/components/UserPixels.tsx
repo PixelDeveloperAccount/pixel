@@ -138,48 +138,18 @@ const UserPixels: React.FC = () => {
         <span className="text-sm font-medium text-gray-900">{formatTimeSince(startTime)}</span>
       </div>
       
-      {userPixels.length === 0 ? (
-        <p className="text-gray-500">No pixels placed yet</p>
-      ) : (
-        <div className="space-y-2">
-          {/* Total Pixels Info */}
-          <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
-            <div className="flex items-center space-x-2 text-gray-700">
-              <img
-                src="https://unpkg.com/pixelarticons@1.8.1/svg/checkbox-on.svg"
-                alt="Total Pixels"
-                className="h-4 w-4"
-              />
-              <span className="text-sm">Total pixels:</span>
-            </div>
-            <span className="text-sm font-medium text-gray-900">{userPixels.length}</span>
-          </div>
-          
-          <div className="max-h-60 overflow-y-auto">
-            {userPixels.map((pixel, index) => (
-              <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded hover:bg-gray-100 transition-colors">
-                <div className="flex items-center space-x-2">
-                  <div 
-                    className="w-4 h-4 rounded border border-gray-300"
-                    style={{ backgroundColor: pixel.color }}
-                  />
-                  <span className="text-sm text-gray-700 font-medium">
-                    ({pixel.x}, {pixel.y})
-                  </span>
-                </div>
-                <div className="flex flex-col items-end">
-                  <span className="text-xs text-gray-500">
-                    {new Date(pixel.timestamp).toLocaleDateString()}
-                  </span>
-                  <span className="text-xs text-gray-400">
-                    {new Date(pixel.timestamp).toLocaleTimeString()}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
+      {/* Total Pixels Info */}
+      <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+        <div className="flex items-center space-x-2 text-gray-700">
+          <img
+            src="https://unpkg.com/pixelarticons@1.8.1/svg/checkbox-on.svg"
+            alt="Total Pixels"
+            className="h-4 w-4"
+          />
+          <span className="text-sm">Total pixels:</span>
         </div>
-      )}
+        <span className="text-sm font-medium text-gray-900">{userPixels.length}</span>
+      </div>
     </div>
   );
 };

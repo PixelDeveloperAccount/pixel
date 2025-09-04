@@ -379,7 +379,7 @@ const Canvas: React.FC = () => {
           className="p-2 rounded-lg bg-white hover:bg-gray-100 transition-colors text-gray-900 shadow-lg"
         >
           <img 
-            src="https://unpkg.com/pixelarticons@1.8.1/svg/trophy.svg" 
+            src="https://unpkg.com/pixelarticons@1.8.1/svg/chart.svg" 
             alt="Leaderboard" 
             className="h-7 w-7" 
           />
@@ -423,12 +423,12 @@ const Canvas: React.FC = () => {
         >
           <button 
             onClick={() => setClickedPixel(null)}
-            className="absolute top-2 right-2 p-1 rounded hover:bg-gray-100 transition-colors"
+            className="absolute top-2 right-2 p-1 rounded-xl hover:bg-gray-100 transition-colors"
             aria-label="Close"
             title="Close"
           >
             <img 
-              src="https://unpkg.com/pixelarticons@1.8.1/svg/x.svg" 
+              src="https://unpkg.com/pixelarticons@1.8.1/svg/close.svg" 
               alt="Close" 
               className="h-5 w-5"
             />
@@ -485,7 +485,7 @@ const Canvas: React.FC = () => {
         </div>
       )}
       
-      {!isPlacingPixel && (
+      {!isPlacingPixel && !clickedPixel && (
         <button
           onClick={() => { setIsPlacingPixel(true); setClickedPixel(null); }}
           className="fixed bottom-4 left-1/2 transform -translate-x-1/2 flex items-center space-x-2 bg-indigo-600 text-white px-5 py-3 text-lg rounded-lg shadow-lg hover:bg-indigo-700 transition-colors font-['Pixelify_Sans']"

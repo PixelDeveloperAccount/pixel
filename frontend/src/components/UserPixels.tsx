@@ -142,9 +142,19 @@ const UserPixels: React.FC = () => {
         <p className="text-gray-500">No pixels placed yet</p>
       ) : (
         <div className="space-y-2">
-          <div className="text-sm font-medium text-gray-700">
-            Total Pixels: {userPixels.length}
+          {/* Total Pixels Info */}
+          <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+            <div className="flex items-center space-x-2 text-gray-700">
+              <img
+                src="https://unpkg.com/pixelarticons@1.8.1/svg/checkbox-on.svg"
+                alt="Total Pixels"
+                className="h-4 w-4"
+              />
+              <span className="text-sm">Total pixels:</span>
+            </div>
+            <span className="text-sm font-medium text-gray-900">{userPixels.length}</span>
           </div>
+          
           <div className="max-h-60 overflow-y-auto">
             {userPixels.map((pixel, index) => (
               <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded hover:bg-gray-100 transition-colors">

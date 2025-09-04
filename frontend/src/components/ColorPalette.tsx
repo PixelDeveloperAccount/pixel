@@ -61,21 +61,46 @@ const ColorPalette: React.FC = () => {
     <div className="fixed bottom-0 left-0 right-0 p-4 bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-1px_rgba(0,0,0,0.06)]">
       <div className="max-w-7xl mx-auto flex items-center">
         <div className="flex-1 flex justify-center relative">
-          <div className="flex gap-1">
-            {colors.map((color) => (
-              <button
-                key={color}
+          <div className="flex items-center gap-2">
+            {/* Custom Color Picker */}
+            <div className="relative">
+              <input
+                type="color"
+                value={selectedColor}
+                onChange={(e) => !isOnCooldown && setSelectedColor(e.target.value)}
                 disabled={isOnCooldown}
-                className={`w-8 h-8 rounded-md transition-all ${
-                  selectedColor === color 
+                className={`w-8 h-8 rounded-md border-2 border-gray-300 cursor-pointer transition-all ${
+                  selectedColor && !colors.includes(selectedColor)
                     ? 'ring-2 ring-indigo-600 scale-110' 
                     : 'hover:scale-105'
-                } ${color === '#ffffff' ? 'ring-1 ring-gray-200' : ''}`}
-                style={{ backgroundColor: color }}
-                onClick={() => !isOnCooldown && setSelectedColor(color)}
-                aria-label={`Select color ${color}`}
+                } ${isOnCooldown ? 'opacity-50 cursor-not-allowed' : ''}`}
+                aria-label="Select custom color"
               />
-            ))}
+              {selectedColor && !colors.includes(selectedColor) && (
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-indigo-600 rounded-full"></div>
+              )}
+            </div>
+            
+            {/* Divider */}
+            <div className="w-px h-6 bg-gray-300"></div>
+            
+            {/* Predefined Colors */}
+            <div className="flex gap-1">
+              {colors.map((color) => (
+                <button
+                  key={color}
+                  disabled={isOnCooldown}
+                  className={`w-8 h-8 rounded-md transition-all ${
+                    selectedColor === color 
+                      ? 'ring-2 ring-indigo-600 scale-110' 
+                      : 'hover:scale-105'
+                  } ${color === '#ffffff' ? 'ring-1 ring-gray-200' : ''}`}
+                  style={{ backgroundColor: color }}
+                  onClick={() => !isOnCooldown && setSelectedColor(color)}
+                  aria-label={`Select color ${color}`}
+                />
+              ))}
+            </div>
           </div>
           {isOnCooldown && (!connected || tokenBalance < 5000) && (
             <div className="absolute inset-0 flex items-center justify-center bg-white">

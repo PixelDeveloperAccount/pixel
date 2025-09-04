@@ -411,9 +411,9 @@ const Canvas: React.FC = () => {
 
       {clickedPixel && !isPlacingPixel && (
         <div 
-          className="absolute bg-white/95 backdrop-blur-sm shadow-xl rounded-xl p-6 z-50 text-base min-w-[400px] inline-block relative max-w-[90vw]"
+          className="fixed bg-white/95 backdrop-blur-sm shadow-xl rounded-xl p-6 z-50 text-base min-w-[400px] inline-block max-w-[90vw]"
           style={{
-            bottom: '12px',
+            bottom: '48px',
             left: '50%',
             transform: 'translateX(-50%)',
             pointerEvents: 'auto'

@@ -49,13 +49,23 @@ const Sidebar: React.FC = () => {
 
         <div className="flex-1 overflow-y-auto">
           <div className="p-4 border-b border-gray-100">
-            <code
+            <div
               onClick={handleCopy}
               title="Click to copy contract address"
-              className="text-base text-gray-700 w-full block text-center font-mono truncate cursor-pointer hover:text-indigo-600 transition-colors py-2"
+              className="flex items-center justify-between p-2 bg-gray-50 rounded cursor-pointer hover:bg-gray-100 transition-colors"
             >
-              {CONTRACT_ADDRESS}
-            </code>
+              <div className="flex items-center space-x-2 text-gray-700">
+                <img
+                  src="https://unpkg.com/pixelarticons@1.8.1/svg/copy.svg"
+                  alt="Contract Address"
+                  className="h-4 w-4"
+                />
+                <span className="text-sm">Contract:</span>
+              </div>
+              <code className="text-sm font-medium text-gray-900 font-mono">
+                {CONTRACT_ADDRESS.slice(0, 8)}...{CONTRACT_ADDRESS.slice(-8)}
+              </code>
+            </div>
           </div>
 
           <div className="p-4 space-y-6">

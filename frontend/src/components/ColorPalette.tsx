@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useCanvas } from '../context/CanvasContext';
 import { useWallet } from '../context/WalletContext';
+import { useSound } from '../context/SoundContext';
 
 const colors = [
   '#be0039', '#ff4500', '#ffa800', '#ffd635', '#fff8b8', '#00a368',
@@ -32,6 +33,7 @@ const ColorPalette: React.FC = () => {
     connected,
     tokenBalance
   } = useWallet();
+  const { isMuted } = useSound();
 
   // Clear any previously selected color whenever the palette visibility or cooldown overlay changes
   useEffect(() => {
@@ -51,6 +53,7 @@ const ColorPalette: React.FC = () => {
   if (!isPlacingPixel) return null;
 
   const playPixelPaintSound = () => {
+    if (isMuted) return; // Don't play sound if muted
     // Sound for confirming/painting a pixel
     const audio = new Audio('/sounds/pixel-confirm1.mp3');
     audio.volume = 0.4;

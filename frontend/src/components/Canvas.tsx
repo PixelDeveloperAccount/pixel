@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useCanvas } from '../context/CanvasContext';
 import { useWallet } from '../context/WalletContext';
+import { useSound } from '../context/SoundContext';
 import HelpModal from './HelpModal';
 import LeaderboardModal from './LeaderboardModal';
 
@@ -24,6 +25,7 @@ const Canvas: React.FC = () => {
     setSelectedColor
   } = useCanvas();
   const { connected } = useWallet();
+  const { isMuted, setIsMuted } = useSound();
   
   const [isDragging, setIsDragging] = useState(false);
   const [startDragPosition, setStartDragPosition] = useState({ x: 0, y: 0 });
@@ -46,6 +48,7 @@ const Canvas: React.FC = () => {
 
   // Sound effects
   const playPixelClickSound = () => {
+    if (isMuted) return; // Don't play sound if muted
     // Randomly pick between 2 pixel click sounds
     const clickSounds = [
       '/sounds/pixel-click1.mp3',
@@ -58,6 +61,7 @@ const Canvas: React.FC = () => {
   };
 
   const playPixelPaintSound = () => {
+    if (isMuted) return; // Don't play sound if muted
     // Sound for confirming/painting a pixel
     const audio = new Audio('/sounds/pixel-confirm1.mp3');
     audio.volume = 0.4;
@@ -471,6 +475,23 @@ const Canvas: React.FC = () => {
           <img 
             src="https://unpkg.com/pixelarticons@1.8.1/svg/zoom-out.svg" 
             alt="Reset zoom" 
+            className="h-7 w-7" 
+          />
+        </button>
+        <button
+          onClick={() => setIsMuted(!isMuted)}
+          className={`p-2 rounded-lg transition-colors text-gray-900 shadow-lg ${
+            isMuted ? 'bg-red-100 hover:bg-red-200' : 'bg-white hover:bg-gray-100'
+          }`}
+          aria-label={isMuted ? "Unmute sounds" : "Mute sounds"}
+          title={isMuted ? "Unmute sounds" : "Mute sounds"}
+        >
+          <img 
+            src={isMuted 
+              ? "https://unpkg.com/pixelarticons@1.8.1/svg/volume-off.svg" 
+              : "https://unpkg.com/pixelarticons@1.8.1/svg/volume-high.svg"
+            } 
+            alt={isMuted ? "Unmute" : "Mute"} 
             className="h-7 w-7" 
           />
         </button>

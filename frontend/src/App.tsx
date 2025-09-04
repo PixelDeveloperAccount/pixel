@@ -10,6 +10,7 @@ import { clusterApiUrl } from '@solana/web3.js';
 import { Layout } from './components/Layout';
 import { CanvasProvider } from './context/CanvasContext';
 import { WalletProvider } from './context/WalletContext';
+import { SoundProvider } from './context/SoundContext';
 import HomePage from './pages/HomePage';
 import { Toaster, resolveValue, ToastBar } from 'react-hot-toast'; // Import Toaster, resolveValue, and ToastBar
 
@@ -33,7 +34,8 @@ function App() {
         <WalletModalProvider>
           <WalletProvider>
             <CanvasProvider>
-              <Layout>
+              <SoundProvider>
+                <Layout>
                 {/* Custom Toaster Implementation with Tailwind CSS - Compact Version */}
                 <Toaster position="top-center">
                   {(t) => {
@@ -79,7 +81,8 @@ function App() {
                   }}
                 </Toaster>
                 <HomePage />
-              </Layout>
+                </Layout>
+              </SoundProvider>
             </CanvasProvider>
           </WalletProvider>
         </WalletModalProvider>

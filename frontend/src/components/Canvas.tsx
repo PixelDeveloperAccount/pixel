@@ -411,7 +411,7 @@ const Canvas: React.FC = () => {
 
       {clickedPixel && !isPlacingPixel && (
         <div 
-          className="fixed bg-white/95 backdrop-blur-sm shadow-xl rounded-xl p-6 z-50 text-base min-w-[400px]"
+          className="fixed bg-white/95 backdrop-blur-sm shadow-xl rounded-xl p-6 z-50 text-base min-w-[400px] relative"
           style={{
             bottom: '12px',
             left: '50%',
@@ -419,6 +419,18 @@ const Canvas: React.FC = () => {
             pointerEvents: 'auto'
           }}
         >
+          <button 
+            onClick={() => setClickedPixel(null)}
+            className="absolute top-2 right-2 p-1 rounded hover:bg-gray-100 transition-colors"
+            aria-label="Close"
+            title="Close"
+          >
+            <img 
+              src="https://unpkg.com/pixelarticons@1.8.1/svg/x.svg" 
+              alt="Close" 
+              className="h-5 w-5"
+            />
+          </button>
           <div className="space-y-3">
             {/* Pixel Info */}
             <div className="flex items-center space-x-3">
@@ -433,14 +445,10 @@ const Canvas: React.FC = () => {
                 />
               )}
               <div>
-                <p className="font-semibold text-gray-900 text-lg">
+                <p className="font-semibold text-gray-900 text-2xl">
                   Pixel: {clickedPixel.x}, {clickedPixel.y}
                 </p>
-                {clickedPixel.walletAddress ? (
-                  <p className="text-base text-gray-600">
-                    Color: {clickedPixel.color.toUpperCase()}
-                  </p>
-                ) : (
+                {!clickedPixel.walletAddress && (
                   <p className="text-base text-gray-500">
                     Not painted yet
                   </p>

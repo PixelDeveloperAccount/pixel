@@ -124,49 +124,26 @@ const Canvas: React.FC = () => {
     ctx.fillStyle = '#fafafa';
     ctx.fillRect(position.x, position.y, canvasSize * scale, canvasSize * scale);
     
-    // Draw grid lines (faint grey) - only in empty areas
+    // Draw grid lines (faint grey)
     ctx.strokeStyle = '#f0f0f0';
     ctx.lineWidth = 1;
     const gridSize = scale;
-
-    // Create a set of occupied positions for quick lookup
-    const occupiedPositions = new Set(pixels.map(p => `${p.x},${p.y}`));
 
     for (let i = 0; i <= canvasSize; i++) {
       const x = position.x + i * gridSize;
       const y = position.y + i * gridSize;
 
-      // Draw vertical lines only between empty cells
-      for (let j = 0; j < canvasSize; j++) {
-        const leftPos = `${i-1},${j}`;
-        const rightPos = `${i},${j}`;
-        const leftOccupied = i > 0 && occupiedPositions.has(leftPos);
-        const rightOccupied = i < canvasSize && occupiedPositions.has(rightPos);
-        
-        // Only draw vertical line if both adjacent cells are empty
-        if (!leftOccupied && !rightOccupied) {
-          ctx.beginPath();
-          ctx.moveTo(x, position.y + j * gridSize);
-          ctx.lineTo(x, position.y + (j + 1) * gridSize);
-          ctx.stroke();
-        }
-      }
+      // Vertical lines
+      ctx.beginPath();
+      ctx.moveTo(x, position.y);
+      ctx.lineTo(x, position.y + canvasSize * scale);
+      ctx.stroke();
 
-      // Draw horizontal lines only between empty cells
-      for (let j = 0; j < canvasSize; j++) {
-        const topPos = `${j},${i-1}`;
-        const bottomPos = `${j},${i}`;
-        const topOccupied = i > 0 && occupiedPositions.has(topPos);
-        const bottomOccupied = i < canvasSize && occupiedPositions.has(bottomPos);
-        
-        // Only draw horizontal line if both adjacent cells are empty
-        if (!topOccupied && !bottomOccupied) {
-          ctx.beginPath();
-          ctx.moveTo(position.x + j * gridSize, y);
-          ctx.lineTo(position.x + (j + 1) * gridSize, y);
-          ctx.stroke();
-        }
-      }
+      // Horizontal lines
+      ctx.beginPath();
+      ctx.moveTo(position.x, y);
+      ctx.lineTo(position.x + canvasSize * scale, y);
+      ctx.stroke();
     }
 
     // Draw pixels

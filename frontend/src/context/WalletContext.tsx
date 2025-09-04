@@ -17,6 +17,7 @@ interface WalletContextType {
   pixelQuota: number;
   pixelsRemaining: number;
   cooldownTime: number;
+  cooldownTimeLeft: number;
   isOnCooldown: boolean;
   decrementPixels: () => void;
   startCooldown: () => void;
@@ -35,6 +36,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [pixelsRemaining, setPixelsRemaining] = useState(1);
   const [isOnCooldown, setIsOnCooldown] = useState(false);
   const [cooldownTime, setCooldownTime] = useState(300);
+  const [cooldownTimeLeft, setCooldownTimeLeft] = useState(0);
   const cooldownIntervalRef = useRef<number>();
 
   // Load cooldown state from localStorage on mount
@@ -52,22 +54,28 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             // Still on cooldown
             setIsOnCooldown(true);
             setPixelsRemaining(0);
+            setCooldownTimeLeft(remaining);
             
             // Start the countdown from where it left off
             let timeLeft = remaining;
             cooldownIntervalRef.current = window.setInterval(() => {
               timeLeft -= 1;
+              setCooldownTimeLeft(timeLeft);
               if (timeLeft <= 0) {
                 clearCooldown();
                 localStorage.removeItem('pixel-cooldown');
-                const quota = connected ? calculateQuota(tokenBalance) : 1;
+                // Use current tokenBalance or fallback to balance
+                const currentTokens = tokenBalance || balance;
+                const quota = connected ? calculateQuota(currentTokens) : 1;
                 setPixelsRemaining(quota);
               }
             }, 1000);
           } else {
             // Cooldown has expired, clean up
             localStorage.removeItem('pixel-cooldown');
-            const quota = connected ? calculateQuota(tokenBalance) : 1;
+            // Use current tokenBalance or fallback to balance
+            const currentTokens = tokenBalance || balance;
+            const quota = connected ? calculateQuota(currentTokens) : 1;
             setPixelsRemaining(quota);
           }
         }
@@ -76,7 +84,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         localStorage.removeItem('pixel-cooldown');
       }
     }
-  }, [walletAddress, connected, tokenBalance]);
+  }, [walletAddress, connected, tokenBalance, balance]);
 
   const calculateQuota = (tokens: number) => {
     if (!connected) return 1;
@@ -95,6 +103,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       cooldownIntervalRef.current = undefined;
     }
     setIsOnCooldown(false);
+    setCooldownTimeLeft(0);
     localStorage.removeItem('pixel-cooldown');
   };
 
@@ -149,6 +158,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const startCooldown = () => {
     if (!isOnCooldown && walletAddress) {
       setIsOnCooldown(true);
+      setCooldownTimeLeft(cooldownTime);
       
       // Save cooldown data to localStorage
       const cooldownData = {
@@ -161,6 +171,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       let timeLeft = cooldownTime;
       cooldownIntervalRef.current = window.setInterval(() => {
         timeLeft -= 1;
+        setCooldownTimeLeft(timeLeft);
         if (timeLeft <= 0) {
           clearCooldown();
           localStorage.removeItem('pixel-cooldown');
@@ -182,6 +193,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       pixelQuota: calculateQuota(balance),
       pixelsRemaining,
       cooldownTime,
+      cooldownTimeLeft,
       isOnCooldown,
       decrementPixels,
       startCooldown

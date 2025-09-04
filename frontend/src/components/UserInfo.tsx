@@ -9,20 +9,8 @@ const UserInfo: React.FC = () => {
     pixelsRemaining,
     pixelQuota,
     isOnCooldown,
-    cooldownTime
+    cooldownTimeLeft
   } = useWallet();
-
-  const [timeLeft, setTimeLeft] = useState(cooldownTime);
-
-  useEffect(() => {
-    if (isOnCooldown) {
-      setTimeLeft(cooldownTime);
-      const interval = setInterval(() => {
-        setTimeLeft(prev => Math.max(0, prev - 1));
-      }, 1000);
-      return () => clearInterval(interval);
-    }
-  }, [isOnCooldown, cooldownTime]);
   
   if (!connected) {
     return (
@@ -64,7 +52,7 @@ const UserInfo: React.FC = () => {
         {isOnCooldown && (
           <div className="flex items-center justify-center space-x-2 text-orange-600 mt-2">
             <Timer className="h-5 w-5" />
-            <span className="font-medium">{timeLeft}s</span>
+            <span className="font-medium">{cooldownTimeLeft}s</span>
           </div>
         )}
       </div>

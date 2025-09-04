@@ -27,28 +27,10 @@ const ColorPalette: React.FC = () => {
     startCooldown, 
     pixelsRemaining,
     isOnCooldown,
-    cooldownTime,
+    cooldownTimeLeft,
     connected,
     tokenBalance
   } = useWallet();
-
-  const [timeLeft, setTimeLeft] = useState(cooldownTime);
-
-  useEffect(() => {
-    if (isOnCooldown) {
-      setTimeLeft(cooldownTime);
-      const interval = setInterval(() => {
-        setTimeLeft(prev => Math.max(0, prev - 1));
-      }, 1000);
-      return () => clearInterval(interval);
-    }
-  }, [isOnCooldown, cooldownTime]);
-
-  useEffect(() => {
-    if (connected && tokenBalance >= 5000) {
-      setTimeLeft(0);
-    }
-  }, [connected, tokenBalance]);
 
 
   if (!isPlacingPixel) return null;
@@ -96,7 +78,7 @@ const ColorPalette: React.FC = () => {
                   alt="Place" 
                   className="h-6 w-6" 
                 />
-                <span>{timeLeft}s</span>
+                <span>{cooldownTimeLeft}s</span>
               </div>
             </div>
           )}

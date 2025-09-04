@@ -35,7 +35,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [tokenBalance, setTokenBalance] = useState(0);
   const [pixelsRemaining, setPixelsRemaining] = useState(1);
   const [isOnCooldown, setIsOnCooldown] = useState(false);
-  const [cooldownTime, setCooldownTime] = useState(300);
+  const [cooldownTime, setCooldownTime] = useState(5);
   const [cooldownTimeLeft, setCooldownTimeLeft] = useState(0);
   const cooldownIntervalRef = useRef<number>();
 
@@ -92,9 +92,9 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const calculateCooldown = (tokens: number) => {
-    if (!connected) return 300; 
+    if (!connected) return 5; 
     const reduction = Math.floor(tokens / 10000) * 10; 
-    return Math.max(60, 300 - reduction); 
+    return Math.max(5, 5 - reduction); 
   };
 
   const clearCooldown = () => {
@@ -139,7 +139,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const disconnectWallet = () => {
     disconnect();
     setPixelsRemaining(1);
-    setCooldownTime(300);
+    setCooldownTime(5);
     clearCooldown();
     localStorage.removeItem('pixel-cooldown');
   };

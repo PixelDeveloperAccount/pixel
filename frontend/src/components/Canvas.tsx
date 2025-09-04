@@ -413,7 +413,7 @@ const Canvas: React.FC = () => {
         <div 
           className="fixed bg-white/95 backdrop-blur-sm shadow-xl rounded-xl p-6 z-50 text-base min-w-[400px] inline-block max-w-[90vw]"
           style={{
-            bottom: 'clamp(24px, 8vh, 120px)',
+            bottom: 'clamp(12px, 4vh, 60px)',
             left: '50%',
             transform: 'translateX(-50%)',
             pointerEvents: 'auto',

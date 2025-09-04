@@ -31,6 +31,7 @@ const Canvas: React.FC = () => {
   const [targetPosition, setTargetPosition] = useState<{ x: number, y: number } | null>(null);
   const [clickedPixel, setClickedPixel] = useState<{ x: number, y: number, color: string, walletAddress?: string | null } | null>(null);
   const [canvasReady, setCanvasReady] = useState(false);
+  const [hoverPosition, setHoverPosition] = useState<{ x: number, y: number } | null>(null);
   const animationRef = useRef<number>();
 
   // Sound effects
@@ -155,16 +156,26 @@ const Canvas: React.FC = () => {
       ctx.strokeRect(pixelX, pixelY, scale, scale);
     });
 
-    // Draw selected position indicator
-    if (selectedPosition) {
+    // Draw hover position indicator (always visible when hovering)
+    if (hoverPosition) {
+      const hoverX = position.x + hoverPosition.x * scale;
+      const hoverY = position.y + hoverPosition.y * scale;
+
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(hoverX - 1, hoverY - 1, scale + 2, scale + 2);
+    }
+
+    // Draw selected position indicator (only when placing pixel)
+    if (selectedPosition && isPlacingPixel) {
       const selectedX = position.x + selectedPosition.x * scale;
       const selectedY = position.y + selectedPosition.y * scale;
 
-      ctx.strokeStyle = '#000000';
+      ctx.strokeStyle = '#ff0000';
       ctx.lineWidth = 3;
       ctx.strokeRect(selectedX - 1, selectedY - 1, scale + 2, scale + 2);
     }
-  }, [pixels, position, scale, selectedPosition, canvasSize, canvasReady]);
+  }, [pixels, position, scale, selectedPosition, hoverPosition, isPlacingPixel, canvasSize, canvasReady]);
 
   // Force initial render
   useEffect(() => {
@@ -243,6 +254,28 @@ const Canvas: React.FC = () => {
       
       setPosition(newPosition);
       setStartDragPosition({ x: e.clientX, y: e.clientY });
+    } else {
+      // Track hover position for cursor display
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      const gridX = Math.floor((x - position.x) / scale);
+      const gridY = Math.floor((y - position.y) / scale);
+      
+      if (
+        gridX >= 0 && 
+        gridX < canvasSize && 
+        gridY >= 0 && 
+        gridY < canvasSize
+      ) {
+        setHoverPosition({ x: gridX, y: gridY });
+      } else {
+        setHoverPosition(null);
+      }
     }
   };
 
@@ -252,6 +285,7 @@ const Canvas: React.FC = () => {
 
   const handleMouseLeave = () => {
     setIsDragging(false);
+    setHoverPosition(null);
   };
 
   const handleWheel = (e: React.WheelEvent) => {

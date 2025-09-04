@@ -28,10 +28,11 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
               <span>PIXEL tokens determine your pixel placement abilities</span>
             </div>
             <ul className="list-disc list-inside space-y-2">
-              <li>1-999 tokens: 5 pixels, 5 min cooldown</li>
-              <li>1,000-4,999 tokens: 10 pixels, 3 min cooldown</li>
-              <li>5,000-9,999 tokens: 15 pixels, 2 min cooldown</li>
-              <li>10,000+ tokens: 20 pixels, 1 min cooldown</li>
+              <li>0 Tokens: 1 minute cooldown, 5 Pixels</li>
+              <li>1 - 50,000 Tokens: 30 second cooldown, 30 Pixels</li>
+              <li>50,001 - 300,000 Tokens: 25 second cooldown, 45 Pixels</li>
+              <li>300,001 - 1,000,000 Tokens: 15 second cooldown, 70 Pixels</li>
+              <li>1,000,000+ Tokens: No cooldown, Infinite Pixels</li>
             </ul>
           </div>
 
@@ -39,9 +40,9 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
             <h3 className="font-semibold text-gray-900 mb-2 text-xl">Cooldown System</h3>
             <div className="flex items-center space-x-2 mb-2">
               <Timer className="w-6 h-6 text-orange-600" />
-              <span>After using all pixels, a cooldown period begins</span>
+              <span>No cooldown between individual pixel placements</span>
             </div>
-            <p>Your cooldown duration decreases as you hold more PIXEL tokens!</p>
+            <p>Cooldown only starts when you run out of pixels. Higher token holders get faster cooldowns and more pixels!</p>
           </div>
         </div>
 

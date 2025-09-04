@@ -111,7 +111,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   // Toast notifications for wallet connection/disconnection
   useEffect(() => {
     if (connected && walletAddress) {
-      toast.success(`Wallet connected! ${walletAddress.slice(0, 8)}...${walletAddress.slice(-8)}`, {
+      toast.success(`Wallet connected!`, {
         duration: 3000,
         style: {
           background: '#10B981',

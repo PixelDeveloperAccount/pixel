@@ -110,30 +110,22 @@ const UserColors: React.FC = () => {
         <span className="text-sm text-gray-500">{userColors.length} colors used</span>
       </div>
       
-      <div className="flex flex-wrap gap-2 justify-center">
+      <div className="flex justify-between items-center">
         {topColors.map((colorData, index) => (
           <div 
             key={index} 
-            className="relative w-12 h-12 rounded border-2 border-gray-300 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+            className="relative w-10 h-10 rounded border-2 border-gray-300 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
             style={{ backgroundColor: colorData.color }}
             title={`${colorData.color.toUpperCase()} - ${colorData.count} pixel${colorData.count > 1 ? 's' : ''}`}
           >
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-xs font-bold text-white drop-shadow-lg">
+              <span className="text-sm font-bold text-white drop-shadow-lg">
                 {colorData.count}
               </span>
             </div>
           </div>
         ))}
       </div>
-      
-      {userColors.length > 5 && (
-        <div className="mt-3 pt-2 border-t border-gray-200">
-          <div className="text-xs text-gray-500 text-center">
-            Showing top 5 of {userColors.length} colors
-          </div>
-        </div>
-      )}
     </div>
   );
 };

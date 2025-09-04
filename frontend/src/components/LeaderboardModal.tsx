@@ -127,16 +127,16 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
           </button>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="flex flex-wrap gap-2 mb-4">
+        {/* Main Category Navigation - Big Bar */}
+        <div className="flex w-full mb-4 bg-gray-100 rounded-lg p-1">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors font-['Pixelify_Sans'] ${
+              className={`flex-1 flex items-center justify-center space-x-2 px-4 py-3 rounded-md transition-colors font-['Pixelify_Sans'] ${
                 activeTab === tab.id
-                  ? 'bg-indigo-600 text-white border-b-2 border-indigo-600'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-white text-indigo-600 shadow-sm'
+                  : 'text-gray-700 hover:text-gray-900'
               }`}
             >
               <tab.icon className="h-5 w-5" />
@@ -145,15 +145,15 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
           ))}
         </div>
 
-        {/* Timeframe Navigation */}
-        <div className="flex flex-wrap gap-2 mb-6">
+        {/* Timeframe Navigation - Small Tabs */}
+        <div className="flex gap-1 mb-6">
           {timeframes.map((timeframe) => (
             <button
               key={timeframe.id}
               onClick={() => setActiveTimeframe(timeframe.id)}
-              className={`px-4 py-2 rounded-lg transition-colors font-['Pixelify_Sans'] ${
+              className={`px-3 py-1 text-sm rounded transition-colors font-['Pixelify_Sans'] ${
                 activeTimeframe === timeframe.id
-                  ? 'bg-indigo-600 text-white border-b-2 border-indigo-600'
+                  ? 'bg-indigo-600 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >

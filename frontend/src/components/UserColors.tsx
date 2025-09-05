@@ -95,6 +95,23 @@ const UserColors: React.FC = () => {
     return null;
   }
 
+  // Render shimmer while loading
+  if (loading) {
+    return (
+      <div className="bg-white rounded-lg shadow-lg p-4">
+        <div className="flex justify-between items-center mb-3">
+          <h3 className="text-lg font-semibold text-gray-900">Your Colors</h3>
+          <span className="text-sm text-gray-400">Loading…</span>
+        </div>
+        <div className="flex justify-between items-center">
+          {[...Array(5)].map((_, idx) => (
+            <div key={idx} className="relative w-10 h-10 rounded border-2 border-gray-200 shadow-sm shimmer"></div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   // Only show if user has more than 3 colors
   if (userColors.length <= 3) {
     return null;

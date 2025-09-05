@@ -178,6 +178,13 @@ const Canvas: React.FC = () => {
     }
   }, [isPlacingPixel]);
 
+  // Close the pixel info modal whenever Help or Leaderboard modals open
+  useEffect(() => {
+    if (showHelp || showLeaderboard) {
+      setClickedPixel(null);
+    }
+  }, [showHelp, showLeaderboard]);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || !canvasReady) return;

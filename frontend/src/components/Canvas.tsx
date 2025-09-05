@@ -72,10 +72,30 @@ const Canvas: React.FC = () => {
     const canvas = canvasRef.current;
     if (!canvas) return newPosition;
 
+    // Calculate the scaled canvas size
+    const scaledCanvasSize = canvasSize * scale;
+    
+    // Calculate the center position to keep canvas centered
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    
+    // Calculate the offset needed to center the canvas
+    const offsetX = centerX - scaledCanvasSize / 2;
+    const offsetY = centerY - scaledCanvasSize / 2;
+    
+    // When fully zoomed out (scale <= 0.1), limit panning to keep canvas centered
+    if (scale <= 0.1) {
+      return {
+        x: offsetX,
+        y: offsetY
+      };
+    }
+    
+    // For other zoom levels, allow normal panning but with bounds
     const maxPanX = canvas.width;
     const maxPanY = canvas.height;
-    const minPanX = -canvasSize * scale;
-    const minPanY = -canvasSize * scale;
+    const minPanX = -scaledCanvasSize;
+    const minPanY = -scaledCanvasSize;
 
     return {
       x: Math.min(maxPanX, Math.max(minPanX, newPosition.x)),

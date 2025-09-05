@@ -18,9 +18,9 @@ const stickerImages = [
 const generateStickerData = () => {
   // Canvas dimensions
   const canvasSize = 1000;
-  const minDistanceFromEdge = 100;
-  const minDistanceFromCenter = 250; // Distance from canvas center
-  const minDistanceBetweenStickers = 120;
+  const minDistanceFromEdge = 200; // Increased buffer from canvas edge
+  const minDistanceFromCenter = 300; // Increased distance from canvas center
+  const minDistanceBetweenStickers = 150; // Increased spacing between stickers
   
   // Calculate world coordinates for gray areas around the canvas
   const centerX = canvasSize / 2;
@@ -37,24 +37,24 @@ const generateStickerData = () => {
     
     do {
       // Generate positions in world coordinates (around the canvas)
-      // Place stickers in the gray areas around the canvas
+      // Place stickers in the gray areas around the canvas with larger buffers
       const side = Math.floor(Math.random() * 4); // 0=top, 1=right, 2=bottom, 3=left
       
       switch (side) {
         case 0: // Top
           x = Math.random() * canvasSize;
-          y = -Math.random() * minDistanceFromEdge - 50;
+          y = -Math.random() * minDistanceFromEdge - 150; // Further from canvas
           break;
         case 1: // Right
-          x = canvasSize + Math.random() * minDistanceFromEdge + 50;
+          x = canvasSize + Math.random() * minDistanceFromEdge + 150; // Further from canvas
           y = Math.random() * canvasSize;
           break;
         case 2: // Bottom
           x = Math.random() * canvasSize;
-          y = canvasSize + Math.random() * minDistanceFromEdge + 50;
+          y = canvasSize + Math.random() * minDistanceFromEdge + 150; // Further from canvas
           break;
         case 3: // Left
-          x = -Math.random() * minDistanceFromEdge - 50;
+          x = -Math.random() * minDistanceFromEdge - 150; // Further from canvas
           y = Math.random() * canvasSize;
           break;
         default:
@@ -99,7 +99,7 @@ const generateStickerData = () => {
       },
       rotation: Math.random() * 360 - 180, // Random rotation between -180 and 180 degrees
       size: size,
-      zIndex: Math.floor(Math.random() * 3) + 1, // Lower z-index to stay behind canvas
+      zIndex: -1, // Very low z-index to stay behind all UI elements
     };
   });
 };

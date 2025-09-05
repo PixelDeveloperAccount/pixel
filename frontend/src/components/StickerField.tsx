@@ -30,13 +30,14 @@ const generateStickerData = () => {
     let top, left;
     let attempts = 0;
     const maxAttempts = 50;
+    let distanceFromCenter;
     
     do {
       top = Math.random() * (viewportHeight - minDistanceFromEdge * 2) + minDistanceFromEdge;
       left = Math.random() * (viewportWidth - minDistanceFromEdge * 2) + minDistanceFromEdge;
       
       // Check if position is too close to center
-      const distanceFromCenter = Math.sqrt(
+      distanceFromCenter = Math.sqrt(
         Math.pow(left - centerX, 2) + Math.pow(top - centerY, 2)
       );
       

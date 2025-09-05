@@ -488,8 +488,8 @@ const Canvas: React.FC = () => {
         >
           <img 
             src={isMuted 
-              ? "https://unpkg.com/pixelarticons@1.8.1/svg/volume-off.svg" 
-              : "https://unpkg.com/pixelarticons@1.8.1/svg/volume-high.svg"
+              ? "https://unpkg.com/pixelarticons@1.8.1/svg/volume-x.svg" 
+              : "https://unpkg.com/pixelarticons@1.8.1/svg/volume-3.svg"
             } 
             alt={isMuted ? "Unmute" : "Mute"} 
             className="h-7 w-7" 

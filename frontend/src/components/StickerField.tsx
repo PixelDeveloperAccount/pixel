@@ -41,7 +41,7 @@ const generateStickerData = () => {
     let validPosition = false;
     
     do {
-      size = Math.random() * 80 + 120; // Base size between 120px and 200px
+      size = Math.random() * 160 + 240; // Base size between 240px and 400px (2x bigger)
       
       // Generate positions in a much larger area around the canvas
       // This covers the entire zoom spectrum from 0.1x to 50x

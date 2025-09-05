@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Palette, Clock, Map, BarChart3 } from 'lucide-react';
+import { Palette, Clock, Map, BarChart3 } from 'lucide-react';
 
 interface LeaderboardEntry {
   walletAddress: string;
@@ -127,9 +127,15 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
           </h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            className="p-1 rounded-xl hover:bg-gray-100 transition-colors"
+            aria-label="Close"
+            title="Close"
           >
-            <X className="h-6 w-6 text-gray-500" />
+            <img 
+              src="https://unpkg.com/pixelarticons@1.8.1/svg/close.svg" 
+              alt="Close" 
+              className="h-5 w-5"
+            />
           </button>
         </div>
 

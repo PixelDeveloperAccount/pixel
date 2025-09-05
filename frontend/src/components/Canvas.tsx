@@ -480,7 +480,7 @@ const Canvas: React.FC = () => {
           title="Reset zoom"
         >
           <img 
-            src="https://unpkg.com/pixelarticons@1.8.1/svg/zoom-out.svg" 
+            src="https://unpkg.com/pixelarticons@1.8.1/svg/scale.svg" 
             alt="Reset zoom" 
             className="h-7 w-7" 
           />

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Palette, Clock, Map } from 'lucide-react';
 
 interface LeaderboardEntry {
   walletAddress: string;
@@ -34,10 +33,30 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
   });
 
   const tabs = [
-    { id: 'pixels', name: 'Pixels', icon: Palette, description: 'Total pixels per user' },
-    { id: 'colours', name: 'Colours', icon: Palette, description: 'Overall most used colours on canvas' },
-    { id: 'territory', name: 'Territory', icon: Map, description: 'Most pixels linked together per user' },
-    { id: 'timeplayed', name: 'Time Played', icon: Clock, description: 'Longest time spent on canvas' }
+    { 
+      id: 'pixels', 
+      name: 'Pixels', 
+      icon: () => <img src="https://unpkg.com/pixelarticons@1.8.1/svg/paint-bucket.svg" alt="Pixels" className="h-5 w-5" />, 
+      description: 'Total pixels per user' 
+    },
+    { 
+      id: 'colours', 
+      name: 'Colours', 
+      icon: () => <img src="https://unpkg.com/pixelarticons@1.8.1/svg/palette.svg" alt="Colours" className="h-5 w-5" />, 
+      description: 'Overall most used colours on canvas' 
+    },
+    { 
+      id: 'territory', 
+      name: 'Territory', 
+      icon: () => <img src="https://unpkg.com/pixelarticons@1.8.1/svg/map.svg" alt="Territory" className="h-5 w-5" />, 
+      description: 'Most pixels linked together per user' 
+    },
+    { 
+      id: 'timeplayed', 
+      name: 'Time Played', 
+      icon: () => <img src="https://unpkg.com/pixelarticons@1.8.1/svg/clock.svg" alt="Time Played" className="h-5 w-5" />, 
+      description: 'Longest time spent on canvas' 
+    }
   ];
 
   const timeframes = [
@@ -181,7 +200,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
                   : 'text-gray-700 hover:text-gray-900'
               }`}
             >
-              <tab.icon className="h-5 w-5" />
+              <tab.icon />
               <span>{tab.name}</span>
             </button>
           ))}

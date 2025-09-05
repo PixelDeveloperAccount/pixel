@@ -1,5 +1,5 @@
 import React from 'react';
-import Sticker from './Sticker';
+import { useCanvas } from '../context/CanvasContext';
 
 // Array of your local sticker images
 const stickerImages = [
@@ -16,11 +16,11 @@ const stickerImages = [
 
 // Generate random positions and rotations for stickers in world coordinates
 const generateStickerData = () => {
-  // Canvas dimensions (assuming 1000x1000 canvas)
+  // Canvas dimensions
   const canvasSize = 1000;
-  const minDistanceFromEdge = 50;
-  const minDistanceFromCenter = 200; // Distance from canvas center
-  const minDistanceBetweenStickers = 80;
+  const minDistanceFromEdge = 100;
+  const minDistanceFromCenter = 250; // Distance from canvas center
+  const minDistanceBetweenStickers = 120;
   
   // Calculate world coordinates for gray areas around the canvas
   const centerX = canvasSize / 2;
@@ -43,18 +43,18 @@ const generateStickerData = () => {
       switch (side) {
         case 0: // Top
           x = Math.random() * canvasSize;
-          y = Math.random() * minDistanceFromEdge;
+          y = -Math.random() * minDistanceFromEdge - 50;
           break;
         case 1: // Right
-          x = canvasSize + Math.random() * minDistanceFromEdge;
+          x = canvasSize + Math.random() * minDistanceFromEdge + 50;
           y = Math.random() * canvasSize;
           break;
         case 2: // Bottom
           x = Math.random() * canvasSize;
-          y = canvasSize + Math.random() * minDistanceFromEdge;
+          y = canvasSize + Math.random() * minDistanceFromEdge + 50;
           break;
         case 3: // Left
-          x = Math.random() * minDistanceFromEdge;
+          x = -Math.random() * minDistanceFromEdge - 50;
           y = Math.random() * canvasSize;
           break;
         default:
@@ -62,7 +62,7 @@ const generateStickerData = () => {
           y = Math.random() * canvasSize;
       }
       
-      size = Math.random() * 100 + 100; // Bigger: Random size between 100px and 200px
+      size = Math.random() * 80 + 120; // Base size between 120px and 200px
       
       // Check if position is too close to center (canvas area)
       distanceFromCenter = Math.sqrt(
@@ -105,6 +105,7 @@ const generateStickerData = () => {
 };
 
 const StickerField: React.FC = () => {
+  const { scale, position, canvasSize } = useCanvas();
   const [stickerData, setStickerData] = React.useState(generateStickerData());
 
   // Regenerate positions on window resize
@@ -119,27 +120,34 @@ const StickerField: React.FC = () => {
 
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-      {stickerData.map((sticker, index) => (
-        <div
-          key={`${sticker.alt}-${index}`}
-          className="absolute pointer-events-none select-none"
-          style={{
-            left: `${sticker.position.x}px`,
-            top: `${sticker.position.y}px`,
-            transform: `rotate(${sticker.rotation}deg)`,
-            width: `${sticker.size}px`,
-            height: `${sticker.size}px`,
-            zIndex: sticker.zIndex,
-            filter: 'drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3))',
-          }}
-        >
-          <img
-            src={sticker.src}
-            alt={sticker.alt}
-            className="w-full h-full object-contain"
-          />
-        </div>
-      ))}
+      {stickerData.map((sticker, index) => {
+        // Transform world coordinates to screen coordinates using canvas transformation
+        const screenX = sticker.position.x * scale + position.x;
+        const screenY = sticker.position.y * scale + position.y;
+        const screenSize = sticker.size * scale;
+        
+        return (
+          <div
+            key={`${sticker.alt}-${index}`}
+            className="absolute pointer-events-none select-none"
+            style={{
+              left: `${screenX}px`,
+              top: `${screenY}px`,
+              transform: `rotate(${sticker.rotation}deg)`,
+              width: `${screenSize}px`,
+              height: `${screenSize}px`,
+              zIndex: sticker.zIndex,
+              filter: 'drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3))',
+            }}
+          >
+            <img
+              src={sticker.src}
+              alt={sticker.alt}
+              className="w-full h-full object-contain"
+            />
+          </div>
+        );
+      })}
     </div>
   );
 };

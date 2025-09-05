@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Palette, Clock, Map, BarChart3 } from 'lucide-react';
+import { Palette, Clock, Map } from 'lucide-react';
 
 interface LeaderboardEntry {
   walletAddress: string;
@@ -115,14 +115,53 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
-  // Removed unused getRankIcon for now
+  const getRankDisplay = (rank: number) => {
+    if (rank === 1) {
+      return (
+        <img 
+          src="https://unpkg.com/pixelarticons@1.8.1/svg/medal.svg" 
+          alt="Gold Medal" 
+          className="h-6 w-6 mx-auto"
+          style={{ filter: 'hue-rotate(45deg) saturate(1.5) brightness(1.2)' }}
+        />
+      );
+    } else if (rank === 2) {
+      return (
+        <img 
+          src="https://unpkg.com/pixelarticons@1.8.1/svg/medal.svg" 
+          alt="Silver Medal" 
+          className="h-6 w-6 mx-auto"
+          style={{ filter: 'grayscale(0.3) brightness(1.1)' }}
+        />
+      );
+    } else if (rank === 3) {
+      return (
+        <img 
+          src="https://unpkg.com/pixelarticons@1.8.1/svg/medal.svg" 
+          alt="Bronze Medal" 
+          className="h-6 w-6 mx-auto"
+          style={{ filter: 'hue-rotate(25deg) saturate(1.2) brightness(0.9)' }}
+        />
+      );
+    } else {
+      return (
+        <span className="text-lg font-bold text-gray-400">
+          {rank}
+        </span>
+      );
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white rounded-xl shadow-xl p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-3xl font-bold text-gray-900 font-['Pixelify_Sans'] flex items-center space-x-3">
-            <BarChart3 className="h-8 w-8 text-indigo-600" />
+            <img 
+              src="https://unpkg.com/pixelarticons@1.8.1/svg/chart.svg" 
+              alt="Leaderboard" 
+              className="h-8 w-8"
+            />
             <span>Leaderboard</span>
           </h2>
           <button
@@ -182,7 +221,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
                 <div key={`skeleton-${idx}`} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center space-x-4">
                     <div className="w-8 text-center">
-                      <div className="h-5 rounded shimmer"></div>
+                      <div className="h-6 w-6 rounded shimmer mx-auto"></div>
                     </div>
                     <div className="flex items-center space-x-3">
                       <div className="w-8 h-8 rounded-full shimmer"></div>
@@ -202,8 +241,8 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
                 className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
               >
                 <div className="flex items-center space-x-4">
-                  <div className="text-lg font-bold text-gray-400 w-8 text-center">
-                    {entry.rank}
+                  <div className="w-8 text-center">
+                    {getRankDisplay(entry.rank)}
                   </div>
                   <div className="flex items-center space-x-3">
                     <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">

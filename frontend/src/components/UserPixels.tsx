@@ -14,7 +14,6 @@ const UserPixels: React.FC = () => {
   const { walletAddress, connected } = useWallet();
   const { pixels, startTime } = useCanvas();
   const [userPixels, setUserPixels] = useState<UserPixel[]>([]);
-  const [newPixelsCount, setNewPixelsCount] = useState(0);
   const autoRefreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastPixelCountRef = useRef<number>(0);
 
@@ -56,13 +55,8 @@ const UserPixels: React.FC = () => {
       
       // If the user has placed new pixels, refresh the log immediately
       if (currentPixelCount > lastPixelCountRef.current) {
-        const newPixels = currentPixelCount - lastPixelCountRef.current;
-        setNewPixelsCount(newPixels);
         fetchUserPixels();
         lastPixelCountRef.current = currentPixelCount;
-        
-        // Clear new pixels indicator after 3 seconds
-        setTimeout(() => setNewPixelsCount(0), 3000);
       }
     }
   }, [pixels, connected, walletAddress]);
@@ -113,15 +107,6 @@ const UserPixels: React.FC = () => {
         <h3 className="text-lg font-semibold text-gray-900">Your Pixels</h3>
       </div>
       
-      
-      <div className="flex items-center justify-end mb-2">
-        {newPixelsCount > 0 && (
-          <div className="flex items-center space-x-1 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium animate-pulse">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            <span>{newPixelsCount} new pixel{newPixelsCount > 1 ? 's' : ''}</span>
-          </div>
-        )}
-      </div>
       
       {/* Session Start Info */}
       <div className="flex items-center justify-between mb-3 p-2 bg-gray-50 rounded">

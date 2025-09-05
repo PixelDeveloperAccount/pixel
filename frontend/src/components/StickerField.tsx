@@ -18,90 +18,97 @@ const stickerImages = [
 const generateStickerData = () => {
   // Canvas dimensions
   const canvasSize = 1000;
-  const minDistanceFromEdge = 200; // Increased buffer from canvas edge
-  const minDistanceFromCenter = 300; // Increased distance from canvas center
-  const minDistanceBetweenStickers = 150; // Increased spacing between stickers
+  const minDistanceFromEdge = 300; // Increased buffer from canvas edge
+  const minDistanceFromCenter = 400; // Increased distance from canvas center
+  const minDistanceBetweenStickers = 120; // Spacing between stickers
+  const maxStickersPerSide = 8; // Number of stickers per side
   
   // Calculate world coordinates for gray areas around the canvas
   const centerX = canvasSize / 2;
   const centerY = canvasSize / 2;
   
   const placedStickers: Array<{x: number, y: number, size: number}> = [];
+  const allStickers: Array<{src: string, alt: string, position: {x: number, y: number}, rotation: number, size: number, zIndex: number}> = [];
   
-  return stickerImages.map((image, index) => {
-    let x, y, size;
-    let attempts = 0;
-    const maxAttempts = 200;
-    let distanceFromCenter;
-    let validPosition = false;
-    
-    do {
-      // Generate positions in world coordinates (around the canvas)
-      // Place stickers in the gray areas around the canvas with larger buffers
-      const side = Math.floor(Math.random() * 4); // 0=top, 1=right, 2=bottom, 3=left
+  // Generate stickers for each side
+  for (let side = 0; side < 4; side++) {
+    for (let i = 0; i < maxStickersPerSide; i++) {
+      const imageIndex = Math.floor(Math.random() * stickerImages.length);
+      const image = stickerImages[imageIndex];
       
-      switch (side) {
-        case 0: // Top
-          x = Math.random() * canvasSize;
-          y = -Math.random() * minDistanceFromEdge - 150; // Further from canvas
-          break;
-        case 1: // Right
-          x = canvasSize + Math.random() * minDistanceFromEdge + 150; // Further from canvas
-          y = Math.random() * canvasSize;
-          break;
-        case 2: // Bottom
-          x = Math.random() * canvasSize;
-          y = canvasSize + Math.random() * minDistanceFromEdge + 150; // Further from canvas
-          break;
-        case 3: // Left
-          x = -Math.random() * minDistanceFromEdge - 150; // Further from canvas
-          y = Math.random() * canvasSize;
-          break;
-        default:
-          x = Math.random() * canvasSize;
-          y = Math.random() * canvasSize;
-      }
+      let x, y, size;
+      let attempts = 0;
+      const maxAttempts = 100;
+      let distanceFromCenter;
+      let validPosition = false;
       
-      size = Math.random() * 80 + 120; // Base size between 120px and 200px
-      
-      // Check if position is too close to center (canvas area)
-      distanceFromCenter = Math.sqrt(
-        Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2)
-      );
-      
-      if (distanceFromCenter >= minDistanceFromCenter) {
-        // Check collision with other stickers
-        validPosition = true;
-        for (const placed of placedStickers) {
-          const distance = Math.sqrt(
-            Math.pow(x - placed.x, 2) + Math.pow(y - placed.y, 2)
-          );
-          if (distance < minDistanceBetweenStickers + (size + placed.size) / 2) {
-            validPosition = false;
+      do {
+        size = Math.random() * 80 + 120; // Base size between 120px and 200px
+        
+        // Generate positions in world coordinates (around the canvas)
+        switch (side) {
+          case 0: // Top
+            x = Math.random() * canvasSize;
+            y = -Math.random() * minDistanceFromEdge - 200; // Further from canvas
             break;
+          case 1: // Right
+            x = canvasSize + Math.random() * minDistanceFromEdge + 200; // Further from canvas
+            y = Math.random() * canvasSize;
+            break;
+          case 2: // Bottom
+            x = Math.random() * canvasSize;
+            y = canvasSize + Math.random() * minDistanceFromEdge + 200; // Further from canvas
+            break;
+          case 3: // Left
+            x = -Math.random() * minDistanceFromEdge - 200; // Further from canvas
+            y = Math.random() * canvasSize;
+            break;
+          default:
+            x = Math.random() * canvasSize;
+            y = Math.random() * canvasSize;
+        }
+        
+        // Check if position is too close to center (canvas area)
+        distanceFromCenter = Math.sqrt(
+          Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2)
+        );
+        
+        if (distanceFromCenter >= minDistanceFromCenter) {
+          // Check collision with other stickers
+          validPosition = true;
+          for (const placed of placedStickers) {
+            const distance = Math.sqrt(
+              Math.pow(x - placed.x, 2) + Math.pow(y - placed.y, 2)
+            );
+            if (distance < minDistanceBetweenStickers + (size + placed.size) / 2) {
+              validPosition = false;
+              break;
+            }
           }
         }
-      }
+        
+        attempts++;
+      } while ((distanceFromCenter < minDistanceFromCenter || !validPosition) && attempts < maxAttempts);
       
-      attempts++;
-    } while ((distanceFromCenter < minDistanceFromCenter || !validPosition) && attempts < maxAttempts);
-    
-    // Add this sticker to placed stickers for collision detection
-    if (validPosition) {
-      placedStickers.push({ x, y, size });
+      // Add this sticker to placed stickers for collision detection
+      if (validPosition) {
+        placedStickers.push({ x, y, size });
+        
+        allStickers.push({
+          ...image,
+          position: {
+            x: x,
+            y: y,
+          },
+          rotation: Math.random() * 360 - 180, // Random rotation between -180 and 180 degrees
+          size: size,
+          zIndex: -1, // Very low z-index to stay behind all UI elements
+        });
+      }
     }
-    
-    return {
-      ...image,
-      position: {
-        x: x,
-        y: y,
-      },
-      rotation: Math.random() * 360 - 180, // Random rotation between -180 and 180 degrees
-      size: size,
-      zIndex: -1, // Very low z-index to stay behind all UI elements
-    };
-  });
+  }
+  
+  return allStickers;
 };
 
 const StickerField: React.FC = () => {

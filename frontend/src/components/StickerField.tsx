@@ -18,8 +18,8 @@ const stickerImages = [
 const generateStickerData = () => {
   return stickerImages.map((image, index) => {
     // Avoid placing stickers too close to edges and center
-    const minDistanceFromEdge = 100;
-    const maxDistanceFromCenter = 200;
+    const minDistanceFromEdge = 80;
+    const minDistanceFromCenter = 400; // Much larger buffer from center to avoid canvas area
     
     // Calculate viewport dimensions
     const viewportWidth = window.innerWidth;
@@ -29,20 +29,20 @@ const generateStickerData = () => {
     
     let top, left;
     let attempts = 0;
-    const maxAttempts = 50;
+    const maxAttempts = 100;
     let distanceFromCenter;
     
     do {
       top = Math.random() * (viewportHeight - minDistanceFromEdge * 2) + minDistanceFromEdge;
       left = Math.random() * (viewportWidth - minDistanceFromEdge * 2) + minDistanceFromEdge;
       
-      // Check if position is too close to center
+      // Check if position is too close to center (canvas area)
       distanceFromCenter = Math.sqrt(
         Math.pow(left - centerX, 2) + Math.pow(top - centerY, 2)
       );
       
       attempts++;
-    } while (distanceFromCenter < maxDistanceFromCenter && attempts < maxAttempts);
+    } while (distanceFromCenter < minDistanceFromCenter && attempts < maxAttempts);
     
     return {
       ...image,
@@ -51,8 +51,8 @@ const generateStickerData = () => {
         left: `${left}px`,
       },
       rotation: Math.random() * 360 - 180, // Random rotation between -180 and 180 degrees
-      size: Math.random() * 40 + 30, // Random size between 30px and 70px
-      zIndex: Math.floor(Math.random() * 5) + 1, // Random z-index between 1-5
+      size: Math.random() * 80 + 80, // Much bigger: Random size between 80px and 160px
+      zIndex: Math.floor(Math.random() * 3) + 1, // Lower z-index to stay behind canvas
     };
   });
 };
@@ -71,7 +71,7 @@ const StickerField: React.FC = () => {
   }, []);
 
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+    <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
       {stickerData.map((sticker, index) => (
         <Sticker
           key={`${sticker.alt}-${index}`}

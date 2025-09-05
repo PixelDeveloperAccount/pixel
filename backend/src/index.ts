@@ -278,8 +278,29 @@ app.get('/api/leaderboard/:type', async (req, res) => {
         break;
         
       case 'colors':
-        leaderboard = Object.entries(walletStats)
-          .map(([wallet, stats]) => ({ walletAddress: wallet, value: stats.colors.size, rank: 0 }))
+        // Count color usage across all pixels
+        const colorCounts: Record<string, number> = {};
+        for (const key of pixelKeys) {
+          const pixelData = await redisClient.get(key);
+          if (pixelData) {
+            try {
+              const parsedData = JSON.parse(pixelData);
+              const color = parsedData.color;
+              if (color) {
+                colorCounts[color] = (colorCounts[color] || 0) + 1;
+              }
+            } catch (parseError) {
+              // Handle legacy pixels that only store color as string
+              if (pixelData && typeof pixelData === 'string') {
+                colorCounts[pixelData] = (colorCounts[pixelData] || 0) + 1;
+              }
+            }
+          }
+        }
+        
+        // Convert to leaderboard format with color as walletAddress and count as value
+        leaderboard = Object.entries(colorCounts)
+          .map(([color, count]) => ({ walletAddress: color, value: count, rank: 0 }))
           .sort((a, b) => b.value - a.value)
           .slice(0, 10)
           .map((entry, index) => ({ ...entry, rank: index + 1 }));

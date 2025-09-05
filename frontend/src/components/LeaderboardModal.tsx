@@ -92,7 +92,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
       case 'territory':
         return `${value.toLocaleString()} pixels`;
       case 'colours':
-        return `${value} colours`;
+        return `${value.toLocaleString()} pixels`;
       default:
         return value.toLocaleString();
     }
@@ -105,7 +105,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
       case 'territory':
         return 'Territory size';
       case 'colours':
-        return 'Colours used';
+        return 'Times used';
       default:
         return 'Pixels painted';
     }
@@ -215,7 +215,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
                       <div className="h-6 w-6 rounded shimmer mx-auto"></div>
                     </div>
                     <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 rounded-full shimmer"></div>
+                      <div className={`w-8 h-8 rounded shimmer ${activeTab === 'colours' ? '' : 'rounded-full'}`}></div>
                       <div className="w-28 h-4 rounded shimmer"></div>
                     </div>
                   </div>
@@ -236,12 +236,20 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
                     {getRankDisplay(entry.rank)}
                   </div>
                   <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                      {entry.walletAddress.slice(2, 4).toUpperCase()}
-                    </div>
+                    {activeTab === 'colours' ? (
+                      <div 
+                        className="w-8 h-8 rounded border-2 border-gray-300 shadow-sm"
+                        style={{ backgroundColor: entry.walletAddress }}
+                        title={`Color: ${entry.walletAddress}`}
+                      />
+                    ) : (
+                      <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                        {entry.walletAddress.slice(2, 4).toUpperCase()}
+                      </div>
+                    )}
                     <div>
                       <p className="font-medium text-gray-900 font-['Pixelify_Sans'] text-sm">
-                        {formatWalletAddress(entry.walletAddress)}
+                        {activeTab === 'colours' ? `Color #${entry.walletAddress}` : formatWalletAddress(entry.walletAddress)}
                       </p>
                     </div>
                   </div>

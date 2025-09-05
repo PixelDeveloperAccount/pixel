@@ -12,6 +12,18 @@ const UserInfo: React.FC = () => {
     isOnCooldown,
     cooldownTimeLeft
   } = useWallet();
+  const [showInfoShimmer, setShowInfoShimmer] = useState(false);
+
+  // Show a brief shimmer on first load after connecting
+  useEffect(() => {
+    if (connected) {
+      setShowInfoShimmer(true);
+      const timer = setTimeout(() => setShowInfoShimmer(false), 800);
+      return () => clearTimeout(timer);
+    } else {
+      setShowInfoShimmer(false);
+    }
+  }, [connected]);
   
   if (!connected) {
     return (
@@ -37,7 +49,11 @@ const UserInfo: React.FC = () => {
             />
             <span>PIXEL Balance:</span>
           </div>
-          <span className="font-medium text-gray-900">{tokenBalance.toLocaleString()}</span>
+          {showInfoShimmer ? (
+            <span className="inline-block w-16 h-5 rounded shimmer" aria-hidden="true"></span>
+          ) : (
+            <span className="font-medium text-gray-900">{tokenBalance.toLocaleString()}</span>
+          )}
         </div>
         
         <div className="flex items-center justify-between">
@@ -49,7 +65,11 @@ const UserInfo: React.FC = () => {
             />
             <span>Available Pixels:</span>
           </div>
-          <span className="font-medium text-gray-900">{pixelsRemaining} / {pixelQuota}</span>
+          {showInfoShimmer ? (
+            <span className="inline-block w-24 h-5 rounded shimmer" aria-hidden="true"></span>
+          ) : (
+            <span className="font-medium text-gray-900">{pixelsRemaining} / {pixelQuota}</span>
+          )}
         </div>
         
         {isOnCooldown && (

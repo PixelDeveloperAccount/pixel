@@ -14,6 +14,7 @@ const UserPixels: React.FC = () => {
   const { walletAddress, connected } = useWallet();
   const { pixels, startTime } = useCanvas();
   const [userPixels, setUserPixels] = useState<UserPixel[]>([]);
+  const [showTotalsShimmer, setShowTotalsShimmer] = useState(false);
   const autoRefreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastPixelCountRef = useRef<number>(0);
 
@@ -21,8 +22,12 @@ const UserPixels: React.FC = () => {
   useEffect(() => {
     if (connected && walletAddress) {
       fetchUserPixels();
+      setShowTotalsShimmer(true);
+      const t = setTimeout(() => setShowTotalsShimmer(false), 800);
+      return () => clearTimeout(t);
     } else {
       setUserPixels([]);
+      setShowTotalsShimmer(false);
     }
   }, [connected, walletAddress]);
 
@@ -118,7 +123,11 @@ const UserPixels: React.FC = () => {
           />
           <span className="text-sm">Session start:</span>
         </div>
-        <span className="text-sm font-medium text-gray-900">{formatTimeSince(startTime)}</span>
+        {showTotalsShimmer ? (
+          <span className="inline-block w-16 h-4 rounded shimmer" aria-hidden="true"></span>
+        ) : (
+          <span className="text-sm font-medium text-gray-900">{formatTimeSince(startTime)}</span>
+        )}
       </div>
       
       {/* Total Pixels Info */}
@@ -131,7 +140,11 @@ const UserPixels: React.FC = () => {
           />
           <span className="text-sm">Total pixels:</span>
         </div>
-        <span className="text-sm font-medium text-gray-900">{userPixels.length}</span>
+        {showTotalsShimmer ? (
+          <span className="inline-block w-10 h-4 rounded shimmer" aria-hidden="true"></span>
+        ) : (
+          <span className="text-sm font-medium text-gray-900">{userPixels.length}</span>
+        )}
       </div>
       
       {/* Connect Button */}

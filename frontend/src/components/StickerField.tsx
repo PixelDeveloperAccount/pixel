@@ -18,10 +18,9 @@ const stickerImages = [
 const generateStickerData = () => {
   // Canvas dimensions
   const canvasSize = 1000;
-  const minDistanceFromEdge = 300; // Increased buffer from canvas edge
-  const minDistanceFromCenter = 400; // Increased distance from canvas center
-  const minDistanceBetweenStickers = 120; // Spacing between stickers
-  const maxStickersPerSide = 8; // Number of stickers per side
+  const minDistanceFromCenter = 400; // Distance from canvas center
+  const minDistanceBetweenStickers = 100; // Spacing between stickers
+  const totalStickers = 60; // Total number of stickers to fill the entire zoom spectrum
   
   // Calculate world coordinates for gray areas around the canvas
   const centerX = canvasSize / 2;
@@ -30,81 +29,65 @@ const generateStickerData = () => {
   const placedStickers: Array<{x: number, y: number, size: number}> = [];
   const allStickers: Array<{src: string, alt: string, position: {x: number, y: number}, rotation: number, size: number, zIndex: number}> = [];
   
-  // Generate stickers for each side
-  for (let side = 0; side < 4; side++) {
-    for (let i = 0; i < maxStickersPerSide; i++) {
-      const imageIndex = Math.floor(Math.random() * stickerImages.length);
-      const image = stickerImages[imageIndex];
+  // Generate stickers across a much larger area to cover all zoom levels
+  for (let i = 0; i < totalStickers; i++) {
+    const imageIndex = Math.floor(Math.random() * stickerImages.length);
+    const image = stickerImages[imageIndex];
+    
+    let x, y, size;
+    let attempts = 0;
+    const maxAttempts = 200;
+    let distanceFromCenter;
+    let validPosition = false;
+    
+    do {
+      size = Math.random() * 80 + 120; // Base size between 120px and 200px
       
-      let x, y, size;
-      let attempts = 0;
-      const maxAttempts = 100;
-      let distanceFromCenter;
-      let validPosition = false;
+      // Generate positions in a much larger area around the canvas
+      // This covers the entire zoom spectrum from 0.1x to 50x
+      const maxDistance = 5000; // Large area to cover all zoom levels
+      const angle = Math.random() * 2 * Math.PI; // Random angle
+      const distance = Math.random() * maxDistance + minDistanceFromCenter; // Random distance from center
       
-      do {
-        size = Math.random() * 80 + 120; // Base size between 120px and 200px
-        
-        // Generate positions in world coordinates (around the canvas)
-        switch (side) {
-          case 0: // Top
-            x = Math.random() * canvasSize;
-            y = -Math.random() * minDistanceFromEdge - 200; // Further from canvas
+      x = centerX + Math.cos(angle) * distance;
+      y = centerY + Math.sin(angle) * distance;
+      
+      // Check if position is too close to center (canvas area)
+      distanceFromCenter = Math.sqrt(
+        Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2)
+      );
+      
+      if (distanceFromCenter >= minDistanceFromCenter) {
+        // Check collision with other stickers
+        validPosition = true;
+        for (const placed of placedStickers) {
+          const distance = Math.sqrt(
+            Math.pow(x - placed.x, 2) + Math.pow(y - placed.y, 2)
+          );
+          if (distance < minDistanceBetweenStickers + (size + placed.size) / 2) {
+            validPosition = false;
             break;
-          case 1: // Right
-            x = canvasSize + Math.random() * minDistanceFromEdge + 200; // Further from canvas
-            y = Math.random() * canvasSize;
-            break;
-          case 2: // Bottom
-            x = Math.random() * canvasSize;
-            y = canvasSize + Math.random() * minDistanceFromEdge + 200; // Further from canvas
-            break;
-          case 3: // Left
-            x = -Math.random() * minDistanceFromEdge - 200; // Further from canvas
-            y = Math.random() * canvasSize;
-            break;
-          default:
-            x = Math.random() * canvasSize;
-            y = Math.random() * canvasSize;
-        }
-        
-        // Check if position is too close to center (canvas area)
-        distanceFromCenter = Math.sqrt(
-          Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2)
-        );
-        
-        if (distanceFromCenter >= minDistanceFromCenter) {
-          // Check collision with other stickers
-          validPosition = true;
-          for (const placed of placedStickers) {
-            const distance = Math.sqrt(
-              Math.pow(x - placed.x, 2) + Math.pow(y - placed.y, 2)
-            );
-            if (distance < minDistanceBetweenStickers + (size + placed.size) / 2) {
-              validPosition = false;
-              break;
-            }
           }
         }
-        
-        attempts++;
-      } while ((distanceFromCenter < minDistanceFromCenter || !validPosition) && attempts < maxAttempts);
-      
-      // Add this sticker to placed stickers for collision detection
-      if (validPosition) {
-        placedStickers.push({ x, y, size });
-        
-        allStickers.push({
-          ...image,
-          position: {
-            x: x,
-            y: y,
-          },
-          rotation: Math.random() * 360 - 180, // Random rotation between -180 and 180 degrees
-          size: size,
-          zIndex: -1, // Very low z-index to stay behind all UI elements
-        });
       }
+      
+      attempts++;
+    } while ((distanceFromCenter < minDistanceFromCenter || !validPosition) && attempts < maxAttempts);
+    
+    // Add this sticker to placed stickers for collision detection
+    if (validPosition) {
+      placedStickers.push({ x, y, size });
+      
+      allStickers.push({
+        ...image,
+        position: {
+          x: x,
+          y: y,
+        },
+        rotation: Math.random() * 360 - 180, // Random rotation between -180 and 180 degrees
+        size: size,
+        zIndex: -1, // Very low z-index to stay behind all UI elements
+      });
     }
   }
   

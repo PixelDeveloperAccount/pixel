@@ -118,30 +118,21 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
   const getRankDisplay = (rank: number) => {
     if (rank === 1) {
       return (
-        <img 
-          src="https://unpkg.com/pixelarticons@1.8.1/svg/medal.svg" 
-          alt="Gold Medal" 
-          className="h-6 w-6 mx-auto"
-          style={{ filter: 'hue-rotate(45deg) saturate(1.5) brightness(1.2)' }}
-        />
+        <span className="text-2xl">
+          🥇
+        </span>
       );
     } else if (rank === 2) {
       return (
-        <img 
-          src="https://unpkg.com/pixelarticons@1.8.1/svg/medal.svg" 
-          alt="Silver Medal" 
-          className="h-6 w-6 mx-auto"
-          style={{ filter: 'grayscale(0.3) brightness(1.1)' }}
-        />
+        <span className="text-2xl">
+          🥈
+        </span>
       );
     } else if (rank === 3) {
       return (
-        <img 
-          src="https://unpkg.com/pixelarticons@1.8.1/svg/medal.svg" 
-          alt="Bronze Medal" 
-          className="h-6 w-6 mx-auto"
-          style={{ filter: 'hue-rotate(25deg) saturate(1.2) brightness(0.9)' }}
-        />
+        <span className="text-2xl">
+          🥉
+        </span>
       );
     } else {
       return (

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Trophy, Palette, Clock, Map, User, Users, Globe, BarChart3 } from 'lucide-react';
+import { X, Palette, Clock, Map, BarChart3 } from 'lucide-react';
 
 interface LeaderboardEntry {
   walletAddress: string;
@@ -19,6 +19,18 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
     colours: [],
     territory: [],
     timeplayed: []
+  });
+  const [loadingMap, setLoadingMap] = useState<Record<string, boolean>>({
+    pixels: true,
+    colours: true,
+    territory: true,
+    timeplayed: true
+  });
+  const [hasLoadedOnceMap, setHasLoadedOnceMap] = useState<Record<string, boolean>>({
+    pixels: false,
+    colours: false,
+    territory: false,
+    timeplayed: false
   });
 
   const tabs = [
@@ -40,13 +52,15 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
     const fetchLeaderboard = async (type: string) => {
       try {
         const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
-    const response = await fetch(`${backendUrl}/api/leaderboard/${type}`);
+        setLoadingMap(prev => ({ ...prev, [type]: true }));
+        const response = await fetch(`${backendUrl}/api/leaderboard/${type}`);
         if (response.ok) {
           const data = await response.json();
           setLeaderboards(prev => ({
             ...prev,
             [type]: data.leaderboard || []
           }));
+          setHasLoadedOnceMap(prev => ({ ...prev, [type]: true }));
         }
       } catch (error) {
         console.error(`Error fetching ${type} leaderboard:`, error);
@@ -55,6 +69,9 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
           ...prev,
           [type]: []
         }));
+      }
+      finally {
+        setLoadingMap(prev => ({ ...prev, [type]: false }));
       }
     };
 
@@ -98,18 +115,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
-  const getRankIcon = (rank: number) => {
-    switch (rank) {
-      case 1:
-        return '🥇';
-      case 2:
-        return '🥈';
-      case 3:
-        return '🥉';
-      default:
-        return `#${rank}`;
-    }
-  };
+  // Removed unused getRankIcon for now
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -165,6 +171,25 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
         {/* Leaderboard Content */}
         <div className="overflow-y-auto max-h-[400px]">
           <div className="space-y-2">
+            {(!hasLoadedOnceMap[activeTab] && loadingMap[activeTab]) && (
+              Array.from({ length: 5 }).map((_, idx) => (
+                <div key={`skeleton-${idx}`} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-8 text-center">
+                      <div className="h-5 rounded shimmer"></div>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 rounded-full shimmer"></div>
+                      <div className="w-28 h-4 rounded shimmer"></div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="w-16 h-5 rounded shimmer ml-auto"></div>
+                    <div className="w-20 h-3 rounded shimmer mt-1 ml-auto"></div>
+                  </div>
+                </div>
+              ))
+            )}
             {leaderboards[activeTab]?.map((entry) => (
               <div
                 key={entry.walletAddress}

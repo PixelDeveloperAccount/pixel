@@ -105,7 +105,7 @@ const UserColors: React.FC = () => {
     return (
       <div className="bg-white rounded-lg shadow-lg p-4">
         <div className="flex justify-between items-center mb-3">
-          <h3 className="text-lg font-semibold text-gray-900">Your top colors</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Your colors</h3>
           <span className="text-sm text-gray-400">Loading…</span>
         </div>
         <div className="space-y-2">

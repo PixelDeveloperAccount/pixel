@@ -14,35 +14,59 @@ const stickerImages = [
   { src: '/stickers/sticker9.png', alt: 'Sticker 9' },
 ];
 
-// Generate random positions and rotations for stickers with collision detection
+// Generate random positions and rotations for stickers in world coordinates
 const generateStickerData = () => {
-  const minDistanceFromEdge = 100;
-  const minDistanceFromCenter = 450; // Larger buffer from center to avoid canvas area
-  const minDistanceBetweenStickers = 120; // Minimum distance between stickers
+  // Canvas dimensions (assuming 1000x1000 canvas)
+  const canvasSize = 1000;
+  const minDistanceFromEdge = 50;
+  const minDistanceFromCenter = 200; // Distance from canvas center
+  const minDistanceBetweenStickers = 80;
   
-  // Calculate viewport dimensions
-  const viewportWidth = window.innerWidth;
-  const viewportHeight = window.innerHeight;
-  const centerX = viewportWidth / 2;
-  const centerY = viewportHeight / 2;
+  // Calculate world coordinates for gray areas around the canvas
+  const centerX = canvasSize / 2;
+  const centerY = canvasSize / 2;
   
   const placedStickers: Array<{x: number, y: number, size: number}> = [];
   
   return stickerImages.map((image, index) => {
-    let top, left, size;
+    let x, y, size;
     let attempts = 0;
     const maxAttempts = 200;
     let distanceFromCenter;
     let validPosition = false;
     
     do {
-      top = Math.random() * (viewportHeight - minDistanceFromEdge * 2) + minDistanceFromEdge;
-      left = Math.random() * (viewportWidth - minDistanceFromEdge * 2) + minDistanceFromEdge;
+      // Generate positions in world coordinates (around the canvas)
+      // Place stickers in the gray areas around the canvas
+      const side = Math.floor(Math.random() * 4); // 0=top, 1=right, 2=bottom, 3=left
+      
+      switch (side) {
+        case 0: // Top
+          x = Math.random() * canvasSize;
+          y = Math.random() * minDistanceFromEdge;
+          break;
+        case 1: // Right
+          x = canvasSize + Math.random() * minDistanceFromEdge;
+          y = Math.random() * canvasSize;
+          break;
+        case 2: // Bottom
+          x = Math.random() * canvasSize;
+          y = canvasSize + Math.random() * minDistanceFromEdge;
+          break;
+        case 3: // Left
+          x = Math.random() * minDistanceFromEdge;
+          y = Math.random() * canvasSize;
+          break;
+        default:
+          x = Math.random() * canvasSize;
+          y = Math.random() * canvasSize;
+      }
+      
       size = Math.random() * 100 + 100; // Bigger: Random size between 100px and 200px
       
       // Check if position is too close to center (canvas area)
       distanceFromCenter = Math.sqrt(
-        Math.pow(left - centerX, 2) + Math.pow(top - centerY, 2)
+        Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2)
       );
       
       if (distanceFromCenter >= minDistanceFromCenter) {
@@ -50,7 +74,7 @@ const generateStickerData = () => {
         validPosition = true;
         for (const placed of placedStickers) {
           const distance = Math.sqrt(
-            Math.pow(left - placed.x, 2) + Math.pow(top - placed.y, 2)
+            Math.pow(x - placed.x, 2) + Math.pow(y - placed.y, 2)
           );
           if (distance < minDistanceBetweenStickers + (size + placed.size) / 2) {
             validPosition = false;
@@ -64,14 +88,14 @@ const generateStickerData = () => {
     
     // Add this sticker to placed stickers for collision detection
     if (validPosition) {
-      placedStickers.push({ x: left, y: top, size });
+      placedStickers.push({ x, y, size });
     }
     
     return {
       ...image,
       position: {
-        top: `${top}px`,
-        left: `${left}px`,
+        x: x,
+        y: y,
       },
       rotation: Math.random() * 360 - 180, // Random rotation between -180 and 180 degrees
       size: size,
@@ -96,15 +120,25 @@ const StickerField: React.FC = () => {
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
       {stickerData.map((sticker, index) => (
-        <Sticker
+        <div
           key={`${sticker.alt}-${index}`}
-          src={sticker.src}
-          alt={sticker.alt}
-          position={sticker.position}
-          rotation={sticker.rotation}
-          size={sticker.size}
-          zIndex={sticker.zIndex}
-        />
+          className="absolute pointer-events-none select-none"
+          style={{
+            left: `${sticker.position.x}px`,
+            top: `${sticker.position.y}px`,
+            transform: `rotate(${sticker.rotation}deg)`,
+            width: `${sticker.size}px`,
+            height: `${sticker.size}px`,
+            zIndex: sticker.zIndex,
+            filter: 'drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3))',
+          }}
+        >
+          <img
+            src={sticker.src}
+            alt={sticker.alt}
+            className="w-full h-full object-contain"
+          />
+        </div>
       ))}
     </div>
   );

@@ -18,7 +18,7 @@ const stickerImages = [
 const generateStickerData = () => {
   // Canvas dimensions
   const canvasSize = 1000;
-  const minDistanceFromCenter = 400; // Distance from canvas center
+  const minDistanceFromCenter = 800; // Much larger buffer from canvas center (was 400)
   const minDistanceBetweenStickers = 100; // Spacing between stickers
   const totalStickers = 60; // Total number of stickers to fill the entire zoom spectrum
   

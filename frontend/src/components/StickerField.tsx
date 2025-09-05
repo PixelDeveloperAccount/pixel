@@ -14,35 +14,58 @@ const stickerImages = [
   { src: '/stickers/sticker9.png', alt: 'Sticker 9' },
 ];
 
-// Generate random positions and rotations for stickers
+// Generate random positions and rotations for stickers with collision detection
 const generateStickerData = () => {
+  const minDistanceFromEdge = 100;
+  const minDistanceFromCenter = 450; // Larger buffer from center to avoid canvas area
+  const minDistanceBetweenStickers = 120; // Minimum distance between stickers
+  
+  // Calculate viewport dimensions
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  const centerX = viewportWidth / 2;
+  const centerY = viewportHeight / 2;
+  
+  const placedStickers: Array<{x: number, y: number, size: number}> = [];
+  
   return stickerImages.map((image, index) => {
-    // Avoid placing stickers too close to edges and center
-    const minDistanceFromEdge = 80;
-    const minDistanceFromCenter = 400; // Much larger buffer from center to avoid canvas area
-    
-    // Calculate viewport dimensions
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-    const centerX = viewportWidth / 2;
-    const centerY = viewportHeight / 2;
-    
-    let top, left;
+    let top, left, size;
     let attempts = 0;
-    const maxAttempts = 100;
+    const maxAttempts = 200;
     let distanceFromCenter;
+    let validPosition = false;
     
     do {
       top = Math.random() * (viewportHeight - minDistanceFromEdge * 2) + minDistanceFromEdge;
       left = Math.random() * (viewportWidth - minDistanceFromEdge * 2) + minDistanceFromEdge;
+      size = Math.random() * 100 + 100; // Bigger: Random size between 100px and 200px
       
       // Check if position is too close to center (canvas area)
       distanceFromCenter = Math.sqrt(
         Math.pow(left - centerX, 2) + Math.pow(top - centerY, 2)
       );
       
+      if (distanceFromCenter >= minDistanceFromCenter) {
+        // Check collision with other stickers
+        validPosition = true;
+        for (const placed of placedStickers) {
+          const distance = Math.sqrt(
+            Math.pow(left - placed.x, 2) + Math.pow(top - placed.y, 2)
+          );
+          if (distance < minDistanceBetweenStickers + (size + placed.size) / 2) {
+            validPosition = false;
+            break;
+          }
+        }
+      }
+      
       attempts++;
-    } while (distanceFromCenter < minDistanceFromCenter && attempts < maxAttempts);
+    } while ((distanceFromCenter < minDistanceFromCenter || !validPosition) && attempts < maxAttempts);
+    
+    // Add this sticker to placed stickers for collision detection
+    if (validPosition) {
+      placedStickers.push({ x: left, y: top, size });
+    }
     
     return {
       ...image,
@@ -51,7 +74,7 @@ const generateStickerData = () => {
         left: `${left}px`,
       },
       rotation: Math.random() * 360 - 180, // Random rotation between -180 and 180 degrees
-      size: Math.random() * 80 + 80, // Much bigger: Random size between 80px and 160px
+      size: size,
       zIndex: Math.floor(Math.random() * 3) + 1, // Lower z-index to stay behind canvas
     };
   });
@@ -71,7 +94,7 @@ const StickerField: React.FC = () => {
   }, []);
 
   return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+    <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
       {stickerData.map((sticker, index) => (
         <Sticker
           key={`${sticker.alt}-${index}`}

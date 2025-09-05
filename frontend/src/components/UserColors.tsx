@@ -12,6 +12,7 @@ const UserColors: React.FC = () => {
   const { pixels } = useCanvas();
   const [userColors, setUserColors] = useState<UserColor[]>([]);
   const [loading, setLoading] = useState(false);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const autoRefreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastPixelCountRef = useRef<number>(0);
 
@@ -21,6 +22,7 @@ const UserColors: React.FC = () => {
       fetchUserColors();
     } else {
       setUserColors([]);
+      setHasLoadedOnce(false);
     }
   }, [connected, walletAddress]);
 
@@ -83,6 +85,9 @@ const UserColors: React.FC = () => {
         
         setUserColors(colorsArray);
         lastPixelCountRef.current = data.pixels?.length || 0;
+        if (!hasLoadedOnce) {
+          setHasLoadedOnce(true);
+        }
       }
     } catch (error) {
       console.error('Error fetching user colors:', error);
@@ -95,8 +100,8 @@ const UserColors: React.FC = () => {
     return null;
   }
 
-  // Render shimmer while loading
-  if (loading) {
+  // Render shimmer only during the first load for the current wallet
+  if (!hasLoadedOnce && loading) {
     return (
       <div className="bg-white rounded-lg shadow-lg p-4">
         <div className="flex justify-between items-center mb-3">

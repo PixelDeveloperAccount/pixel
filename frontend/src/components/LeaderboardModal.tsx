@@ -36,13 +36,13 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
     { 
       id: 'pixels', 
       name: 'Pixels', 
-      icon: () => <img src="https://unpkg.com/pixelarticons@1.8.1/svg/paint-bucket.svg" alt="Pixels" className="h-5 w-5" />, 
+      icon: () => <img src="https://unpkg.com/pixelarticons@1.8.1/svg/checkbox-on.svg" alt="Pixels" className="h-5 w-5" />, 
       description: 'Total pixels per user' 
     },
     { 
       id: 'colours', 
       name: 'Colours', 
-      icon: () => <img src="https://unpkg.com/pixelarticons@1.8.1/svg/palette.svg" alt="Colours" className="h-5 w-5" />, 
+      icon: () => <img src="https://unpkg.com/pixelarticons@1.8.1/svg/paint-bucket.svg" alt="Colours" className="h-5 w-5" />, 
       description: 'Overall most used colours on canvas' 
     },
     { 

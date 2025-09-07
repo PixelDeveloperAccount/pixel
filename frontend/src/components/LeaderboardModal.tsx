@@ -1,10 +1,5 @@
-import React, { useState, useEffect } from 'react';
-
-interface LeaderboardEntry {
-  walletAddress: string;
-  value: number;
-  rank: number;
-}
+import React, { useState } from 'react';
+import { useLeaderboard } from '../context/LeaderboardContext';
 
 interface LeaderboardModalProps {
   onClose: () => void;
@@ -13,27 +8,12 @@ interface LeaderboardModalProps {
 const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
   const [activeTab, setActiveTab] = useState('pixels');
   const [activeTimeframe, setActiveTimeframe] = useState('today');
-  const [leaderboards, setLeaderboards] = useState<Record<string, LeaderboardEntry[]>>({
-    pixels: [],
-    colours: [],
-    territory: [],
-    timeplayed: []
-  });
-  const [loadingMap, setLoadingMap] = useState<Record<string, boolean>>({
-    pixels: true,
-    colours: true,
-    territory: true,
-    timeplayed: true
-  });
-  const [hasLoadedOnceMap, setHasLoadedOnceMap] = useState<Record<string, boolean>>({
-    pixels: false,
-    colours: false,
-    territory: false,
-    timeplayed: false
-  });
-  const [refreshInterval, setRefreshInterval] = useState<NodeJS.Timeout | null>(null);
-  const [secondsSinceUpdate, setSecondsSinceUpdate] = useState<number>(0);
-  const [timerInterval, setTimerInterval] = useState<NodeJS.Timeout | null>(null);
+  const { 
+    leaderboards, 
+    loadingMap, 
+    hasLoadedOnceMap, 
+    secondsSinceUpdate
+  } = useLeaderboard();
 
   const tabs = [
     { 
@@ -69,79 +49,6 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
     { id: 'alltime', name: 'All time' }
   ];
 
-  // Fetch leaderboard data from backend
-  const fetchLeaderboard = async (type: string) => {
-    try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
-      setLoadingMap(prev => ({ ...prev, [type]: true }));
-      const response = await fetch(`${backendUrl}/api/leaderboard/${type}`);
-      if (response.ok) {
-        const data = await response.json();
-        setLeaderboards(prev => ({
-          ...prev,
-          [type]: data.leaderboard || []
-        }));
-        setHasLoadedOnceMap(prev => ({ ...prev, [type]: true }));
-        setSecondsSinceUpdate(0);
-      }
-    } catch (error) {
-      console.error(`Error fetching ${type} leaderboard:`, error);
-      // Fallback to empty array if fetch fails
-      setLeaderboards(prev => ({
-        ...prev,
-        [type]: []
-      }));
-    }
-    finally {
-      setLoadingMap(prev => ({ ...prev, [type]: false }));
-    }
-  };
-
-  const fetchAllLeaderboards = () => {
-    const types = ['pixels', 'colours', 'territory', 'timeplayed'];
-    types.forEach(type => fetchLeaderboard(type));
-  };
-
-  // Initial fetch and setup periodic refresh
-  useEffect(() => {
-    fetchAllLeaderboards();
-    
-    // Set up periodic refresh every 1 minute
-    const interval = setInterval(fetchAllLeaderboards, 60000);
-    setRefreshInterval(interval);
-    
-    return () => {
-      if (interval) {
-        clearInterval(interval);
-      }
-    };
-  }, []);
-
-  // Set up timer that ticks every second
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setSecondsSinceUpdate(prev => prev + 1);
-    }, 1000);
-    setTimerInterval(timer);
-    
-    return () => {
-      if (timer) {
-        clearInterval(timer);
-      }
-    };
-  }, []);
-
-  // Cleanup intervals on unmount
-  useEffect(() => {
-    return () => {
-      if (refreshInterval) {
-        clearInterval(refreshInterval);
-      }
-      if (timerInterval) {
-        clearInterval(timerInterval);
-      }
-    };
-  }, [refreshInterval, timerInterval]);
 
   const formatValue = (value: number, type: string) => {
     switch (type) {
@@ -331,7 +238,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
         {/* Footer */}
         <div className="mt-6 pt-4 border-t border-gray-200">
           <p className="text-sm text-gray-500 text-center font-['Pixelify_Sans']">
-            Last updated {secondsSinceUpdate} seconds ago
+            Updates every 5 minutes • Last updated {secondsSinceUpdate} seconds ago
           </p>
         </div>
       </div>

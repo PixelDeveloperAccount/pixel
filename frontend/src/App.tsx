@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import { ConnectionProvider, WalletProvider as SolanaWalletProvider } from '@solana/wallet-adapter-react';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
@@ -11,8 +11,9 @@ import { Layout } from './components/Layout';
 import { CanvasProvider } from './context/CanvasContext';
 import { WalletProvider } from './context/WalletContext';
 import { SoundProvider } from './context/SoundContext';
+import { LeaderboardProvider } from './context/LeaderboardContext';
 import HomePage from './pages/HomePage';
-import { Toaster, resolveValue, ToastBar } from 'react-hot-toast'; // Import Toaster, resolveValue, and ToastBar
+import { Toaster, ToastBar } from 'react-hot-toast'; // Import Toaster and ToastBar
 
 import '@solana/wallet-adapter-react-ui/styles.css';
 
@@ -35,7 +36,8 @@ function App() {
           <WalletProvider>
             <CanvasProvider>
               <SoundProvider>
-                <Layout>
+                <LeaderboardProvider>
+                  <Layout>
                 {/* Custom Toaster Implementation with Tailwind CSS - Compact Version */}
                 <Toaster position="top-center">
                   {(t) => {
@@ -81,7 +83,8 @@ function App() {
                   }}
                 </Toaster>
                 <HomePage />
-                </Layout>
+                  </Layout>
+                </LeaderboardProvider>
               </SoundProvider>
             </CanvasProvider>
           </WalletProvider>

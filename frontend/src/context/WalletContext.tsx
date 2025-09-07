@@ -65,19 +65,17 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               if (timeLeft <= 0) {
                 clearCooldown();
                 localStorage.removeItem('pixel-cooldown');
-                // Use current tokenBalance or fallback to balance
-                const currentTokens = tokenBalance || balance;
-                const quota = connected ? calculateQuota(currentTokens) : 1;
-                setPixelsRemaining(quota);
+                // Use current tokenBalance
+                const quota = connected ? calculateQuota(tokenBalance) : 1;
+                setPixelsRemaining(quota === Infinity ? Infinity : quota);
               }
             }, 1000);
           } else {
             // Cooldown has expired, clean up
             localStorage.removeItem('pixel-cooldown');
-            // Use current tokenBalance or fallback to balance
-            const currentTokens = tokenBalance || balance;
-            const quota = connected ? calculateQuota(currentTokens) : 1;
-            setPixelsRemaining(quota);
+            // Use current tokenBalance
+            const quota = connected ? calculateQuota(tokenBalance) : 1;
+            setPixelsRemaining(quota === Infinity ? Infinity : quota);
           }
         }
       } catch (error) {
@@ -89,13 +87,20 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const calculateQuota = (tokens: number) => {
     if (!connected) return 1;
-    return Math.max(1, Math.floor(tokens / 5000)); 
+    if (tokens >= 1000000) return Infinity; // Infinite pixels for 1M+ tokens
+    if (tokens >= 300001) return 70; // 70 pixels for 300k+ tokens
+    if (tokens >= 50001) return 45; // 45 pixels for 50k+ tokens
+    if (tokens >= 1) return 30; // 30 pixels for 1+ tokens
+    return 5; // 5 pixels for 0 tokens
   };
 
   const calculateCooldown = (tokens: number) => {
-    if (!connected) return 5; 
-    const reduction = Math.floor(tokens / 10000) * 10; 
-    return Math.max(5, 5 - reduction); 
+    if (!connected) return 60; // 1 minute for disconnected users
+    if (tokens >= 1000000) return 0; // No cooldown for 1M+ tokens
+    if (tokens >= 300001) return 15; // 15 seconds for 300k+ tokens
+    if (tokens >= 50001) return 25; // 25 seconds for 50k+ tokens
+    if (tokens >= 1) return 30; // 30 seconds for 1+ tokens
+    return 60; // 1 minute for 0 tokens
   };
 
   const clearCooldown = () => {
@@ -128,20 +133,24 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       connection.getBalance(publicKey).then(lamports => {
         const sol = lamports / 1e9;
         setBalance(sol);
-        setPixelsRemaining(calculateQuota(sol));
-        setCooldownTime(calculateCooldown(sol));
       });
 
       // Fetch token balance from backend
       (async () => {
         try {
           const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
-    const response = await fetch(`${backendUrl}/api/owns-token/${walletAddress}?mint=${TOKEN_MINT}`);
+          const response = await fetch(`${backendUrl}/api/owns-token/${walletAddress}?mint=${TOKEN_MINT}`);
           const data = await response.json();
-          setTokenBalance(data.tokenBalance || 0);
+          const tokens = data.tokenBalance || 0;
+          setTokenBalance(tokens);
+          const quota = calculateQuota(tokens);
+          setPixelsRemaining(quota === Infinity ? Infinity : quota);
+          setCooldownTime(calculateCooldown(tokens));
         } catch (error) {
           console.error('Error fetching token balance:', error);
           setTokenBalance(0);
+          setPixelsRemaining(calculateQuota(0));
+          setCooldownTime(calculateCooldown(0));
         }
       })();
     }
@@ -155,7 +164,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const wasConnected = connected;
     disconnect();
     setPixelsRemaining(1);
-    setCooldownTime(5);
+    setCooldownTime(60);
     clearCooldown();
     localStorage.removeItem('pixel-cooldown');
     
@@ -173,6 +182,10 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const decrementPixels = () => {
     setPixelsRemaining(prev => {
+      // If user has infinite pixels, don't decrement
+      if (prev === Infinity) {
+        return prev;
+      }
       const newValue = Math.max(0, prev - 1);
       // Only start cooldown if all pixels are used
       if (newValue === 0) {
@@ -203,7 +216,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           clearCooldown();
           localStorage.removeItem('pixel-cooldown');
           const quota = connected ? calculateQuota(tokenBalance) : 1;
-          setPixelsRemaining(quota);
+          setPixelsRemaining(quota === Infinity ? Infinity : quota);
         }
       }, 1000);
     }
@@ -217,7 +230,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       tokenBalance,
       connectWallet,
       disconnectWallet,
-      pixelQuota: calculateQuota(balance),
+      pixelQuota: calculateQuota(tokenBalance),
       pixelsRemaining,
       cooldownTime,
       cooldownTimeLeft,

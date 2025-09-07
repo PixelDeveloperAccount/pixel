@@ -68,7 +68,9 @@ const UserInfo: React.FC = () => {
           {showInfoShimmer ? (
             <span className="inline-block w-24 h-5 rounded shimmer" aria-hidden="true"></span>
           ) : (
-            <span className="font-medium text-gray-900">{pixelsRemaining} / {pixelQuota}</span>
+            <span className="font-medium text-gray-900">
+              {pixelsRemaining} / {pixelQuota === Infinity ? '∞' : pixelQuota}
+            </span>
           )}
         </div>
         

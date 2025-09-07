@@ -273,7 +273,7 @@ app.get('/api/leaderboard/:type', async (req, res) => {
         leaderboard = Object.entries(walletStats)
           .map(([wallet, stats]) => ({ walletAddress: wallet, value: stats.pixels, rank: 0 }))
           .sort((a, b) => b.value - a.value)
-          .slice(0, 10)
+          .slice(0, 20)
           .map((entry, index) => ({ ...entry, rank: index + 1 }));
         break;
         
@@ -300,10 +300,10 @@ app.get('/api/leaderboard/:type', async (req, res) => {
         }
         
         // Convert to leaderboard format with color as walletAddress and count as value
+        // Show all colors, no limit
         leaderboard = Object.entries(colorCounts)
           .map(([color, count]) => ({ walletAddress: color, value: count, rank: 0 }))
           .sort((a, b) => b.value - a.value)
-          .slice(0, 10)
           .map((entry, index) => ({ ...entry, rank: index + 1 }));
         break;
         
@@ -378,7 +378,7 @@ app.get('/api/leaderboard/:type', async (req, res) => {
             return { walletAddress: wallet, value: maxTerritory, rank: 0 };
           })
           .sort((a, b) => b.value - a.value)
-          .slice(0, 10)
+          .slice(0, 20)
           .map((entry, index) => ({ ...entry, rank: index + 1 }));
         break;
         
@@ -391,7 +391,7 @@ app.get('/api/leaderboard/:type', async (req, res) => {
             rank: 0 
           }))
           .sort((a, b) => b.value - a.value)
-          .slice(0, 10)
+          .slice(0, 20)
           .map((entry, index) => ({ ...entry, rank: index + 1 }));
         break;
         

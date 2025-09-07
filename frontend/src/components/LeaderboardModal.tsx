@@ -200,32 +200,18 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
             />
             <span>Leaderboard</span>
           </h2>
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={fetchAllLeaderboards}
-              className="p-1 rounded-xl hover:bg-gray-100 transition-colors"
-              aria-label="Refresh"
-              title="Refresh leaderboard"
-            >
-              <img 
-                src="https://unpkg.com/pixelarticons@1.8.1/svg/refresh.svg" 
-                alt="Refresh" 
-                className="h-5 w-5"
-              />
-            </button>
-            <button
-              onClick={onClose}
-              className="p-1 rounded-xl hover:bg-gray-100 transition-colors"
-              aria-label="Close"
-              title="Close"
-            >
-              <img 
-                src="https://unpkg.com/pixelarticons@1.8.1/svg/close.svg" 
-                alt="Close" 
-                className="h-5 w-5"
-              />
-            </button>
-          </div>
+          <button
+            onClick={onClose}
+            className="p-1 rounded-xl hover:bg-gray-100 transition-colors"
+            aria-label="Close"
+            title="Close"
+          >
+            <img 
+              src="https://unpkg.com/pixelarticons@1.8.1/svg/close.svg" 
+              alt="Close" 
+              className="h-5 w-5"
+            />
+          </button>
         </div>
 
         {/* Main Category Navigation - Big Bar */}

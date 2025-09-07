@@ -7,6 +7,7 @@ const UserPixels: React.FC = () => {
   const { walletAddress, connected } = useWallet();
   const { pixels, startTime } = useCanvas();
   const [showTotalsShimmer, setShowTotalsShimmer] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   // Get user pixels directly from canvas context (real-time)
   const userPixels = React.useMemo(() => {
@@ -28,9 +29,18 @@ const UserPixels: React.FC = () => {
     }
   }, [connected, walletAddress]);
 
+  // Update current time every second for live session timer
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
 
   const formatTimeSince = (date: Date) => {
-    const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+    const seconds = Math.floor((currentTime.getTime() - date.getTime()) / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);

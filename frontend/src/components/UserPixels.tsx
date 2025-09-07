@@ -1,88 +1,32 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useWallet } from '../context/WalletContext';
 import { useCanvas } from '../context/CanvasContext';
 import ConnectButton from './ConnectButton';
 
-interface UserPixel {
-  x: number;
-  y: number;
-  color: string;
-  timestamp: number;
-}
-
 const UserPixels: React.FC = () => {
   const { walletAddress, connected } = useWallet();
   const { pixels, startTime } = useCanvas();
-  const [userPixels, setUserPixels] = useState<UserPixel[]>([]);
   const [showTotalsShimmer, setShowTotalsShimmer] = useState(false);
-  const autoRefreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const lastPixelCountRef = useRef<number>(0);
 
-  // Initial fetch when wallet connects
+  // Get user pixels directly from canvas context (real-time)
+  const userPixels = React.useMemo(() => {
+    if (!connected || !walletAddress) return [];
+    
+    return pixels
+      .filter(pixel => pixel.walletAddress === walletAddress)
+      .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+  }, [pixels, connected, walletAddress]);
+
+  // Show shimmer briefly when wallet connects
   useEffect(() => {
     if (connected && walletAddress) {
-      fetchUserPixels();
       setShowTotalsShimmer(true);
       const t = setTimeout(() => setShowTotalsShimmer(false), 800);
       return () => clearTimeout(t);
     } else {
-      setUserPixels([]);
       setShowTotalsShimmer(false);
     }
   }, [connected, walletAddress]);
-
-  // Auto-refresh functionality
-  useEffect(() => {
-    if (connected && walletAddress) {
-      // Set up auto-refresh interval (every 10 seconds)
-      autoRefreshIntervalRef.current = setInterval(() => {
-        fetchUserPixels();
-      }, 10000); // 10 seconds
-
-      return () => {
-        if (autoRefreshIntervalRef.current) {
-          clearInterval(autoRefreshIntervalRef.current);
-        }
-      };
-    } else {
-      // Clear interval if not connected
-      if (autoRefreshIntervalRef.current) {
-        clearInterval(autoRefreshIntervalRef.current);
-      }
-    }
-  }, [connected, walletAddress]);
-
-  // Real-time updates when new pixels are placed by the user
-  useEffect(() => {
-    if (connected && walletAddress) {
-      const currentUserPixels = pixels.filter(pixel => pixel.walletAddress === walletAddress);
-      const currentPixelCount = currentUserPixels.length;
-      
-      // If the user has placed new pixels, refresh the log immediately
-      if (currentPixelCount > lastPixelCountRef.current) {
-        fetchUserPixels();
-        lastPixelCountRef.current = currentPixelCount;
-      }
-    }
-  }, [pixels, connected, walletAddress]);
-
-  const fetchUserPixels = async () => {
-    if (!walletAddress) return;
-    
-    try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
-      const response = await fetch(`${backendUrl}/api/pixels-by-wallet/${walletAddress}`);
-      if (response.ok) {
-              const data = await response.json();
-      // Sort pixels by timestamp (newest first)
-      const sortedPixels = (data.pixels || []).sort((a: UserPixel, b: UserPixel) => b.timestamp - a.timestamp);
-      setUserPixels(sortedPixels);
-      lastPixelCountRef.current = data.pixels?.length || 0;
-      }
-    } catch (error) {
-      console.error('Error fetching user pixels:', error);
-    }
-  };
 
 
   const formatTimeSince = (date: Date) => {

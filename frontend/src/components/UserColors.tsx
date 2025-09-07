@@ -1,107 +1,46 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useWallet } from '../context/WalletContext';
 import { useCanvas } from '../context/CanvasContext';
-
-interface UserColor {
-  color: string;
-  count: number;
-}
 
 const UserColors: React.FC = () => {
   const { walletAddress, connected } = useWallet();
   const { pixels } = useCanvas();
-  const [userColors, setUserColors] = useState<UserColor[]>([]);
-  const [loading, setLoading] = useState(false);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
-  const autoRefreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const lastPixelCountRef = useRef<number>(0);
 
-  // Initial fetch when wallet connects
-  useEffect(() => {
-    if (connected && walletAddress) {
-      fetchUserColors();
-    } else {
-      setUserColors([]);
-      setHasLoadedOnce(false);
-    }
-  }, [connected, walletAddress]);
-
-  // Auto-refresh functionality
-  useEffect(() => {
-    if (connected && walletAddress) {
-      // Set up auto-refresh interval (every 10 seconds)
-      autoRefreshIntervalRef.current = setInterval(() => {
-        fetchUserColors();
-      }, 10000); // 10 seconds
-
-      return () => {
-        if (autoRefreshIntervalRef.current) {
-          clearInterval(autoRefreshIntervalRef.current);
-        }
-      };
-    } else {
-      // Clear interval if not connected
-      if (autoRefreshIntervalRef.current) {
-        clearInterval(autoRefreshIntervalRef.current);
-      }
-    }
-  }, [connected, walletAddress]);
-
-  // Real-time updates when new pixels are placed by the user
-  useEffect(() => {
-    if (connected && walletAddress) {
-      const currentUserPixels = pixels.filter(pixel => pixel.walletAddress === walletAddress);
-      const currentPixelCount = currentUserPixels.length;
-      
-      // If the user has placed new pixels, refresh the colors immediately
-      if (currentPixelCount > lastPixelCountRef.current) {
-        fetchUserColors();
-        lastPixelCountRef.current = currentPixelCount;
-      }
-    }
+  // Get user colors directly from canvas context (real-time)
+  const userColors = React.useMemo(() => {
+    if (!connected || !walletAddress) return [];
+    
+    const userPixels = pixels.filter(pixel => pixel.walletAddress === walletAddress);
+    
+    // Count colors used by the user
+    const colorCounts: Record<string, number> = {};
+    userPixels.forEach((pixel) => {
+      colorCounts[pixel.color] = (colorCounts[pixel.color] || 0) + 1;
+    });
+    
+    // Convert to array and sort by count (most used first)
+    return Object.entries(colorCounts).map(([color, count]) => ({
+      color,
+      count
+    })).sort((a, b) => b.count - a.count);
   }, [pixels, connected, walletAddress]);
 
-  const fetchUserColors = async () => {
-    if (!walletAddress) return;
-    
-    setLoading(true);
-    try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
-    const response = await fetch(`${backendUrl}/api/pixels-by-wallet/${walletAddress}`);
-      if (response.ok) {
-        const data = await response.json();
-        
-        // Count colors used by the user
-        const colorCounts: Record<string, number> = {};
-        data.pixels?.forEach((pixel: any) => {
-          colorCounts[pixel.color] = (colorCounts[pixel.color] || 0) + 1;
-        });
-        
-        // Convert to array and sort by count (most used first)
-        const colorsArray = Object.entries(colorCounts).map(([color, count]) => ({
-          color,
-          count
-        })).sort((a, b) => b.count - a.count);
-        
-        setUserColors(colorsArray);
-        lastPixelCountRef.current = data.pixels?.length || 0;
-        if (!hasLoadedOnce) {
-          setHasLoadedOnce(true);
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching user colors:', error);
-    } finally {
-      setLoading(false);
+  // Set hasLoadedOnce when user connects
+  useEffect(() => {
+    if (connected && walletAddress && !hasLoadedOnce) {
+      setHasLoadedOnce(true);
+    } else if (!connected) {
+      setHasLoadedOnce(false);
     }
-  };
+  }, [connected, walletAddress, hasLoadedOnce]);
 
   if (!connected) {
     return null;
   }
 
   // Render shimmer only during the first load for the current wallet
-  if (!hasLoadedOnce && loading) {
+  if (!hasLoadedOnce) {
     return (
       <div className="bg-white rounded-lg shadow-lg p-4">
         <div className="flex justify-between items-center mb-3">

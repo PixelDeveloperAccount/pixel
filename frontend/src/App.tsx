@@ -61,7 +61,7 @@ function App() {
                     return (
                       // Using ToastBar for built-in animation handling
                       <ToastBar toast={t} style={{padding: 0, background: 'transparent', boxShadow: 'none'}}>
-                        {({ icon, message }) => ( // icon and message are provided by ToastBar
+                        {({ message }) => ( // Only use message from ToastBar, ignore the default icon
                           <div
                            className={`${baseToastClasses} ${animationClasses}`}
                           >

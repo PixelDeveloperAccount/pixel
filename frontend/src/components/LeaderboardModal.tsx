@@ -31,8 +31,9 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
     territory: false,
     timeplayed: false
   });
-  const [lastUpdateTime, setLastUpdateTime] = useState<Date | null>(null);
   const [refreshInterval, setRefreshInterval] = useState<NodeJS.Timeout | null>(null);
+  const [secondsSinceUpdate, setSecondsSinceUpdate] = useState<number>(0);
+  const [timerInterval, setTimerInterval] = useState<NodeJS.Timeout | null>(null);
 
   const tabs = [
     { 
@@ -81,7 +82,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
           [type]: data.leaderboard || []
         }));
         setHasLoadedOnceMap(prev => ({ ...prev, [type]: true }));
-        setLastUpdateTime(new Date());
+        setSecondsSinceUpdate(0);
       }
     } catch (error) {
       console.error(`Error fetching ${type} leaderboard:`, error);
@@ -105,8 +106,8 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
   useEffect(() => {
     fetchAllLeaderboards();
     
-    // Set up periodic refresh every 30 seconds
-    const interval = setInterval(fetchAllLeaderboards, 30000);
+    // Set up periodic refresh every 1 minute
+    const interval = setInterval(fetchAllLeaderboards, 60000);
     setRefreshInterval(interval);
     
     return () => {
@@ -116,14 +117,31 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
     };
   }, []);
 
-  // Cleanup interval on unmount
+  // Set up timer that ticks every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setSecondsSinceUpdate(prev => prev + 1);
+    }, 1000);
+    setTimerInterval(timer);
+    
+    return () => {
+      if (timer) {
+        clearInterval(timer);
+      }
+    };
+  }, []);
+
+  // Cleanup intervals on unmount
   useEffect(() => {
     return () => {
       if (refreshInterval) {
         clearInterval(refreshInterval);
       }
+      if (timerInterval) {
+        clearInterval(timerInterval);
+      }
     };
-  }, [refreshInterval]);
+  }, [refreshInterval, timerInterval]);
 
   const formatValue = (value: number, type: string) => {
     switch (type) {
@@ -313,11 +331,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
         {/* Footer */}
         <div className="mt-6 pt-4 border-t border-gray-200">
           <p className="text-sm text-gray-500 text-center font-['Pixelify_Sans']">
-            Leaderboards update every 30 seconds
-            {lastUpdateTime && (
-              <span> • Last updated: {lastUpdateTime.toLocaleTimeString()}</span>
-            )}
-            <span> • Your position: Not ranked yet</span>
+            Last updated {secondsSinceUpdate} seconds ago
           </p>
         </div>
       </div>

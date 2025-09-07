@@ -278,6 +278,7 @@ app.get('/api/leaderboard/:type', async (req, res) => {
         break;
         
       case 'colors':
+      case 'colours': // Support both spellings
         // Count color usage across all pixels
         const colorCounts: Record<string, number> = {};
         for (const key of pixelKeys) {
@@ -376,6 +377,19 @@ app.get('/api/leaderboard/:type', async (req, res) => {
             
             return { walletAddress: wallet, value: maxTerritory, rank: 0 };
           })
+          .sort((a, b) => b.value - a.value)
+          .slice(0, 10)
+          .map((entry, index) => ({ ...entry, rank: index + 1 }));
+        break;
+        
+      case 'timeplayed':
+        // Calculate total time spent on canvas (from first to last pixel)
+        leaderboard = Object.entries(walletStats)
+          .map(([wallet, stats]) => ({ 
+            walletAddress: wallet, 
+            value: Math.floor((stats.lastPixel - stats.firstPixel) / 1000), // Convert to seconds
+            rank: 0 
+          }))
           .sort((a, b) => b.value - a.value)
           .slice(0, 10)
           .map((entry, index) => ({ ...entry, rank: index + 1 }));

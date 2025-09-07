@@ -31,6 +31,8 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
     territory: false,
     timeplayed: false
   });
+  const [lastUpdateTime, setLastUpdateTime] = useState<Date | null>(null);
+  const [refreshInterval, setRefreshInterval] = useState<NodeJS.Timeout | null>(null);
 
   const tabs = [
     { 
@@ -67,37 +69,61 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
   ];
 
   // Fetch leaderboard data from backend
-  useEffect(() => {
-    const fetchLeaderboard = async (type: string) => {
-      try {
-        const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
-        setLoadingMap(prev => ({ ...prev, [type]: true }));
-        const response = await fetch(`${backendUrl}/api/leaderboard/${type}`);
-        if (response.ok) {
-          const data = await response.json();
-          setLeaderboards(prev => ({
-            ...prev,
-            [type]: data.leaderboard || []
-          }));
-          setHasLoadedOnceMap(prev => ({ ...prev, [type]: true }));
-        }
-      } catch (error) {
-        console.error(`Error fetching ${type} leaderboard:`, error);
-        // Fallback to empty array if fetch fails
+  const fetchLeaderboard = async (type: string) => {
+    try {
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+      setLoadingMap(prev => ({ ...prev, [type]: true }));
+      const response = await fetch(`${backendUrl}/api/leaderboard/${type}`);
+      if (response.ok) {
+        const data = await response.json();
         setLeaderboards(prev => ({
           ...prev,
-          [type]: []
+          [type]: data.leaderboard || []
         }));
+        setHasLoadedOnceMap(prev => ({ ...prev, [type]: true }));
+        setLastUpdateTime(new Date());
       }
-      finally {
-        setLoadingMap(prev => ({ ...prev, [type]: false }));
-      }
-    };
+    } catch (error) {
+      console.error(`Error fetching ${type} leaderboard:`, error);
+      // Fallback to empty array if fetch fails
+      setLeaderboards(prev => ({
+        ...prev,
+        [type]: []
+      }));
+    }
+    finally {
+      setLoadingMap(prev => ({ ...prev, [type]: false }));
+    }
+  };
 
-    // Fetch all leaderboard types
+  const fetchAllLeaderboards = () => {
     const types = ['pixels', 'colours', 'territory', 'timeplayed'];
     types.forEach(type => fetchLeaderboard(type));
+  };
+
+  // Initial fetch and setup periodic refresh
+  useEffect(() => {
+    fetchAllLeaderboards();
+    
+    // Set up periodic refresh every 30 seconds
+    const interval = setInterval(fetchAllLeaderboards, 30000);
+    setRefreshInterval(interval);
+    
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
   }, []);
+
+  // Cleanup interval on unmount
+  useEffect(() => {
+    return () => {
+      if (refreshInterval) {
+        clearInterval(refreshInterval);
+      }
+    };
+  }, [refreshInterval]);
 
   const formatValue = (value: number, type: string) => {
     switch (type) {
@@ -174,18 +200,32 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
             />
             <span>Leaderboard</span>
           </h2>
-          <button
-            onClick={onClose}
-            className="p-1 rounded-xl hover:bg-gray-100 transition-colors"
-            aria-label="Close"
-            title="Close"
-          >
-            <img 
-              src="https://unpkg.com/pixelarticons@1.8.1/svg/close.svg" 
-              alt="Close" 
-              className="h-5 w-5"
-            />
-          </button>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={fetchAllLeaderboards}
+              className="p-1 rounded-xl hover:bg-gray-100 transition-colors"
+              aria-label="Refresh"
+              title="Refresh leaderboard"
+            >
+              <img 
+                src="https://unpkg.com/pixelarticons@1.8.1/svg/refresh.svg" 
+                alt="Refresh" 
+                className="h-5 w-5"
+              />
+            </button>
+            <button
+              onClick={onClose}
+              className="p-1 rounded-xl hover:bg-gray-100 transition-colors"
+              aria-label="Close"
+              title="Close"
+            >
+              <img 
+                src="https://unpkg.com/pixelarticons@1.8.1/svg/close.svg" 
+                alt="Close" 
+                className="h-5 w-5"
+              />
+            </button>
+          </div>
         </div>
 
         {/* Main Category Navigation - Big Bar */}
@@ -287,7 +327,11 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
         {/* Footer */}
         <div className="mt-6 pt-4 border-t border-gray-200">
           <p className="text-sm text-gray-500 text-center font-['Pixelify_Sans']">
-            Leaderboards update every 5 minutes • Your position: Not ranked yet
+            Leaderboards update every 30 seconds
+            {lastUpdateTime && (
+              <span> • Last updated: {lastUpdateTime.toLocaleTimeString()}</span>
+            )}
+            <span> • Your position: Not ranked yet</span>
           </p>
         </div>
       </div>

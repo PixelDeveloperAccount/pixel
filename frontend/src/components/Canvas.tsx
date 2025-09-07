@@ -453,7 +453,6 @@ const Canvas: React.FC = () => {
       setIsPlacingPixel(true);
       setSelectedPosition({ x: clickedPixel.x, y: clickedPixel.y });
       setClickedPixel(null); // Hide the popup when entering placement mode
-      playPixelClickSound();
     }
   };
 

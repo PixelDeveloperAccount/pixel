@@ -77,7 +77,7 @@ const ColorPalette: React.FC = () => {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 p-4 bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-1px_rgba(0,0,0,0.06)]">
+    <div className="fixed bottom-0 left-0 right-0 p-4 bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-1px_rgba(0,0,0,0.06)] z-50">
       <div className="max-w-7xl mx-auto flex items-center">
         <div className="flex-1 flex justify-center relative">
           <div className="flex items-center gap-2">

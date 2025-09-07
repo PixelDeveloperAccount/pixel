@@ -6,7 +6,7 @@ import {
 import toast from 'react-hot-toast';
 
 // Replace with your actual token mint
-const TOKEN_MINT = '';
+const TOKEN_MINT = '6TdvRoTarRaDWDKisxC23zZhvhERNvFP8d7pG8CvBAGS';
 
 interface WalletContextType {
   connected: boolean;

@@ -97,8 +97,8 @@ export const LeaderboardProvider: React.FC<{ children: React.ReactNode }> = ({ c
     // Initial fetch
     fetchAllLeaderboards();
     
-    // Set up background refresh every 5 minutes
-    const interval = setInterval(fetchAllLeaderboards, 5 * 60 * 1000); // 5 minutes
+    // Set up background refresh every 10 minutes
+    const interval = setInterval(fetchAllLeaderboards, 10 * 60 * 1000); // 10 minutes
     setRefreshInterval(interval);
     
     return () => {

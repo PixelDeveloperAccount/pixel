@@ -238,7 +238,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
         {/* Footer */}
         <div className="mt-6 pt-4 border-t border-gray-200">
           <p className="text-sm text-gray-500 text-center font-['Pixelify_Sans']">
-            Updates every 5 minutes • Last updated {secondsSinceUpdate} seconds ago
+            Updates every 10 minutes • Last updated {secondsSinceUpdate} seconds ago
           </p>
         </div>
       </div>

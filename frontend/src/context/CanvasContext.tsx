@@ -108,6 +108,18 @@ export const CanvasProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       socket.disconnect();
     };
   }, [canvasStatus]); // This effect now depends on the canvasStatus
+
+  // Calculate favorite color whenever pixels change
+  useEffect(() => {
+    if (pixels.length > 0) {
+      const colorCounts = pixels.reduce((acc, pixel) => {
+        acc[pixel.color] = (acc[pixel.color] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+      const mostUsedColor = Object.entries(colorCounts).reduce((a, b) => (a[1] > b[1] ? a : b))[0];
+      setFavoriteColor(mostUsedColor);
+    }
+  }, [pixels]);
   
   useEffect(() => {
     setPosition({
@@ -138,8 +150,6 @@ export const CanvasProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       });
 
       if (response.ok) {
-        const newPixel = { x, y, color, walletAddress, timestamp: Date.now() };
-        setPixels(prev => [...prev, newPixel]);
         toast.success('Pixel placed successfully!');
       } else {
         toast.error('Failed to place pixel');
@@ -149,12 +159,6 @@ export const CanvasProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       toast.error('Error placing pixel');
     }
 
-    const colorCounts = pixels.reduce((acc, pixel) => {
-      acc[pixel.color] = (acc[pixel.color] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-    const mostUsedColor = Object.entries(colorCounts).reduce((a, b) => (a[1] > b[1] ? a : b))[0];
-    setFavoriteColor(mostUsedColor);
     setIsPlacingPixel(false);
     setSelectedPosition(null);
   };

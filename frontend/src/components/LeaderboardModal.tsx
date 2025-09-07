@@ -113,6 +113,21 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
     }
   };
 
+  const formatTimeSinceUpdate = (seconds: number) => {
+    if (seconds < 60) {
+      return `${seconds} seconds ago`;
+    }
+    
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    
+    if (remainingSeconds === 0) {
+      return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+    }
+    
+    return `${minutes} minute${minutes !== 1 ? 's' : ''} ${remainingSeconds} second${remainingSeconds !== 1 ? 's' : ''} ago`;
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white rounded-xl shadow-xl p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden">
@@ -238,7 +253,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
         {/* Footer */}
         <div className="mt-6 pt-4 border-t border-gray-200">
           <p className="text-sm text-gray-500 text-center font-['Pixelify_Sans']">
-            Updates every 10 minutes • Last updated {secondsSinceUpdate} seconds ago
+            Updates every 10 minutes • Last updated {formatTimeSinceUpdate(secondsSinceUpdate)}
           </p>
         </div>
       </div>

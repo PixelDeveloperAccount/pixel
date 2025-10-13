@@ -635,10 +635,10 @@ const Canvas: React.FC = () => {
       )}
       
       {!isPlacingPixel && !clickedPixel && (
-        <button
-          onClick={() => { setIsPlacingPixel(true); setClickedPixel(null); }}
-          className="fixed bottom-4 left-1/2 transform -translate-x-1/2 flex items-center space-x-2 bg-indigo-600 text-white px-5 py-3 text-lg rounded-lg shadow-lg hover:bg-indigo-700 transition-colors font-['Pixelify_Sans']"
-        >
+          <button
+            onClick={() => { setIsPlacingPixel(true); setClickedPixel(null); }}
+            className="fixed bottom-4 left-1/2 transform -translate-x-1/2 flex items-center space-x-2 bg-indigo-600 text-white px-5 py-3 text-lg rounded-lg shadow-lg hover:bg-indigo-700 transition-colors font-['Pixelify_Sans'] z-50"
+          >
           <img 
           src="https://unpkg.com/pixelarticons@1.8.1/svg/add-box.svg" 
           alt="Place" 

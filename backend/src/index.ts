@@ -6,6 +6,7 @@ import { createClient } from 'redis';
 import axios from 'axios';
 import { Request, Response } from 'express';
 import dotenv from 'dotenv';
+import { ethers } from 'ethers';
 
 dotenv.config();
 
@@ -48,7 +49,27 @@ app.use(cors({
 }));
 app.use(express.json());
 
-const HELIUS_API_KEY = process.env.HELIUS_API_KEY; 
+// BSC Configuration
+const BSC_RPC_URL = process.env.BSC_RPC_URL || 'https://bsc-dataseed.binance.org/';
+const TOKEN_CONTRACT_ADDRESS = process.env.TOKEN_CONTRACT_ADDRESS || '0x0000000000000000000000000000000000000000';
+
+// ERC-20 ABI for token balance checking
+const ERC20_ABI = [
+  {
+    "constant": true,
+    "inputs": [{"name": "_owner", "type": "address"}],
+    "name": "balanceOf",
+    "outputs": [{"name": "balance", "type": "uint256"}],
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "decimals",
+    "outputs": [{"name": "", "type": "uint8"}],
+    "type": "function"
+  }
+]; 
 
 
 app.get('/api/canvas', async (_req, res) => {
@@ -171,47 +192,40 @@ app.get('/api/pixels-by-wallet/:wallet', async (req, res) => {
 
 app.get('/api/owns-token/:wallet', async (req, res) => {
   const wallet = req.params.wallet;
-  const mint = req.query.mint;
 
-  if (!wallet || !mint || typeof mint !== 'string') {
-    res.status(400).json({ error: 'Missing wallet or token mint' });
+  if (!wallet) {
+    res.status(400).json({ error: 'Missing wallet address' });
     return;
   }
 
-  const heliusRpcUrl = `https://mainnet.helius-rpc.com/?api-key=${process.env.HELIUS_API_KEY}`;
-
   try {
-    const response = await axios.post(heliusRpcUrl, {
-      jsonrpc: '2.0',
-      id: 'check-token',
-      method: 'searchAssets',
-      params: {
-        ownerAddress: wallet,
-        tokenType: 'fungible',
-        displayOptions: {
-          showCollectionMetadata: false,
-        },
-      },
-    });
-
-    const items = response.data?.result?.items || [];
-
-    const token = items.find((t: any) => t.id === mint);
-
-    if (!token) {
-      console.log(`Wallet ${wallet} ❌ does NOT own token ${mint}`);
-      res.json({ ownsToken: false, tokenBalance: 0 });
+    const provider = new ethers.JsonRpcProvider(BSC_RPC_URL);
+    
+    // If no token contract is specified, use BNB balance
+    if (TOKEN_CONTRACT_ADDRESS === '0x0000000000000000000000000000000000000000') {
+      const bnbBalance = await provider.getBalance(wallet);
+      const bnbFormatted = parseFloat(ethers.formatEther(bnbBalance));
+      
+      console.log(`Wallet ${wallet} ✅ has ${bnbFormatted} BNB`);
+      res.json({ ownsToken: true, tokenBalance: bnbFormatted });
       return;
     }
 
-    const rawBalance = token.token_info?.balance || 0;
-    const decimals = token.token_info?.decimals || 0;
-    const humanBalance = rawBalance / 10 ** decimals;
+    // Check ERC-20 token balance
+    const tokenContract = new ethers.Contract(TOKEN_CONTRACT_ADDRESS, ERC20_ABI, provider);
+    const tokenBalance = await tokenContract.balanceOf(wallet);
+    const decimals = await tokenContract.decimals();
+    const formattedBalance = parseFloat(ethers.formatUnits(tokenBalance, decimals));
 
-    console.log(`Wallet ${wallet} ✅ owns ${humanBalance} of token ${mint}`);
-    res.json({ ownsToken: true, tokenBalance: humanBalance });
+    if (formattedBalance > 0) {
+      console.log(`Wallet ${wallet} ✅ owns ${formattedBalance} of token ${TOKEN_CONTRACT_ADDRESS}`);
+      res.json({ ownsToken: true, tokenBalance: formattedBalance });
+    } else {
+      console.log(`Wallet ${wallet} ❌ does NOT own token ${TOKEN_CONTRACT_ADDRESS}`);
+      res.json({ ownsToken: false, tokenBalance: 0 });
+    }
   } catch (err: any) {
-    console.error('Error calling Helius:', err.message);
+    console.error('Error checking BSC token balance:', err.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

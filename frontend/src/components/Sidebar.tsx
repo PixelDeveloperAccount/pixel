@@ -1,5 +1,4 @@
 import React from 'react';
-import { Palette } from 'lucide-react';
 import BSCUserInfo from './BSCUserInfo';
 import UserPixels from './UserPixels';
 import UserColors from './UserColors';
@@ -47,7 +46,11 @@ const Sidebar: React.FC = () => {
       }`}>
         <div className="flex items-center justify-center p-6 border-b border-gray-100">
           <div className="flex items-center space-x-2">
-            <Palette className="text-indigo-600 h-7 w-7" />
+            <img
+              src="/logo/binancepixel.png"
+              alt="Binance Pixel Logo"
+              className="h-7 w-7"
+            />
             <h1 className="text-2xl font-bold text-gray-900 font-['Pixelify_Sans']">{t('app.title')}</h1>
           </div>
         </div>

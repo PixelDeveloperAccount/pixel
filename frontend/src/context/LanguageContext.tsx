@@ -99,6 +99,11 @@ const translations = {
     'network.connection_failed': 'Failed to connect wallet',
     'network.wallet_connected': 'Wallet connected successfully!',
     'network.wallet_disconnected': 'Wallet disconnected!',
+    
+    // Wallet Modal
+    'wallet.installed': 'Installed',
+    'wallet.not_installed': 'Not installed',
+    'wallet.install_prompt': '💡 Don\'t have a wallet? Install MetaMask or Trust Wallet to get started!',
   },
   zh: {
     // App
@@ -187,6 +192,11 @@ const translations = {
     'network.connection_failed': '连接钱包失败',
     'network.wallet_connected': '钱包连接成功！',
     'network.wallet_disconnected': '钱包已断开连接！',
+    
+    // Wallet Modal
+    'wallet.installed': '已安装',
+    'wallet.not_installed': '未安装',
+    'wallet.install_prompt': '💡 没有钱包？安装 MetaMask 或 Trust Wallet 开始使用！',
   }
 };
 

@@ -79,8 +79,27 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   };
 
-  const connectWallet = async () => {
-    if (typeof window.ethereum === 'undefined') {
+  const connectWallet = async (walletType?: string) => {
+    let provider = window.ethereum;
+
+    // Handle different wallet types
+    if (walletType === 'binance' && window.BinanceChain) {
+      provider = window.BinanceChain;
+    } else if (walletType === 'walletconnect') {
+      // For WalletConnect, we'll use the standard ethereum provider
+      // In a real implementation, you'd integrate WalletConnect here
+      toast.error('WalletConnect integration coming soon!', {
+        duration: 3000,
+        style: {
+          background: '#EF4444',
+          color: '#fff',
+          fontFamily: 'Pixelify Sans, sans-serif',
+        },
+      });
+      return;
+    }
+
+    if (!provider) {
       toast.error('Please install a BSC-compatible wallet (MetaMask, Trust Wallet, etc.)', {
         duration: 3000,
         style: {
@@ -94,7 +113,7 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     try {
       // Request account access
-      const accounts = await window.ethereum.request({
+      const accounts = await provider.request({
         method: 'eth_requestAccounts',
       });
 
@@ -339,6 +358,14 @@ export const useBSCWallet = () => {
 declare global {
   interface Window {
     ethereum?: {
+      request: (args: { method: string; params?: any[] }) => Promise<any>;
+      on: (event: string, callback: (...args: any[]) => void) => void;
+      removeListener: (event: string, callback: (...args: any[]) => void) => void;
+      isMetaMask?: boolean;
+      isTrust?: boolean;
+      isCoinbaseWallet?: boolean;
+    };
+    BinanceChain?: {
       request: (args: { method: string; params?: any[] }) => Promise<any>;
       on: (event: string, callback: (...args: any[]) => void) => void;
       removeListener: (event: string, callback: (...args: any[]) => void) => void;

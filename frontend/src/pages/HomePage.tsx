@@ -17,7 +17,7 @@ const HomePage: React.FC = () => {
         return (
           <div className="flex flex-col items-center justify-center h-full text-white" style={{ backgroundColor: '#333333' }}>
             <img 
-              src="/loading/binance-loading.gif" 
+              src="/loading/binance-loading-img.gif" 
               alt="Loading..." 
               className="w-32 h-32"
             />

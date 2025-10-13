@@ -65,6 +65,10 @@ export const CanvasProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   // NEW: Extracted the fetching logic into a useCallback so we can call it manually to retry
   const loadCanvas = useCallback(async () => {
     setCanvasStatus('loading'); // Set status to loading before the request
+    
+    // Add a 3-second delay to show the loading animation
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    
     try {
       const response = await fetch(`${BACKEND_URL}/api/canvas`);
       if (!response.ok) {

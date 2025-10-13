@@ -19,7 +19,7 @@ const HomePage: React.FC = () => {
             <img 
               src="/loading/binance-loading.gif" 
               alt="Loading..." 
-              className="w-16 h-16"
+              className="w-32 h-32"
             />
           </div>
         );

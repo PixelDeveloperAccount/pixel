@@ -44,6 +44,7 @@ const translations = {
     'user.total_pixels': 'Total pixels:',
     'user.colors_used': '{count} colors used',
     'user.connect_wallet_pixels': 'Connect your wallet to see your placed pixels',
+    'user.pixels': 'Your pixels',
     
     // Color Palette
     'color.confirm': 'Confirm',
@@ -57,6 +58,26 @@ const translations = {
     'leaderboard.territory': 'Territory',
     'leaderboard.time_played': 'Time Played',
     'leaderboard.loading': 'Loading…',
+    'leaderboard.title': 'Leaderboard',
+    'leaderboard.today': 'Today',
+    'leaderboard.week': 'Week',
+    'leaderboard.month': 'Month',
+    'leaderboard.alltime': 'All time',
+    'leaderboard.total_pixels_per_user': 'Total pixels per user',
+    'leaderboard.most_used_colors': 'Overall most used colours on canvas',
+    'leaderboard.most_pixels_linked': 'Most pixels linked together per user',
+    'leaderboard.longest_time_spent': 'Longest time spent on canvas',
+    'leaderboard.time_played_label': 'Time played',
+    'leaderboard.territory_size': 'Territory size',
+    'leaderboard.times_used': 'Times used',
+    'leaderboard.pixels_painted': 'Pixels painted',
+    'leaderboard.updates_every_10_minutes': 'Updates every 10 minutes',
+    'leaderboard.last_updated': 'Last updated',
+    'leaderboard.seconds_ago': 'seconds ago',
+    'leaderboard.minute_ago': 'minute ago',
+    'leaderboard.minutes_ago': 'minutes ago',
+    'leaderboard.second_ago': 'second ago',
+    'leaderboard.seconds_ago_plural': 'seconds ago',
     
     // Social
     'social.github': 'GitHub',
@@ -66,10 +87,27 @@ const translations = {
     'social.language': 'Language',
     'social.english': 'English',
     'social.chinese': '中文',
+    'social.social': 'Social',
     
     // Help
     'help.title': 'Help',
     'help.close': 'Close',
+    'help.welcome': 'Welcome to PIXEL',
+    'help.controls': 'Controls',
+    'help.click_to_place': 'Click to place a pixel',
+    'help.right_click_drag': 'Right-click + drag to pan the canvas',
+    'help.scroll_zoom': 'Scroll to zoom in/out',
+    'help.token_system': 'Token System',
+    'help.pixel_tokens_determine': 'PIXEL tokens determine your pixel placement abilities',
+    'help.zero_tokens': '0 Tokens: 1 minute cooldown, 5 Pixels',
+    'help.one_to_fifty_thousand': '1 - 50,000 Tokens: 30 second cooldown, 30 Pixels',
+    'help.fifty_to_three_hundred': '50,001 - 300,000 Tokens: 25 second cooldown, 45 Pixels',
+    'help.three_hundred_to_million': '300,001 - 1,000,000 Tokens: 15 second cooldown, 70 Pixels',
+    'help.million_plus': '1,000,000+ Tokens: No cooldown, Infinite Pixels',
+    'help.cooldown_system': 'Cooldown System',
+    'help.no_cooldown_between': 'No cooldown between individual pixel placements',
+    'help.cooldown_starts_when_out': 'Cooldown only starts when you run out of pixels. Higher token holders get faster cooldowns and more pixels!',
+    'help.lets_start': 'Let\'s Start!',
     
     // Status
     'status.loading': 'Loading…',
@@ -81,6 +119,8 @@ const translations = {
     'time.minutes': 'm',
     'time.hours': 'h',
     'time.days': 'd',
+    'time.seconds_short': 's',
+    'time.minutes_short': 'm',
     
     // Cooldown
     'cooldown.wait': 'Wait {time}s',
@@ -137,6 +177,7 @@ const translations = {
     'user.total_pixels': '总像素:',
     'user.colors_used': '使用了 {count} 种颜色',
     'user.connect_wallet_pixels': '连接您的钱包查看已放置的像素',
+    'user.pixels': '你的像素',
     
     // Color Palette
     'color.confirm': '确认',
@@ -150,6 +191,26 @@ const translations = {
     'leaderboard.territory': '领土',
     'leaderboard.time_played': '游戏时间',
     'leaderboard.loading': '加载中…',
+    'leaderboard.title': '排行榜',
+    'leaderboard.today': '今天',
+    'leaderboard.week': '本周',
+    'leaderboard.month': '本月',
+    'leaderboard.alltime': '全部时间',
+    'leaderboard.total_pixels_per_user': '每个用户的总像素',
+    'leaderboard.most_used_colors': '画布上最常用的颜色',
+    'leaderboard.most_pixels_linked': '每个用户连接最多的像素',
+    'leaderboard.longest_time_spent': '在画布上花费的最长时间',
+    'leaderboard.time_played_label': '游戏时间',
+    'leaderboard.territory_size': '领土大小',
+    'leaderboard.times_used': '使用次数',
+    'leaderboard.pixels_painted': '绘制的像素',
+    'leaderboard.updates_every_10_minutes': '每10分钟更新一次',
+    'leaderboard.last_updated': '最后更新',
+    'leaderboard.seconds_ago': '秒前',
+    'leaderboard.minute_ago': '分钟前',
+    'leaderboard.minutes_ago': '分钟前',
+    'leaderboard.second_ago': '秒前',
+    'leaderboard.seconds_ago_plural': '秒前',
     
     // Social
     'social.github': 'GitHub',
@@ -159,10 +220,27 @@ const translations = {
     'social.language': '语言',
     'social.english': 'English',
     'social.chinese': '中文',
+    'social.social': '社会',
     
     // Help
     'help.title': '帮助',
     'help.close': '关闭',
+    'help.welcome': '欢迎来到 PIXEL',
+    'help.controls': '控制',
+    'help.click_to_place': '点击放置像素',
+    'help.right_click_drag': '右键点击 + 拖拽平移画布',
+    'help.scroll_zoom': '滚轮缩放',
+    'help.token_system': '代币系统',
+    'help.pixel_tokens_determine': 'PIXEL 代币决定您的像素放置能力',
+    'help.zero_tokens': '0 代币: 1分钟冷却，5个像素',
+    'help.one_to_fifty_thousand': '1 - 50,000 代币: 30秒冷却，30个像素',
+    'help.fifty_to_three_hundred': '50,001 - 300,000 代币: 25秒冷却，45个像素',
+    'help.three_hundred_to_million': '300,001 - 1,000,000 代币: 15秒冷却，70个像素',
+    'help.million_plus': '1,000,000+ 代币: 无冷却，无限像素',
+    'help.cooldown_system': '冷却系统',
+    'help.no_cooldown_between': '单个像素放置之间无冷却',
+    'help.cooldown_starts_when_out': '只有在像素用完时才开始冷却。代币持有者越多，冷却越快，像素越多！',
+    'help.lets_start': '开始吧！',
     
     // Status
     'status.loading': '加载中…',
@@ -174,6 +252,8 @@ const translations = {
     'time.minutes': '分',
     'time.hours': '时',
     'time.days': '天',
+    'time.seconds_short': '秒',
+    'time.minutes_short': '分',
     
     // Cooldown
     'cooldown.wait': '等待 {time}秒',

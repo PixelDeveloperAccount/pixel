@@ -78,7 +78,7 @@ const Sidebar: React.FC = () => {
             <UserColors />
 
             <div className="bg-white rounded-lg shadow-lg p-4">
-              <h3 className="text-xl font-semibold mb-3 text-gray-900 font-['Pixelify_Sans']">Social</h3>
+              <h3 className="text-xl font-semibold mb-3 text-gray-900 font-['Pixelify_Sans']">{t('social.social')}</h3>
               <div className="grid grid-cols-2 gap-3 font-['Pixelify_Sans'] text-base">
                 <a
                   href="https://github.com/PixelDeveloperAccount/pixel"

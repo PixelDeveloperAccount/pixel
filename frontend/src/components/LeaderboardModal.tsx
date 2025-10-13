@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useLeaderboard } from '../context/LeaderboardContext';
+import { useLanguage } from '../context/LanguageContext';
 
 interface LeaderboardModalProps {
   onClose: () => void;
 }
 
 const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState('pixels');
   const [activeTimeframe, setActiveTimeframe] = useState('today');
   const { 
@@ -18,35 +20,35 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
   const tabs = [
     { 
       id: 'pixels', 
-      name: 'Pixels', 
+      name: t('leaderboard.pixels'), 
       icon: () => <img src="https://unpkg.com/pixelarticons@1.8.1/svg/checkbox-on.svg" alt="Pixels" className="h-5 w-5" />, 
-      description: 'Total pixels per user' 
+      description: t('leaderboard.total_pixels_per_user') 
     },
     { 
       id: 'colours', 
-      name: 'Colours', 
+      name: t('leaderboard.colors'), 
       icon: () => <img src="https://unpkg.com/pixelarticons@1.8.1/svg/paint-bucket.svg" alt="Colours" className="h-5 w-5" />, 
-      description: 'Overall most used colours on canvas' 
+      description: t('leaderboard.most_used_colors') 
     },
     { 
       id: 'territory', 
-      name: 'Territory', 
+      name: t('leaderboard.territory'), 
       icon: () => <img src="https://unpkg.com/pixelarticons@1.8.1/svg/map.svg" alt="Territory" className="h-5 w-5" />, 
-      description: 'Most pixels linked together per user' 
+      description: t('leaderboard.most_pixels_linked') 
     },
     { 
       id: 'timeplayed', 
-      name: 'Time Played', 
+      name: t('leaderboard.time_played'), 
       icon: () => <img src="https://unpkg.com/pixelarticons@1.8.1/svg/clock.svg" alt="Time Played" className="h-5 w-5" />, 
-      description: 'Longest time spent on canvas' 
+      description: t('leaderboard.longest_time_spent') 
     }
   ];
 
   const timeframes = [
-    { id: 'today', name: 'Today' },
-    { id: 'week', name: 'Week' },
-    { id: 'month', name: 'Month' },
-    { id: 'alltime', name: 'All time' }
+    { id: 'today', name: t('leaderboard.today') },
+    { id: 'week', name: t('leaderboard.week') },
+    { id: 'month', name: t('leaderboard.month') },
+    { id: 'alltime', name: t('leaderboard.alltime') }
   ];
 
 
@@ -56,13 +58,13 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
         const hours = Math.floor(value / 3600);
         const minutes = Math.floor((value % 3600) / 60);
         if (hours > 0) {
-          return `${hours}h ${minutes}m`;
+          return `${hours}${t('time.hours')} ${minutes}${t('time.minutes_short')}`;
         }
-        return `${minutes}m`;
+        return `${minutes}${t('time.minutes_short')}`;
       case 'territory':
-        return `${value.toLocaleString()} pixels`;
+        return `${value.toLocaleString()} ${t('leaderboard.pixels')}`;
       case 'colours':
-        return `${value.toLocaleString()} pixels`;
+        return `${value.toLocaleString()} ${t('leaderboard.pixels')}`;
       default:
         return value.toLocaleString();
     }
@@ -71,13 +73,13 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
   const getValueLabel = (type: string) => {
     switch (type) {
       case 'timeplayed':
-        return 'Time played';
+        return t('leaderboard.time_played_label');
       case 'territory':
-        return 'Territory size';
+        return t('leaderboard.territory_size');
       case 'colours':
-        return 'Times used';
+        return t('leaderboard.times_used');
       default:
-        return 'Pixels painted';
+        return t('leaderboard.pixels_painted');
     }
   };
 
@@ -115,17 +117,17 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
 
   const formatTimeSinceUpdate = (seconds: number) => {
     if (seconds < 60) {
-      return `${seconds} seconds ago`;
+      return `${seconds} ${t('leaderboard.seconds_ago')}`;
     }
     
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     
     if (remainingSeconds === 0) {
-      return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+      return `${minutes} ${minutes !== 1 ? t('leaderboard.minutes_ago') : t('leaderboard.minute_ago')}`;
     }
     
-    return `${minutes} minute${minutes !== 1 ? 's' : ''} ${remainingSeconds} second${remainingSeconds !== 1 ? 's' : ''} ago`;
+    return `${minutes} ${minutes !== 1 ? t('leaderboard.minutes_ago') : t('leaderboard.minute_ago')} ${remainingSeconds} ${remainingSeconds !== 1 ? t('leaderboard.seconds_ago_plural') : t('leaderboard.second_ago')}`;
   };
 
   return (
@@ -138,7 +140,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
               alt="Leaderboard" 
               className="h-8 w-8"
             />
-            <span>Leaderboard</span>
+            <span>{t('leaderboard.title')}</span>
           </h2>
           <button
             onClick={onClose}
@@ -253,7 +255,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
         {/* Footer */}
         <div className="mt-6 pt-4 border-t border-gray-200">
           <p className="text-sm text-gray-500 text-center font-['Pixelify_Sans']">
-            Updates every 10 minutes • Last updated {formatTimeSinceUpdate(secondsSinceUpdate)}
+{t('leaderboard.updates_every_10_minutes')} • {t('leaderboard.last_updated')} {formatTimeSinceUpdate(secondsSinceUpdate)}
           </p>
         </div>
       </div>

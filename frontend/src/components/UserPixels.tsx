@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useBSCWallet } from '../context/BSCWalletContext';
 import { useCanvas } from '../context/CanvasContext';
+import { useLanguage } from '../context/LanguageContext';
 import BSCConnectButton from './BSCConnectButton';
 
 const UserPixels: React.FC = () => {
+  const { t } = useLanguage();
   const { walletAddress, connected } = useBSCWallet();
   const { pixels, startTime } = useCanvas();
   const [showTotalsShimmer, setShowTotalsShimmer] = useState(false);
@@ -45,17 +47,17 @@ const UserPixels: React.FC = () => {
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
 
-    if (days > 0) return `${days}d ${hours % 24}h`;
-    if (hours > 0) return `${hours}h ${minutes % 60}m`;
-    if (minutes > 0) return `${minutes}m ${seconds % 60}s`;
-    return `${seconds}s`;
+    if (days > 0) return `${days}${t('time.days')} ${hours % 24}${t('time.hours')}`;
+    if (hours > 0) return `${hours}${t('time.hours')} ${minutes % 60}${t('time.minutes_short')}`;
+    if (minutes > 0) return `${minutes}${t('time.minutes_short')} ${seconds % 60}${t('time.seconds_short')}`;
+    return `${seconds}${t('time.seconds_short')}`;
   };
 
   if (!connected) {
     return (
       <div className="bg-white rounded-lg shadow-lg p-4">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Your Pixels</h3>
-        <p className="text-gray-600">Connect your wallet to see your placed pixels</p>
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('user.your_pixels')}</h3>
+        <p className="text-gray-600">{t('user.connect_wallet_pixels')}</p>
       </div>
     );
   }
@@ -63,7 +65,7 @@ const UserPixels: React.FC = () => {
   return (
     <div className="bg-white rounded-lg shadow-lg p-4">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">Your Pixels</h3>
+        <h3 className="text-lg font-semibold text-gray-900">{t('user.your_pixels')}</h3>
       </div>
       
       
@@ -75,7 +77,7 @@ const UserPixels: React.FC = () => {
             alt="Session Start"
             className="h-4 w-4"
           />
-          <span className="text-sm">Session start:</span>
+          <span className="text-sm">{t('user.session_start')}</span>
         </div>
         {showTotalsShimmer ? (
           <span className="inline-block w-16 h-4 rounded shimmer" aria-hidden="true"></span>
@@ -92,7 +94,7 @@ const UserPixels: React.FC = () => {
             alt="Total Pixels"
             className="h-4 w-4"
           />
-          <span className="text-sm">Total pixels:</span>
+          <span className="text-sm">{t('user.total_pixels')}</span>
         </div>
         {showTotalsShimmer ? (
           <span className="inline-block w-10 h-4 rounded shimmer" aria-hidden="true"></span>

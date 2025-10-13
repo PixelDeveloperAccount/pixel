@@ -80,10 +80,34 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const connectWallet = async (walletType?: string) => {
-    let provider = window.ethereum;
+    let provider = null;
 
-    // Handle different wallet types
-    if (walletType === 'binance' && window.BinanceChain) {
+    // Handle different wallet types with specific detection
+    if (walletType === 'metamask') {
+      // Check for MetaMask specifically
+      if (window.ethereum && window.ethereum.isMetaMask && !window.ethereum.isPhantom) {
+        provider = window.ethereum;
+      } else {
+        // Try to find MetaMask in the providers array
+        if (window.ethereum && window.ethereum.providers) {
+          provider = window.ethereum.providers.find((p: any) => p.isMetaMask && !p.isPhantom);
+        }
+      }
+    } else if (walletType === 'trust') {
+      // Check for Trust Wallet specifically
+      if (window.ethereum && window.ethereum.isTrust) {
+        provider = window.ethereum;
+      } else if (window.ethereum && window.ethereum.providers) {
+        provider = window.ethereum.providers.find((p: any) => p.isTrust);
+      }
+    } else if (walletType === 'coinbase') {
+      // Check for Coinbase Wallet specifically
+      if (window.ethereum && window.ethereum.isCoinbaseWallet) {
+        provider = window.ethereum;
+      } else if (window.ethereum && window.ethereum.providers) {
+        provider = window.ethereum.providers.find((p: any) => p.isCoinbaseWallet);
+      }
+    } else if (walletType === 'binance' && window.BinanceChain) {
       provider = window.BinanceChain;
     } else if (walletType === 'walletconnect') {
       // For WalletConnect, we'll use the standard ethereum provider
@@ -97,6 +121,18 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         },
       });
       return;
+    } else {
+      // Default: try to use the first available BSC-compatible provider
+      if (window.ethereum) {
+        if (window.ethereum.providers) {
+          // Multiple wallets installed, find a BSC-compatible one
+          provider = window.ethereum.providers.find((p: any) => 
+            p.isMetaMask || p.isTrust || p.isCoinbaseWallet
+          );
+        } else if (window.ethereum.isMetaMask || window.ethereum.isTrust || window.ethereum.isCoinbaseWallet) {
+          provider = window.ethereum;
+        }
+      }
     }
 
     if (!provider) {
@@ -364,6 +400,16 @@ declare global {
       isMetaMask?: boolean;
       isTrust?: boolean;
       isCoinbaseWallet?: boolean;
+      isPhantom?: boolean;
+      providers?: Array<{
+        request: (args: { method: string; params?: any[] }) => Promise<any>;
+        on: (event: string, callback: (...args: any[]) => void) => void;
+        removeListener: (event: string, callback: (...args: any[]) => void) => void;
+        isMetaMask?: boolean;
+        isTrust?: boolean;
+        isCoinbaseWallet?: boolean;
+        isPhantom?: boolean;
+      }>;
     };
     BinanceChain?: {
       request: (args: { method: string; params?: any[] }) => Promise<any>;

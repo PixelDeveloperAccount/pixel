@@ -21,31 +21,62 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     if (isOpen) {
-      // Check which wallets are installed
+      // Check which wallets are installed with better detection
+      const checkWalletInstalled = (walletType: string) => {
+        if (walletType === 'metamask') {
+          if (window.ethereum && window.ethereum.isMetaMask && !window.ethereum.isPhantom) {
+            return true;
+          }
+          if (window.ethereum && window.ethereum.providers) {
+            return window.ethereum.providers.some((p: any) => p.isMetaMask && !p.isPhantom);
+          }
+          return false;
+        } else if (walletType === 'trust') {
+          if (window.ethereum && window.ethereum.isTrust) {
+            return true;
+          }
+          if (window.ethereum && window.ethereum.providers) {
+            return window.ethereum.providers.some((p: any) => p.isTrust);
+          }
+          return false;
+        } else if (walletType === 'coinbase') {
+          if (window.ethereum && window.ethereum.isCoinbaseWallet) {
+            return true;
+          }
+          if (window.ethereum && window.ethereum.providers) {
+            return window.ethereum.providers.some((p: any) => p.isCoinbaseWallet);
+          }
+          return false;
+        } else if (walletType === 'binance') {
+          return typeof window.BinanceChain !== 'undefined';
+        }
+        return false;
+      };
+
       const availableWallets: Wallet[] = [
         {
           name: 'MetaMask',
           icon: 'https://raw.githubusercontent.com/MetaMask/brand-resources/master/SVG/metamask-fox.svg',
           connector: () => connectWallet('metamask'),
-          isInstalled: typeof window.ethereum !== 'undefined' && window.ethereum.isMetaMask
+          isInstalled: checkWalletInstalled('metamask')
         },
         {
           name: 'Trust Wallet',
           icon: 'https://trustwallet.com/assets/images/media/assets/trust_platform.svg',
           connector: () => connectWallet('trust'),
-          isInstalled: typeof window.ethereum !== 'undefined' && window.ethereum.isTrust
+          isInstalled: checkWalletInstalled('trust')
         },
         {
           name: 'Binance Wallet',
           icon: 'https://www.binance.com/favicon.ico',
           connector: () => connectWallet('binance'),
-          isInstalled: typeof window.BinanceChain !== 'undefined'
+          isInstalled: checkWalletInstalled('binance')
         },
         {
           name: 'Coinbase Wallet',
           icon: 'https://images.ctfassets.net/9sy2a0egs6zh/4zJfzJbG3kTDSk5Wo4RJI1/3f6a6d69d2d6e4b0e8b8b8b8b8b8b8b8/coinbase-wallet-logo.svg',
           connector: () => connectWallet('coinbase'),
-          isInstalled: typeof window.ethereum !== 'undefined' && window.ethereum.isCoinbaseWallet
+          isInstalled: checkWalletInstalled('coinbase')
         },
         {
           name: 'WalletConnect',

@@ -11,7 +11,7 @@ interface BSCWalletContextType {
   walletAddress: string | null;
   balance: number;
   tokenBalance: number;
-  connectWallet: () => void;
+  connectWallet: (walletType?: string) => void;
   disconnectWallet: () => void;
   pixelQuota: number;
   pixelsRemaining: number;
@@ -20,6 +20,7 @@ interface BSCWalletContextType {
   isOnCooldown: boolean;
   decrementPixels: () => void;
   startCooldown: () => void;
+  hasWallet: boolean;
 }
 
 const BSCWalletContext = createContext<BSCWalletContextType | undefined>(undefined);
@@ -34,6 +35,7 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [isOnCooldown, setIsOnCooldown] = useState(false);
   const [cooldownTime, setCooldownTime] = useState(5);
   const [cooldownTimeLeft, setCooldownTimeLeft] = useState(0);
+  const [hasWallet, setHasWallet] = useState(false);
   const cooldownIntervalRef = useRef<number>();
 
   // Load cooldown state from localStorage on mount
@@ -48,7 +50,7 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           setCooldownTimeLeft(timeLeft);
           setIsOnCooldown(true);
           setPixelsRemaining(savedPixels);
-          startCooldownTimer(timeLeft);
+          startCooldownTimer();
         } else {
           localStorage.removeItem('pixel-cooldown');
         }
@@ -61,13 +63,28 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   // Check if wallet is already connected on mount
   useEffect(() => {
+    checkWalletAvailability();
     checkWalletConnection();
   }, []);
 
+  const checkWalletAvailability = () => {
+    const hasBSCWallet = typeof window.ethereum !== 'undefined' && (
+      window.ethereum.isMetaMask || 
+      window.ethereum.isTrust || 
+      window.ethereum.isCoinbaseWallet ||
+      (window.ethereum.providers && window.ethereum.providers.some((p: any) => 
+        p.isMetaMask || p.isTrust || p.isCoinbaseWallet
+      ))
+    ) || typeof window.BinanceChain !== 'undefined';
+    
+    setHasWallet(hasBSCWallet);
+  };
+
   const checkWalletConnection = async () => {
-    if (typeof window.ethereum !== 'undefined') {
+    // Only check for existing connections if a BSC-compatible wallet is installed
+    if (hasWallet) {
       try {
-        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        const accounts = await window.ethereum!.request({ method: 'eth_accounts' });
         if (accounts.length > 0) {
           setWalletAddress(accounts[0]);
           setConnected(true);
@@ -137,7 +154,7 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     if (!provider) {
       toast.error('Please install a BSC-compatible wallet (MetaMask, Trust Wallet, etc.)', {
-        duration: 3000,
+        duration: 5000,
         style: {
           background: '#EF4444',
           color: '#fff',
@@ -375,6 +392,7 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         isOnCooldown,
         decrementPixels,
         startCooldown,
+        hasWallet,
       }}
     >
       {children}

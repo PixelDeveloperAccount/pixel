@@ -16,7 +16,7 @@ interface WalletModalProps {
 
 const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
   const { t } = useLanguage();
-  const { connectWallet } = useBSCWallet();
+  const { connectWallet, hasWallet } = useBSCWallet();
   const [wallets, setWallets] = useState<Wallet[]>([]);
 
   useEffect(() => {
@@ -91,6 +91,62 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
   }, [isOpen, connectWallet]);
 
   if (!isOpen) return null;
+
+  // If no wallets are available, show a message
+  if (!hasWallet) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 font-['Pixelify_Sans']">
+              {t('wallet.connect')}
+            </h2>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          
+          <div className="text-center">
+            <div className="mb-4">
+              <svg className="w-16 h-16 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2 font-['Pixelify_Sans']">
+              No Wallet Detected
+            </h3>
+            <p className="text-gray-600 mb-6 font-['Pixelify_Sans']">
+              Please install a BSC-compatible wallet to continue.
+            </p>
+            
+            <div className="space-y-3">
+              <a
+                href="https://metamask.io/download/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-['Pixelify_Sans']"
+              >
+                Install MetaMask
+              </a>
+              <a
+                href="https://trustwallet.com/download"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full bg-gray-600 text-white py-3 px-4 rounded-lg hover:bg-gray-700 transition-colors font-['Pixelify_Sans']"
+              >
+                Install Trust Wallet
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

@@ -10,10 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@solana/wallet-adapter-react": "^0.15.38",
-    "@solana/wallet-adapter-react-ui": "^0.9.38",
-    "@solana/wallet-adapter-wallets": "^0.19.36",
-    "@solana/web3.js": "^1.98.2",
+    "@web3-react/core": "^8.2.0",
+    "@web3-react/injected-connector": "^6.0.7",
+    "@web3-react/walletconnect-connector": "^6.2.13",
+    "ethers": "^6.15.0",
     "lucide-react": "^0.344.0",
     "pixelarticons": "^1.8.1",
     "react": "^18.3.1",

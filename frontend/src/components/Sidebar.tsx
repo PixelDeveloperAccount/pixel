@@ -1,11 +1,11 @@
 import React from 'react';
 import { Palette } from 'lucide-react';
-import UserInfo from './UserInfo';
+import BSCUserInfo from './BSCUserInfo';
 import UserPixels from './UserPixels';
 import UserColors from './UserColors';
 import toast from 'react-hot-toast'; // Ensure toast is imported
 
-const CONTRACT_ADDRESS = "0x1234567890abcdef1234567890abcdef12345678";
+const CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000"; // Replace with your BSC token contract address
 
 const Sidebar: React.FC = () => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -65,7 +65,7 @@ const Sidebar: React.FC = () => {
           </div>
 
           <div className="p-4 space-y-6">
-            <UserInfo />
+            <BSCUserInfo />
 
             <UserPixels />
 

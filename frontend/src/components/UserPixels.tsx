@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useWallet } from '../context/WalletContext';
+import { useBSCWallet } from '../context/BSCWalletContext';
 import { useCanvas } from '../context/CanvasContext';
-import ConnectButton from './ConnectButton';
+import BSCConnectButton from './BSCConnectButton';
 
 const UserPixels: React.FC = () => {
-  const { walletAddress, connected } = useWallet();
+  const { walletAddress, connected } = useBSCWallet();
   const { pixels, startTime } = useCanvas();
   const [showTotalsShimmer, setShowTotalsShimmer] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -102,7 +102,7 @@ const UserPixels: React.FC = () => {
       </div>
       
       {/* Connect Button */}
-      <ConnectButton />
+      <BSCConnectButton />
     </div>
   );
 };

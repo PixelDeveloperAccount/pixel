@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useWallet } from '../context/WalletContext';
+import { useBSCWallet } from '../context/BSCWalletContext';
 import { useCanvas } from '../context/CanvasContext';
 
 const UserColors: React.FC = () => {
-  const { walletAddress, connected } = useWallet();
+  const { walletAddress, connected } = useBSCWallet();
   const { pixels } = useCanvas();
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
 

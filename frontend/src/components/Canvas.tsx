@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useCanvas } from '../context/CanvasContext';
-import { useWallet } from '../context/WalletContext';
+import { useBSCWallet } from '../context/BSCWalletContext';
 import { useSound } from '../context/SoundContext';
 import HelpModal from './HelpModal';
 import LeaderboardModal from './LeaderboardModal';
@@ -24,7 +24,7 @@ const Canvas: React.FC = () => {
     sampleColor,
     setSelectedColor
   } = useCanvas();
-  const { connected } = useWallet();
+  const { connected } = useBSCWallet();
   const { isMuted, setIsMuted } = useSound();
   
   const [isDragging, setIsDragging] = useState(false);

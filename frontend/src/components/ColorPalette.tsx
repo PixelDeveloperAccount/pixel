@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useCanvas } from '../context/CanvasContext';
-import { useWallet } from '../context/WalletContext';
+import { useBSCWallet } from '../context/BSCWalletContext';
 import { useSound } from '../context/SoundContext';
 
 const colors = [
@@ -32,7 +32,7 @@ const ColorPalette: React.FC = () => {
     cooldownTimeLeft,
     connected,
     tokenBalance
-  } = useWallet();
+  } = useBSCWallet();
   const { isMuted } = useSound();
 
   // Clear any previously selected color whenever the palette visibility or cooldown overlay changes

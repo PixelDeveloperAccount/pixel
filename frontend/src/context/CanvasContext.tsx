@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { io, Socket } from "socket.io-client";
-import { useWallet } from './WalletContext';
+import { useBSCWallet } from './BSCWalletContext';
 import toast from 'react-hot-toast';
 
 interface Pixel {
@@ -45,7 +45,7 @@ const CanvasContext = createContext<CanvasContextType | undefined>(undefined);
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
 
 export const CanvasProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { walletAddress } = useWallet();
+  const { walletAddress } = useBSCWallet();
   const [pixels, setPixels] = useState<Pixel[]>([]);
   // NEW: State to track the loading/error status of the canvas
   const [canvasStatus, setCanvasStatus] = useState<CanvasStatus>('loading');

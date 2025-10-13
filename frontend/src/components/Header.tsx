@@ -1,10 +1,10 @@
 import React from 'react';
 import { Palette, MousePointer, Wallet } from 'lucide-react';
-import { useWallet } from '../context/WalletContext';
-import ConnectButton from './ConnectButton';
+import { useBSCWallet } from '../context/BSCWalletContext';
+import BSCConnectButton from './BSCConnectButton';
 
 const Header: React.FC = () => {
-  const { connected, tokenBalance, pixelQuota } = useWallet();
+  const { connected, tokenBalance, pixelQuota } = useBSCWallet();
 
   return (
     <header className="backdrop-blur-md bg-gray-900/80 shadow-md py-3 px-4 sm:px-6">
@@ -23,11 +23,11 @@ const Header: React.FC = () => {
             {connected && (
               <div className="flex items-center space-x-1">
                 <Wallet className="h-5 w-5" />
-                <span>Tokens: {tokenBalance.toLocaleString()}</span>
+                <span>BNB: {tokenBalance.toFixed(4)}</span>
               </div>
             )}
           </div>
-          <ConnectButton />
+          <BSCConnectButton />
         </div>
       </div>
     </header>

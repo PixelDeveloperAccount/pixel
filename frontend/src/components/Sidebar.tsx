@@ -49,7 +49,7 @@ const Sidebar: React.FC = () => {
             <img
               src="/logo/binancepixel.png"
               alt="Binance Pixel Logo"
-              className="h-7 w-7"
+              className="h-14 w-14"
             />
             <h1 className="text-2xl font-bold text-gray-900 font-['Pixelify_Sans']">{t('app.title')}</h1>
           </div>

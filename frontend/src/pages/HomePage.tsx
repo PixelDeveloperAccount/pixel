@@ -5,7 +5,6 @@ import Sidebar from '../components/Sidebar';
 import StickerField from '../components/StickerField';
 import { useCanvas } from '../context/CanvasContext';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
-import { OrbitProgress } from "react-loading-indicators";
 
 const HomePage: React.FC = () => {
   // NEW: Get the canvas status and retry function from our context
@@ -17,7 +16,11 @@ const HomePage: React.FC = () => {
       case 'loading':
         return (
           <div className="flex flex-col items-center justify-center h-full text-white" style={{ backgroundColor: '#333333' }}>
-            <OrbitProgress dense color="#ffffff" size="medium" text="" textColor="" />
+            <img 
+              src="/loading/binance-loading.gif" 
+              alt="Loading..." 
+              className="w-16 h-16"
+            />
           </div>
         );
       case 'error':

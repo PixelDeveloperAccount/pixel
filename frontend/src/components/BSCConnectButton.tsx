@@ -1,9 +1,11 @@
 import React from 'react';
 import { Wallet } from 'lucide-react';
 import { useBSCWallet } from '../context/BSCWalletContext';
+import { useLanguage } from '../context/LanguageContext';
 
 const BSCConnectButton: React.FC = () => {
   const { connected, walletAddress, connectWallet, disconnectWallet } = useBSCWallet();
+  const { t } = useLanguage();
 
   if (connected && walletAddress) {
     return (
@@ -13,14 +15,14 @@ const BSCConnectButton: React.FC = () => {
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 bg-green-500 rounded-full"></div>
               <span className="text-sm font-medium text-green-800 font-['Pixelify_Sans']">
-                Connected
+                {t('wallet.connected')}
               </span>
             </div>
             <button
               onClick={disconnectWallet}
               className="text-xs text-green-600 hover:text-green-800 font-['Pixelify_Sans'] underline"
             >
-              Disconnect
+              {t('wallet.disconnect')}
             </button>
           </div>
           <div className="mt-1 text-xs text-green-700 font-['Pixelify_Sans'] break-all">
@@ -38,7 +40,7 @@ const BSCConnectButton: React.FC = () => {
         className="w-full font-['Pixelify_Sans'] flex items-center justify-center space-x-2 px-5 py-3 rounded-lg transition-all text-lg bg-blue-600 hover:bg-blue-700 text-white"
       >
         <Wallet className="h-5 w-5" />
-        <span>Connect MetaMask</span>
+        <span>{t('wallet.connect')}</span>
       </button>
     </div>
   );

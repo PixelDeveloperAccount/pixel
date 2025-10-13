@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { io, Socket } from "socket.io-client";
 import { useBSCWallet } from './BSCWalletContext';
+import { useLanguage } from './LanguageContext';
 import toast from 'react-hot-toast';
 
 interface Pixel {
@@ -46,6 +47,7 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
 
 export const CanvasProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { walletAddress } = useBSCWallet();
+  const { t } = useLanguage();
   const [pixels, setPixels] = useState<Pixel[]>([]);
   // NEW: State to track the loading/error status of the canvas
   const [canvasStatus, setCanvasStatus] = useState<CanvasStatus>('loading');
@@ -130,7 +132,7 @@ export const CanvasProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   
   const placePixel = async (x: number, y: number, color: string) => {
     if (!walletAddress) {
-      toast.error('Please connect your wallet first');
+      toast.error(t('canvas.connect_first'));
       return;
     }
 
@@ -150,13 +152,13 @@ export const CanvasProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       });
 
       if (response.ok) {
-        toast.success('Pixel placed successfully!');
+        toast.success(t('canvas.pixel_placed'));
       } else {
-        toast.error('Failed to place pixel');
+        toast.error(t('canvas.failed_place'));
       }
     } catch (error) {
       console.error('Error placing pixel:', error);
-      toast.error('Error placing pixel');
+      toast.error(t('canvas.error_place'));
     }
 
     setIsPlacingPixel(false);

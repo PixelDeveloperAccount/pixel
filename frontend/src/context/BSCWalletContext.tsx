@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { ethers } from 'ethers';
+import { useLanguage } from './LanguageContext';
 import toast from 'react-hot-toast';
 
 // BSC Mainnet configuration
@@ -24,6 +25,7 @@ interface BSCWalletContextType {
 const BSCWalletContext = createContext<BSCWalletContextType | undefined>(undefined);
 
 export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { t } = useLanguage();
   const [connected, setConnected] = useState(false);
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [balance, setBalance] = useState(0);
@@ -79,7 +81,7 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const connectWallet = async () => {
     if (typeof window.ethereum === 'undefined') {
-      toast.error('MetaMask is not installed!', {
+      toast.error(t('network.metamask_required'), {
         duration: 3000,
         style: {
           background: '#EF4444',
@@ -101,7 +103,7 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setConnected(true);
         await fetchBalances(accounts[0]);
         
-        toast.success('Wallet connected successfully!', {
+        toast.success(t('network.wallet_connected'), {
           duration: 3000,
           style: {
             background: '#10B981',
@@ -113,7 +115,7 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     } catch (error: any) {
       console.error('Error connecting wallet:', error);
       if (error.code === 4001) {
-        toast.error('User rejected the connection request', {
+        toast.error(t('network.connection_rejected'), {
           duration: 3000,
           style: {
             background: '#EF4444',
@@ -122,7 +124,7 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           },
         });
       } else {
-        toast.error('Failed to connect wallet', {
+        toast.error(t('network.connection_failed'), {
           duration: 3000,
           style: {
             background: '#EF4444',
@@ -146,7 +148,7 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     localStorage.removeItem('pixel-cooldown');
     
     if (wasConnected) {
-      toast.success('Wallet disconnected!', {
+      toast.success(t('network.wallet_disconnected'), {
         duration: 3000,
         style: {
           background: '#EF4444',
@@ -281,7 +283,7 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       const handleChainChanged = (chainId: string) => {
         // BSC Mainnet chain ID is 0x38 (56 in decimal)
         if (chainId !== '0x38') {
-          toast.error('Please switch to BSC Mainnet', {
+          toast.error(t('network.switch_bsc'), {
             duration: 5000,
             style: {
               background: '#EF4444',

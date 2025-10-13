@@ -3,16 +3,18 @@ import { CanvasProvider } from './context/CanvasContext';
 import { BSCWalletProvider } from './context/BSCWalletContext';
 import { SoundProvider } from './context/SoundContext';
 import { LeaderboardProvider } from './context/LeaderboardContext';
+import { LanguageProvider } from './context/LanguageContext';
 import HomePage from './pages/HomePage';
 import { Toaster, ToastBar } from 'react-hot-toast'; // Import Toaster and ToastBar
 
 function App() {
   return (
-    <BSCWalletProvider>
-      <CanvasProvider>
-        <SoundProvider>
-          <LeaderboardProvider>
-            <Layout>
+    <LanguageProvider>
+      <BSCWalletProvider>
+        <CanvasProvider>
+          <SoundProvider>
+            <LeaderboardProvider>
+              <Layout>
                 {/* Custom Toaster Implementation with Tailwind CSS - Compact Version */}
                 <Toaster position="top-center">
                   {(t) => {
@@ -57,12 +59,13 @@ function App() {
                     );
                   }}
                 </Toaster>
-              <HomePage />
-            </Layout>
-          </LeaderboardProvider>
-        </SoundProvider>
-      </CanvasProvider>
-    </BSCWalletProvider>
+                <HomePage />
+              </Layout>
+            </LeaderboardProvider>
+          </SoundProvider>
+        </CanvasProvider>
+      </BSCWalletProvider>
+    </LanguageProvider>
   );
 }
 

@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useCanvas } from '../context/CanvasContext';
 import { useBSCWallet } from '../context/BSCWalletContext';
 import { useSound } from '../context/SoundContext';
+import { useLanguage } from '../context/LanguageContext';
 import HelpModal from './HelpModal';
 import LeaderboardModal from './LeaderboardModal';
 
@@ -26,6 +27,7 @@ const Canvas: React.FC = () => {
   } = useCanvas();
   const { connected } = useBSCWallet();
   const { isMuted, setIsMuted } = useSound();
+  const { t } = useLanguage();
   
   const [isDragging, setIsDragging] = useState(false);
   const [startDragPosition, setStartDragPosition] = useState({ x: 0, y: 0 });
@@ -642,7 +644,7 @@ const Canvas: React.FC = () => {
           alt="Place" 
           className="h-7 w-7 filter brightness-0 invert" 
         />
-          <span>Place Pixel</span>
+          <span>{t('canvas.place_pixel')}</span>
         </button>
       )}
     </div>

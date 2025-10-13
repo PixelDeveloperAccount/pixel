@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Coins, MousePointer, Timer } from 'lucide-react';
 import { useBSCWallet } from '../context/BSCWalletContext';
+import { useLanguage } from '../context/LanguageContext';
 import BSCConnectButton from './BSCConnectButton';
 
 const BSCUserInfo: React.FC = () => {
@@ -13,6 +14,7 @@ const BSCUserInfo: React.FC = () => {
     isOnCooldown,
     cooldownTimeLeft
   } = useBSCWallet();
+  const { t } = useLanguage();
   const [showInfoShimmer, setShowInfoShimmer] = useState(false);
 
   // Show a brief shimmer on first load after connecting
@@ -29,8 +31,8 @@ const BSCUserInfo: React.FC = () => {
   if (!connected) {
     return (
       <div className="bg-white rounded-lg shadow-lg p-4">
-        <h3 className="text-xl font-semibold text-gray-900 font-['Pixelify_Sans'] mb-4">Your Info</h3>
-        <p className="text-gray-500 text-center font-['Pixelify_Sans'] mb-4">Connect wallet to see your info</p>
+        <h3 className="text-xl font-semibold text-gray-900 font-['Pixelify_Sans'] mb-4">{t('user.your_info')}</h3>
+        <p className="text-gray-500 text-center font-['Pixelify_Sans'] mb-4">{t('wallet.connect_wallet')}</p>
         <BSCConnectButton />
       </div>
     );
@@ -38,7 +40,7 @@ const BSCUserInfo: React.FC = () => {
   
   return (
     <div className="bg-white rounded-lg shadow-lg p-4 space-y-3">
-      <h3 className="text-xl font-semibold text-gray-900 font-['Pixelify_Sans']">Your Info</h3>
+      <h3 className="text-xl font-semibold text-gray-900 font-['Pixelify_Sans']">{t('user.your_info')}</h3>
       
       <div className="space-y-3 font-['Pixelify_Sans'] text-base">
         <div className="flex items-center justify-between">
@@ -48,7 +50,7 @@ const BSCUserInfo: React.FC = () => {
               alt="Wallet" 
               className="h-6 w-6" 
             />
-            <span>BNB Balance:</span>
+            <span>{t('wallet.bnb_balance')}</span>
           </div>
           {showInfoShimmer ? (
             <span className="inline-block w-16 h-5 rounded shimmer" aria-hidden="true"></span>
@@ -65,7 +67,7 @@ const BSCUserInfo: React.FC = () => {
                 alt="Token" 
                 className="h-6 w-6" 
               />
-              <span>Token Balance:</span>
+              <span>{t('wallet.token_balance')}</span>
             </div>
             {showInfoShimmer ? (
               <span className="inline-block w-16 h-5 rounded shimmer" aria-hidden="true"></span>
@@ -82,7 +84,7 @@ const BSCUserInfo: React.FC = () => {
               alt="Pixels" 
               className="h-6 w-6" 
             />
-            <span>Available Pixels:</span>
+            <span>{t('wallet.available_pixels')}</span>
           </div>
           {showInfoShimmer ? (
             <span className="inline-block w-24 h-5 rounded shimmer" aria-hidden="true"></span>
@@ -96,7 +98,7 @@ const BSCUserInfo: React.FC = () => {
         {isOnCooldown && (
           <div className="flex items-center justify-center space-x-2 text-orange-600 mt-2">
             <Timer className="h-5 w-5" />
-            <span className="font-medium">{cooldownTimeLeft}s</span>
+            <span className="font-medium">{cooldownTimeLeft}{t('time.seconds')}</span>
           </div>
         )}
       </div>

@@ -18,7 +18,7 @@ const translations = {
     'app.pixelchain': 'PixelChain',
     
     // Wallet
-    'wallet.connect': 'Connect MetaMask',
+    'wallet.connect': 'Connect Wallet',
     'wallet.connected': 'Connected',
     'wallet.disconnect': 'Disconnect',
     'wallet.connect_wallet': 'Connect wallet to see your info',
@@ -106,7 +106,7 @@ const translations = {
     'app.pixelchain': '像素链',
     
     // Wallet
-    'wallet.connect': '连接 MetaMask',
+    'wallet.connect': '连接钱包',
     'wallet.connected': '已连接',
     'wallet.disconnect': '断开连接',
     'wallet.connect_wallet': '连接钱包查看您的信息',

@@ -81,7 +81,7 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const connectWallet = async () => {
     if (typeof window.ethereum === 'undefined') {
-      toast.error(t('network.metamask_required'), {
+      toast.error('Please install a BSC-compatible wallet (MetaMask, Trust Wallet, etc.)', {
         duration: 3000,
         style: {
           background: '#EF4444',

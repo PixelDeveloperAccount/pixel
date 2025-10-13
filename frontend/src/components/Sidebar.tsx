@@ -136,13 +136,8 @@ const Sidebar: React.FC = () => {
 
             {/* Language Selection */}
             <div className="bg-white rounded-lg shadow-lg p-4">
-              <h3 className="text-xl font-semibold mb-3 text-gray-900 font-['Pixelify_Sans'] flex items-center space-x-2">
-                <img
-                  src="https://unpkg.com/pixelarticons@1.8.1/svg/comment.svg"
-                  alt={t('social.language')}
-                  className="h-6 w-6"
-                />
-                <span>{t('social.language')}</span>
+              <h3 className="text-xl font-semibold mb-3 text-gray-900 font-['Pixelify_Sans']">
+                {t('social.language')}
               </h3>
               <div className="space-y-2">
                 <button
@@ -151,7 +146,7 @@ const Sidebar: React.FC = () => {
                 >
                   <div className="flex items-center space-x-3">
                     <img
-                      src="https://unpkg.com/pixelarticons@1.8.1/svg/translate.svg"
+                      src="https://unpkg.com/pixelarticons@1.8.1/svg/script-text.svg"
                       alt={t('social.language')}
                       className="h-5 w-5"
                     />

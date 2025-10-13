@@ -131,20 +131,43 @@ const Sidebar: React.FC = () => {
                     />
                   <span>{t('social.docs')}</span>
                 </a>
+              </div>
+            </div>
+
+            {/* Language Selection */}
+            <div className="bg-white rounded-lg shadow-lg p-4">
+              <h3 className="text-xl font-semibold mb-3 text-gray-900 font-['Pixelify_Sans'] flex items-center space-x-2">
+                <img
+                  src="https://unpkg.com/pixelarticons@1.8.1/svg/comment.svg"
+                  alt={t('social.language')}
+                  className="h-6 w-6"
+                />
+                <span>{t('social.language')}</span>
+              </h3>
+              <div className="space-y-2">
                 <button
                   onClick={toggleLanguage}
-                  className="flex items-center space-x-2 text-gray-900 hover:text-gray-600 transition-colors"
+                  className="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors font-['Pixelify_Sans']"
                 >
-                  <img
+                  <div className="flex items-center space-x-3">
+                    <img
                       src="https://unpkg.com/pixelarticons@1.8.1/svg/translate.svg"
                       alt={t('social.language')}
-                      className="h-6 w-6"
+                      className="h-5 w-5"
                     />
-                  <span>{t('social.language')}</span>
+                    <span className="text-gray-900">{t('social.language')}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm text-gray-600">
+                      {language === 'en' ? t('social.english') : t('social.chinese')}
+                    </span>
+                    <img
+                      src="https://unpkg.com/pixelarticons@1.8.1/svg/chevron-right.svg"
+                      alt="Toggle"
+                      className="h-4 w-4 text-gray-400"
+                    />
+                  </div>
                 </button>
-                <div className="flex items-center space-x-2 text-gray-900">
-                  <span className="text-sm">{language === 'en' ? t('social.english') : t('social.chinese')}</span>
-                </div>
               </div>
             </div>
           </div>

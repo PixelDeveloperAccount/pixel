@@ -5,7 +5,7 @@ export type Language = 'en' | 'zh';
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string) => string;
+  t: (key: string, placeholders?: Record<string, string | number>) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -35,6 +35,8 @@ const translations = {
     'canvas.failed_place': 'Failed to place pixel',
     'canvas.error_place': 'Error placing pixel',
     'canvas.connect_first': 'Please connect your wallet first',
+    'canvas.pixel_coordinates': 'Pixel: {x}, {y}',
+    'canvas.not_painted_yet': 'Not painted yet',
     
     // User Info
     'user.your_info': 'Your Info',
@@ -168,6 +170,8 @@ const translations = {
     'canvas.failed_place': '放置像素失败',
     'canvas.error_place': '放置像素时出错',
     'canvas.connect_first': '请先连接您的钱包',
+    'canvas.pixel_coordinates': '像素: {x}, {y}',
+    'canvas.not_painted_yet': '尚未绘制',
     
     // User Info
     'user.your_info': '您的信息',

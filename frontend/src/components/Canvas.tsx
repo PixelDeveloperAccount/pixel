@@ -597,11 +597,11 @@ const Canvas: React.FC = () => {
               )}
               <div>
                 <p className="font-semibold text-gray-900 text-2xl">
-                  Pixel: {clickedPixel.x}, {clickedPixel.y}
+                  {t('canvas.pixel_coordinates', { x: clickedPixel.x, y: clickedPixel.y })}
                 </p>
                 {!clickedPixel.walletAddress && (
                   <p className="text-base text-gray-500">
-                    Not painted yet
+                    {t('canvas.not_painted_yet')}
                   </p>
                 )}
               </div>

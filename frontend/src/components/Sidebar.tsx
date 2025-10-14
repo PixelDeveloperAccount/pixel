@@ -41,8 +41,8 @@ const Sidebar: React.FC = () => {
             : ''
         } ${
           !isOpen 
-            ? 'bg-white shadow-lg hover:bg-gray-100' 
-            : 'hover:bg-gray-900/10'
+            ? `bg-white shadow-lg ${!isWalletModalOpen ? 'hover:bg-gray-100' : ''}` 
+            : `${!isWalletModalOpen ? 'hover:bg-gray-900/10' : ''}`
         }`}
       >
         <img

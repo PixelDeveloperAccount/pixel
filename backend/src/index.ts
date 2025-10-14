@@ -244,6 +244,11 @@ app.get('/api/leaderboard/:type', async (req, res) => {
     const pixelKeys = await redisClient.keys('pixel:*');
     const now = Date.now();
     
+    console.log(`Processing ${type} leaderboard:`, {
+      totalPixelKeys: pixelKeys.length,
+      currentTime: new Date(now).toISOString()
+    });
+    
     // Calculate all time thresholds
     const timeThresholds = {
       alltime: 0,
@@ -353,7 +358,7 @@ app.get('/api/leaderboard/:type', async (req, res) => {
     };
 
     // Calculate colors leaderboard for all timeframes
-    const calculateColorsLeaderboard = () => {
+    const calculateColorsLeaderboard = async () => {
       const colorCountsByTimeframe: Record<string, Record<string, number>> = {
         alltime: {},
         today: {},
@@ -399,12 +404,28 @@ app.get('/api/leaderboard/:type', async (req, res) => {
     let leaderboardsByTimeframe: Record<string, Array<{ walletAddress: string; value: number; rank: number }>> = {};
     
     if (type === 'colors' || type === 'colours') {
-      leaderboardsByTimeframe = calculateColorsLeaderboard();
+      leaderboardsByTimeframe = await calculateColorsLeaderboard();
     } else {
       Object.entries(walletStatsByTimeframe).forEach(([tf, stats]) => {
         leaderboardsByTimeframe[tf] = calculateLeaderboard(stats, type);
       });
     }
+    
+    // Debug: Log wallet stats summary
+    console.log(`Wallet stats summary for ${type}:`, {
+      alltime: Object.keys(walletStatsByTimeframe.alltime).length,
+      today: Object.keys(walletStatsByTimeframe.today).length,
+      week: Object.keys(walletStatsByTimeframe.week).length,
+      month: Object.keys(walletStatsByTimeframe.month).length
+    });
+    
+    console.log(`Leaderboard ${type} response:`, {
+      totalTimeframes: Object.keys(leaderboardsByTimeframe).length,
+      timeframes: Object.keys(leaderboardsByTimeframe),
+      requestedTimeframe: timeframe,
+      hasRequestedData: !!leaderboardsByTimeframe[timeframe],
+      requestedDataLength: leaderboardsByTimeframe[timeframe]?.length || 0
+    });
     
     res.json({ 
       leaderboardsByTimeframe,

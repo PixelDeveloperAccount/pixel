@@ -214,7 +214,16 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
                 </div>
               ))
             )}
-            {leaderboards[activeTab]?.[activeTimeframe]?.map((entry) => (
+            {(() => {
+              const currentData = leaderboards[activeTab]?.[activeTimeframe];
+              console.log(`Modal rendering ${activeTab} leaderboard for ${activeTimeframe}:`, {
+                hasData: !!currentData,
+                dataLength: currentData?.length || 0,
+                activeTab,
+                activeTimeframe,
+                availableTimeframes: leaderboards[activeTab] ? Object.keys(leaderboards[activeTab]) : []
+              });
+              return currentData?.map((entry) => (
               <div
                 key={entry.walletAddress}
                 className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
@@ -249,7 +258,8 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
                   <p className="text-xs text-gray-500">{getValueLabel(activeTab)}</p>
                 </div>
               </div>
-            ))}
+            ));
+            })()}
           </div>
         </div>
 

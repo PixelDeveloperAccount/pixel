@@ -62,6 +62,13 @@ export const LeaderboardProvider: React.FC<{ children: React.ReactNode }> = ({ c
       const response = await fetch(`${BACKEND_URL}/api/leaderboard/${type}`);
       if (response.ok) {
         const data = await response.json();
+        console.log(`Frontend received ${type} leaderboard data:`, {
+          hasLeaderboardsByTimeframe: !!data.leaderboardsByTimeframe,
+          timeframes: data.leaderboardsByTimeframe ? Object.keys(data.leaderboardsByTimeframe) : [],
+          requestedTimeframe: data.requestedTimeframe,
+          currentLeaderboardLength: data.currentLeaderboard?.length || 0
+        });
+        
         setLeaderboards(prev => ({
           ...prev,
           [type]: data.leaderboardsByTimeframe || {}

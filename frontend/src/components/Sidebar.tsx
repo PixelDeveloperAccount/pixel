@@ -7,7 +7,11 @@ import toast from 'react-hot-toast'; // Ensure toast is imported
 
 const CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000"; // Replace with your BSC token contract address
 
-const Sidebar: React.FC = () => {
+interface SidebarProps {
+  disabled?: boolean;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ disabled = false }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const { t, language, setLanguage } = useLanguage();
 
@@ -28,18 +32,22 @@ const Sidebar: React.FC = () => {
 
   return (
     <>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`fixed top-4 left-4 z-50 p-2 rounded-lg transition-all duration-300 text-gray-900 ${
-          !isOpen ? 'bg-white shadow-lg hover:bg-gray-100' : 'hover:bg-gray-900/10'
-        }`}
-      >
-        <img
-          src="https://unpkg.com/pixelarticons@1.8.1/svg/menu.svg"
-          alt="Menu"
-          className="h-7 w-7"
-        />
-      </button>
+      {!disabled && (
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className={`fixed top-4 left-4 z-50 p-2 rounded-lg transition-all duration-300 text-gray-900 ${
+            !isOpen 
+              ? 'bg-white shadow-lg hover:bg-gray-100' 
+              : 'hover:bg-gray-900/10'
+          }`}
+        >
+          <img
+            src="https://unpkg.com/pixelarticons@1.8.1/svg/menu.svg"
+            alt="Menu"
+            className="h-7 w-7"
+          />
+        </button>
+      )}
 
       <div className={`fixed top-0 left-0 h-full w-72 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-40 flex flex-col ${
         isOpen ? 'translate-x-0' : '-translate-x-full'

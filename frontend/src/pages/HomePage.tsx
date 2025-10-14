@@ -1,7 +1,6 @@
 import React from 'react';
 import Canvas from '../components/Canvas';
 import ColorPalette from '../components/ColorPalette';
-import Sidebar from '../components/Sidebar';
 import StickerField from '../components/StickerField';
 import { useCanvas } from '../context/CanvasContext';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
@@ -44,7 +43,6 @@ const HomePage: React.FC = () => {
           <>
             <Canvas />
             <ColorPalette />
-            <Sidebar />
             <StickerField />
           </>
         );

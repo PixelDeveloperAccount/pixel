@@ -218,28 +218,35 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
 
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600 font-['Pixelify_Sans']">
-            Don't have a wallet?
+            {t('wallet.dont_have_wallet')}
           </p>
           <p className="text-sm text-gray-600 font-['Pixelify_Sans']">
-            Install{' '}
-            <a 
-              href="https://metamask.io/en-GB" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:text-blue-800 underline transition-colors"
-            >
-              MetaMask
-            </a>
-            {' '}or{' '}
-            <a 
-              href="https://trustwallet.com/?utm_source=cryptwerk" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:text-blue-800 underline transition-colors"
-            >
-              TrustWallet
-            </a>
-            {' '}and create a wallet to continue
+            {t('wallet.install_wallets').split('MetaMask or TrustWallet').map((part, index) => (
+              <React.Fragment key={index}>
+                {part}
+                {index === 0 && (
+                  <>
+                    <a 
+                      href="https://metamask.io/en-GB" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 underline transition-colors"
+                    >
+                      MetaMask
+                    </a>
+                    {' '}or{' '}
+                    <a 
+                      href="https://trustwallet.com/?utm_source=cryptwerk" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 underline transition-colors"
+                    >
+                      TrustWallet
+                    </a>
+                  </>
+                )}
+              </React.Fragment>
+            ))}
           </p>
         </div>
       </div>

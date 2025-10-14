@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useBSCWallet } from '../context/BSCWalletContext';
 import { useCanvas } from '../context/CanvasContext';
+import { useLanguage } from '../context/LanguageContext';
 
 const UserColors: React.FC = () => {
   const { walletAddress, connected } = useBSCWallet();
   const { pixels } = useCanvas();
+  const { t } = useLanguage();
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
 
   // Get user colors directly from canvas context (real-time)
@@ -44,8 +46,8 @@ const UserColors: React.FC = () => {
     return (
       <div className="bg-white rounded-lg shadow-lg p-4">
         <div className="flex justify-between items-center mb-3">
-          <h3 className="text-lg font-semibold text-gray-900">Your colors</h3>
-          <span className="text-sm text-gray-400">Loading…</span>
+          <h3 className="text-lg font-semibold text-gray-900 font-['Pixelify_Sans']">{t('user.your_colors')}</h3>
+          <span className="text-sm text-gray-400 font-['Pixelify_Sans']">{t('user.colors_loading')}</span>
         </div>
         <div className="space-y-2">
           <div className="flex justify-between items-center">
@@ -76,8 +78,8 @@ const UserColors: React.FC = () => {
   return (
     <div className="bg-white rounded-lg shadow-lg p-4">
       <div className="flex justify-between items-center mb-3">
-        <h3 className="text-lg font-semibold text-gray-900">Your colors</h3>
-        <span className="text-sm text-gray-500">{userColors.length} colors used</span>
+        <h3 className="text-lg font-semibold text-gray-900 font-['Pixelify_Sans']">{t('user.your_colors')}</h3>
+        <span className="text-sm text-gray-500 font-['Pixelify_Sans']">{t('user.colors_used', { count: userColors.length })}</span>
       </div>
       <div className="space-y-2">
         <div className="flex justify-between items-center">

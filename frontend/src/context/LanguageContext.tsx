@@ -47,6 +47,7 @@ const translations = {
     'user.colors_used': '{count} colors used',
     'user.connect_wallet_pixels': 'Connect your wallet to see your placed pixels',
     'user.pixels': 'Your pixels',
+    'user.colors_loading': 'Loading…',
     
     // Color Palette
     'color.confirm': 'Confirm',
@@ -146,6 +147,8 @@ const translations = {
     'wallet.installed': 'Installed',
     'wallet.not_installed': 'Not installed',
     'wallet.install_prompt': '💡 Don\'t have a wallet? Install MetaMask or Trust Wallet to get started!',
+    'wallet.dont_have_wallet': 'Don\'t have a wallet?',
+    'wallet.install_wallets': 'Install MetaMask or TrustWallet and create a wallet to continue',
   },
   zh: {
     // App
@@ -182,6 +185,7 @@ const translations = {
     'user.colors_used': '使用了 {count} 种颜色',
     'user.connect_wallet_pixels': '连接您的钱包查看已放置的像素',
     'user.pixels': '你的像素',
+    'user.colors_loading': '加载中…',
     
     // Color Palette
     'color.confirm': '确认',
@@ -281,6 +285,8 @@ const translations = {
     'wallet.installed': '已安装',
     'wallet.not_installed': '未安装',
     'wallet.install_prompt': '💡 没有钱包？安装 MetaMask 或 Trust Wallet 开始使用！',
+    'wallet.dont_have_wallet': '没有钱包？',
+    'wallet.install_wallets': '安装 MetaMask 或 TrustWallet 并创建钱包以继续',
   }
 };
 

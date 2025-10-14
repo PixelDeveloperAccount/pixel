@@ -7,11 +7,11 @@ interface LeaderboardEntry {
 }
 
 interface LeaderboardData {
-  pixels: LeaderboardEntry[];
-  colours: LeaderboardEntry[];
-  territory: LeaderboardEntry[];
-  timeplayed: LeaderboardEntry[];
-  [key: string]: LeaderboardEntry[];
+  pixels: Record<string, LeaderboardEntry[]>;
+  colours: Record<string, LeaderboardEntry[]>;
+  territory: Record<string, LeaderboardEntry[]>;
+  timeplayed: Record<string, LeaderboardEntry[]>;
+  [key: string]: Record<string, LeaderboardEntry[]>;
 }
 
 interface LeaderboardContextType {
@@ -21,6 +21,7 @@ interface LeaderboardContextType {
   lastUpdateTime: Date | null;
   secondsSinceUpdate: number;
   refreshLeaderboards: () => void;
+  refreshLeaderboardWithTimeframe: (timeframe: string) => void;
 }
 
 const LeaderboardContext = createContext<LeaderboardContextType | undefined>(undefined);
@@ -29,10 +30,10 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
 
 export const LeaderboardProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [leaderboards, setLeaderboards] = useState<LeaderboardData>({
-    pixels: [],
-    colours: [],
-    territory: [],
-    timeplayed: []
+    pixels: {},
+    colours: {},
+    territory: {},
+    timeplayed: {}
   });
   
   const [loadingMap, setLoadingMap] = useState<Record<string, boolean>>({
@@ -54,7 +55,7 @@ export const LeaderboardProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [refreshInterval, setRefreshInterval] = useState<NodeJS.Timeout | null>(null);
   const [timerInterval, setTimerInterval] = useState<NodeJS.Timeout | null>(null);
 
-  // Fetch individual leaderboard type
+  // Fetch individual leaderboard type (now fetches all timeframes)
   const fetchLeaderboard = useCallback(async (type: string) => {
     try {
       setLoadingMap(prev => ({ ...prev, [type]: true }));
@@ -63,7 +64,7 @@ export const LeaderboardProvider: React.FC<{ children: React.ReactNode }> = ({ c
         const data = await response.json();
         setLeaderboards(prev => ({
           ...prev,
-          [type]: data.leaderboard || []
+          [type]: data.leaderboardsByTimeframe || {}
         }));
         setHasLoadedOnceMap(prev => ({ ...prev, [type]: true }));
         setLastUpdateTime(new Date());
@@ -71,10 +72,10 @@ export const LeaderboardProvider: React.FC<{ children: React.ReactNode }> = ({ c
       }
     } catch (error) {
       console.error(`Error fetching ${type} leaderboard:`, error);
-      // Fallback to empty array if fetch fails
+      // Fallback to empty object if fetch fails
       setLeaderboards(prev => ({
         ...prev,
-        [type]: []
+        [type]: {}
       }));
     } finally {
       setLoadingMap(prev => ({ ...prev, [type]: false }));
@@ -89,6 +90,12 @@ export const LeaderboardProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   // Manual refresh function
   const refreshLeaderboards = useCallback(() => {
+    fetchAllLeaderboards();
+  }, [fetchAllLeaderboards]);
+
+  // Refresh with specific timeframe (now just refreshes all data)
+  const refreshLeaderboardWithTimeframe = useCallback((timeframe: string) => {
+    // No need to make API calls - just refresh all data which includes all timeframes
     fetchAllLeaderboards();
   }, [fetchAllLeaderboards]);
 
@@ -141,7 +148,8 @@ export const LeaderboardProvider: React.FC<{ children: React.ReactNode }> = ({ c
       hasLoadedOnceMap,
       lastUpdateTime,
       secondsSinceUpdate,
-      refreshLeaderboards
+      refreshLeaderboards,
+      refreshLeaderboardWithTimeframe
     }}>
       {children}
     </LeaderboardContext.Provider>

@@ -9,12 +9,13 @@ interface LeaderboardModalProps {
 const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState('pixels');
-  const [activeTimeframe, setActiveTimeframe] = useState('today');
+  const [activeTimeframe, setActiveTimeframe] = useState('alltime');
   const { 
     leaderboards, 
     loadingMap, 
     hasLoadedOnceMap, 
-    secondsSinceUpdate
+    secondsSinceUpdate,
+    refreshLeaderboardWithTimeframe
   } = useLeaderboard();
 
   const tabs = [
@@ -45,10 +46,10 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
   ];
 
   const timeframes = [
+    { id: 'alltime', name: t('leaderboard.alltime') },
     { id: 'today', name: t('leaderboard.today') },
-    { id: 'week', name: t('leaderboard.week') },
-    { id: 'month', name: t('leaderboard.month') },
-    { id: 'alltime', name: t('leaderboard.alltime') }
+    { id: 'week', name: t('leaderboard.weekly') },
+    { id: 'month', name: t('leaderboard.monthly') }
   ];
 
 
@@ -213,7 +214,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
                 </div>
               ))
             )}
-            {leaderboards[activeTab]?.map((entry) => (
+            {leaderboards[activeTab]?.[activeTimeframe]?.map((entry) => (
               <div
                 key={entry.walletAddress}
                 className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"

@@ -5,7 +5,7 @@ import { useBSCWallet } from '../context/BSCWalletContext';
 interface Wallet {
   name: string;
   icon: string;
-  connector: () => Promise<void>;
+  connector: () => void;
   isInstalled: boolean;
 }
 
@@ -95,19 +95,23 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
   // If no wallets are available, show a message
   if (!hasWallet) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50">
+        <div className="bg-white rounded-t-xl p-6 w-full max-w-md mx-4 mb-4">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-900 font-['Pixelify_Sans']">
               {t('wallet.connect')}
             </h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="p-1 rounded-xl hover:bg-gray-100 transition-colors"
+              aria-label="Close"
+              title="Close"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <img 
+                src="https://unpkg.com/pixelarticons@1.8.1/svg/close.svg" 
+                alt="Close" 
+                className="h-5 w-5"
+              />
             </button>
           </div>
           
@@ -149,19 +153,23 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50">
+      <div className="bg-white rounded-t-xl p-6 w-full max-w-md mx-4 mb-4">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-900 font-['Pixelify_Sans']">
             {t('wallet.connect')}
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="p-1 rounded-xl hover:bg-gray-100 transition-colors"
+            aria-label="Close"
+            title="Close"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <img 
+              src="https://unpkg.com/pixelarticons@1.8.1/svg/close.svg" 
+              alt="Close" 
+              className="h-5 w-5"
+            />
           </button>
         </div>
 
@@ -208,9 +216,12 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
           ))}
         </div>
 
-        <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-          <p className="text-sm text-blue-800 font-['Pixelify_Sans']">
-            {t('wallet.install_prompt')}
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-600 font-['Pixelify_Sans']">
+            Don't have a wallet?
+          </p>
+          <p className="text-sm text-gray-600 font-['Pixelify_Sans']">
+            Install MetaMask or TrustWallet and create a wallet to continue
           </p>
         </div>
       </div>

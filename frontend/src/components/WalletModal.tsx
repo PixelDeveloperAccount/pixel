@@ -56,31 +56,31 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
       const availableWallets: Wallet[] = [
         {
           name: 'MetaMask',
-          icon: 'https://raw.githubusercontent.com/MetaMask/brand-resources/master/SVG/metamask-fox.svg',
+          icon: '/wallet-icons/MetaMaskIcon.png',
           connector: () => connectWallet('metamask'),
           isInstalled: checkWalletInstalled('metamask')
         },
         {
           name: 'Trust Wallet',
-          icon: 'https://trustwallet.com/assets/images/media/assets/trust_platform.svg',
+          icon: '/wallet-icons/TrustWalletIcon.png',
           connector: () => connectWallet('trust'),
           isInstalled: checkWalletInstalled('trust')
         },
         {
           name: 'Binance Wallet',
-          icon: 'https://www.binance.com/favicon.ico',
+          icon: '/wallet-icons/BinanceIcon.png',
           connector: () => connectWallet('binance'),
           isInstalled: checkWalletInstalled('binance')
         },
         {
           name: 'Coinbase Wallet',
-          icon: 'https://images.ctfassets.net/9sy2a0egs6zh/4zJfzJbG3kTDSk5Wo4RJI1/3f6a6d69d2d6e4b0e8b8b8b8b8b8b8b8/coinbase-wallet-logo.svg',
+          icon: '/wallet-icons/CoinbaseIcon.png',
           connector: () => connectWallet('coinbase'),
           isInstalled: checkWalletInstalled('coinbase')
         },
         {
           name: 'WalletConnect',
-          icon: 'https://avatars.githubusercontent.com/u/37784886?s=200&v=4',
+          icon: '/wallet-icons/WalletconnectIcon.png',
           connector: () => connectWallet('walletconnect'),
           isInstalled: true // WalletConnect can always be used
         }
@@ -180,15 +180,17 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
                   : 'border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed'
               }`}
             >
-              <img
-                src={wallet.icon}
-                alt={wallet.name}
-                className="w-8 h-8 rounded-full"
-                onError={(e) => {
-                  // Fallback icon if the image fails to load
-                  e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iMTYiIGZpbGw9IiM2MzY2RjEiLz4KPHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSI4IiB5PSI4Ij4KPHBhdGggZD0iTTggMkM0LjY4NjI5IDIgMiA0LjY4NjI5IDIgOEMyIDExLjMxMzcgNC42ODYyOSAxNCA4IDE0QzExLjMxMzcgMTQgMTQgMTEuMzEzNyAxNCA4QzE0IDQuNjg2MjkgMTEuMzEzNyAyIDggMloiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo8L3N2Zz4K';
-                }}
-              />
+              <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden">
+                <img
+                  src={wallet.icon}
+                  alt={wallet.name}
+                  className="w-8 h-8 object-contain"
+                  onError={(e) => {
+                    // Fallback icon if the image fails to load
+                    e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iMTYiIGZpbGw9IiM2MzY2RjEiLz4KPHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSI4IiB5PSI4Ij4KPHBhdGggZD0iTTggMkM0LjY4NjI5IDIgMiA0LjY4NjI5IDIgOEMyIDExLjMxMzcgNC42ODYyOSAxNCA4IDE0QzExLjMxMzcgMTQgMTQgMTEuMzEzNyAxNCA4QzE0IDQuNjg2MjkgMTEuMzEzNyAyIDggMloiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo8L3N2Zz4K';
+                  }}
+                />
+              </div>
               <div className="flex-1 text-left">
                 <div className="font-medium text-gray-900 font-['Pixelify_Sans']">
                   {wallet.name}

@@ -96,7 +96,7 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
   if (!hasWallet) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50">
-        <div className="bg-white rounded-t-xl p-6 w-full max-w-md mx-4 mb-4">
+        <div className="bg-white rounded-t-xl p-6 w-full max-w-md mx-4">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-900 font-['Pixelify_Sans']">
               {t('wallet.connect')}
@@ -154,7 +154,7 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50">
-      <div className="bg-white rounded-t-xl p-6 w-full max-w-md mx-4 mb-4">
+      <div className="bg-white rounded-t-xl p-6 w-full max-w-md mx-4">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-900 font-['Pixelify_Sans']">
             {t('wallet.connect')}
@@ -221,7 +221,25 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
             Don't have a wallet?
           </p>
           <p className="text-sm text-gray-600 font-['Pixelify_Sans']">
-            Install MetaMask or TrustWallet and create a wallet to continue
+            Install{' '}
+            <a 
+              href="https://metamask.io/en-GB" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 underline transition-colors"
+            >
+              MetaMask
+            </a>
+            {' '}or{' '}
+            <a 
+              href="https://trustwallet.com/?utm_source=cryptwerk" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 underline transition-colors"
+            >
+              TrustWallet
+            </a>
+            {' '}and create a wallet to continue
           </p>
         </div>
       </div>

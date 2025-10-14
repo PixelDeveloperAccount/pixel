@@ -34,12 +34,15 @@ const Sidebar: React.FC = () => {
       <button
         onClick={() => setIsOpen(!isOpen)}
         disabled={isWalletModalOpen}
-        className={`fixed top-4 left-4 z-50 p-2 rounded-lg transition-all duration-300 text-gray-900 ${
+        style={{ zIndex: 45 }}
+        className={`fixed top-4 left-4 p-2 rounded-lg transition-all duration-300 text-gray-900 ${
           isWalletModalOpen
-            ? 'bg-gray-300 cursor-not-allowed opacity-50'
-            : !isOpen 
-              ? 'bg-white shadow-lg hover:bg-gray-100' 
-              : 'hover:bg-gray-900/10'
+            ? 'cursor-not-allowed'
+            : ''
+        } ${
+          !isOpen 
+            ? 'bg-white shadow-lg hover:bg-gray-100' 
+            : 'hover:bg-gray-900/10'
         }`}
       >
         <img

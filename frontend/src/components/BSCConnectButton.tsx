@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { Wallet } from 'lucide-react';
 import { useBSCWallet } from '../context/BSCWalletContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useModal } from '../context/ModalContext';
 import WalletModal from './WalletModal';
 
 const BSCConnectButton: React.FC = () => {
   const { connected, walletAddress, disconnectWallet } = useBSCWallet();
   const { t } = useLanguage();
-  const [showWalletModal, setShowWalletModal] = useState(false);
+  const { isWalletModalOpen, setIsWalletModalOpen } = useModal();
 
   if (connected && walletAddress) {
     return (
@@ -39,7 +40,7 @@ const BSCConnectButton: React.FC = () => {
     <>
       <div className="w-full flex items-center justify-center">
         <button
-          onClick={() => setShowWalletModal(true)}
+          onClick={() => setIsWalletModalOpen(true)}
           className="w-full font-['Pixelify_Sans'] flex items-center justify-center space-x-2 px-5 py-3 rounded-lg transition-all text-lg bg-blue-600 hover:bg-blue-700 text-white"
         >
           <Wallet className="h-5 w-5" />
@@ -48,8 +49,8 @@ const BSCConnectButton: React.FC = () => {
       </div>
       
       <WalletModal 
-        isOpen={showWalletModal} 
-        onClose={() => setShowWalletModal(false)} 
+        isOpen={isWalletModalOpen} 
+        onClose={() => setIsWalletModalOpen(false)} 
       />
     </>
   );

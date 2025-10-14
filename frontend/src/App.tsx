@@ -4,6 +4,7 @@ import { BSCWalletProvider } from './context/BSCWalletContext';
 import { SoundProvider } from './context/SoundContext';
 import { LeaderboardProvider } from './context/LeaderboardContext';
 import { LanguageProvider } from './context/LanguageContext';
+import { ModalProvider } from './context/ModalContext';
 import HomePage from './pages/HomePage';
 import { Toaster, ToastBar } from 'react-hot-toast'; // Import Toaster and ToastBar
 
@@ -14,7 +15,8 @@ function App() {
         <CanvasProvider>
           <SoundProvider>
             <LeaderboardProvider>
-              <Layout>
+              <ModalProvider>
+                <Layout>
                 {/* Custom Toaster Implementation with Tailwind CSS - Compact Version */}
                 <Toaster position="top-center">
                   {(t) => {
@@ -60,7 +62,8 @@ function App() {
                   }}
                 </Toaster>
                 <HomePage />
-              </Layout>
+                </Layout>
+              </ModalProvider>
             </LeaderboardProvider>
           </SoundProvider>
         </CanvasProvider>

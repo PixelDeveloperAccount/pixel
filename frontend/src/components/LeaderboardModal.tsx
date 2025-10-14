@@ -9,13 +9,11 @@ interface LeaderboardModalProps {
 const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState('pixels');
-  const [activeTimeframe, setActiveTimeframe] = useState('alltime');
   const { 
     leaderboards, 
     loadingMap, 
     hasLoadedOnceMap, 
-    secondsSinceUpdate,
-    refreshLeaderboardWithTimeframe
+    secondsSinceUpdate
   } = useLeaderboard();
 
   const tabs = [
@@ -45,12 +43,6 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
     }
   ];
 
-  const timeframes = [
-    { id: 'alltime', name: t('leaderboard.alltime') },
-    { id: 'today', name: t('leaderboard.today') },
-    { id: 'week', name: t('leaderboard.weekly') },
-    { id: 'month', name: t('leaderboard.monthly') }
-  ];
 
 
   const formatValue = (value: number, type: string) => {
@@ -175,22 +167,6 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
           ))}
         </div>
 
-        {/* Timeframe Navigation - Small Tabs */}
-        <div className="flex gap-1 mb-6">
-          {timeframes.map((timeframe) => (
-            <button
-              key={timeframe.id}
-              onClick={() => setActiveTimeframe(timeframe.id)}
-              className={`px-3 py-1 text-sm rounded transition-colors font-['Pixelify_Sans'] ${
-                activeTimeframe === timeframe.id
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              {timeframe.name}
-            </button>
-          ))}
-        </div>
 
         {/* Leaderboard Content */}
         <div className="overflow-y-auto max-h-[400px]">
@@ -214,16 +190,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
                 </div>
               ))
             )}
-            {(() => {
-              const currentData = leaderboards[activeTab]?.[activeTimeframe];
-              console.log(`Modal rendering ${activeTab} leaderboard for ${activeTimeframe}:`, {
-                hasData: !!currentData,
-                dataLength: currentData?.length || 0,
-                activeTab,
-                activeTimeframe,
-                availableTimeframes: leaderboards[activeTab] ? Object.keys(leaderboards[activeTab]) : []
-              });
-              return currentData?.map((entry) => (
+            {leaderboards[activeTab]?.map((entry) => (
               <div
                 key={entry.walletAddress}
                 className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
@@ -258,8 +225,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
                   <p className="text-xs text-gray-500">{getValueLabel(activeTab)}</p>
                 </div>
               </div>
-            ));
-            })()}
+            ))}
           </div>
         </div>
 

@@ -233,7 +233,6 @@ app.get('/api/owns-token/:wallet', async (req, res) => {
 // Leaderboard API endpoints
 app.get('/api/leaderboard/:type', async (req, res) => {
   const type = req.params.type;
-  const timeframe = req.query.timeframe as string || 'alltime';
   
   if (!redisClient.isOpen) {
     res.status(503).send({ message: 'Service Unavailable: Redis not connected' });
@@ -242,30 +241,9 @@ app.get('/api/leaderboard/:type', async (req, res) => {
 
   try {
     const pixelKeys = await redisClient.keys('pixel:*');
-    const now = Date.now();
+    const walletStats: Record<string, any> = {};
     
-    console.log(`Processing ${type} leaderboard:`, {
-      totalPixelKeys: pixelKeys.length,
-      currentTime: new Date(now).toISOString()
-    });
-    
-    // Calculate all time thresholds
-    const timeThresholds = {
-      alltime: 0,
-      today: now - (24 * 60 * 60 * 1000), // 24 hours ago
-      week: now - (7 * 24 * 60 * 60 * 1000), // 7 days ago
-      month: now - (30 * 24 * 60 * 60 * 1000) // 30 days ago
-    };
-    
-    // Process data for all timeframes
-    const walletStatsByTimeframe: Record<string, Record<string, any>> = {
-      alltime: {},
-      today: {},
-      week: {},
-      month: {}
-    };
-    
-    // Collect pixel data for all timeframes
+    // Collect all pixel data
     for (const key of pixelKeys) {
       const pixelData = await redisClient.get(key);
       const parts = key.split(':');
@@ -275,163 +253,116 @@ app.get('/api/leaderboard/:type', async (req, res) => {
           const wallet = parsedData.walletAddress;
           if (!wallet) continue;
           
-          // Process for each timeframe
-          Object.entries(timeThresholds).forEach(([tf, threshold]) => {
-            // Skip if pixel is outside this timeframe
-            if (threshold > 0 && parsedData.timestamp < threshold) {
-              return;
-            }
-            
-            if (!walletStatsByTimeframe[tf][wallet]) {
-              walletStatsByTimeframe[tf][wallet] = {
-                pixels: 0,
-                colors: new Set<string>(),
-                firstPixel: parsedData.timestamp,
-                lastPixel: parsedData.timestamp,
-                positions: []
-              };
-            }
-            
-            walletStatsByTimeframe[tf][wallet].pixels++;
-            walletStatsByTimeframe[tf][wallet].colors.add(parsedData.color);
-            walletStatsByTimeframe[tf][wallet].positions.push({ x: parseInt(parts[1]), y: parseInt(parts[2]) });
-            
-            if (parsedData.timestamp < walletStatsByTimeframe[tf][wallet].firstPixel) {
-              walletStatsByTimeframe[tf][wallet].firstPixel = parsedData.timestamp;
-            }
-            if (parsedData.timestamp > walletStatsByTimeframe[tf][wallet].lastPixel) {
-              walletStatsByTimeframe[tf][wallet].lastPixel = parsedData.timestamp;
-            }
-          });
+          if (!walletStats[wallet]) {
+            walletStats[wallet] = {
+              pixels: 0,
+              colors: new Set<string>(),
+              firstPixel: parsedData.timestamp,
+              lastPixel: parsedData.timestamp,
+              positions: []
+            };
+          }
+          
+          walletStats[wallet].pixels++;
+          walletStats[wallet].colors.add(parsedData.color);
+          walletStats[wallet].positions.push({ x: parseInt(parts[1]), y: parseInt(parts[2]) });
+          
+          if (parsedData.timestamp < walletStats[wallet].firstPixel) {
+            walletStats[wallet].firstPixel = parsedData.timestamp;
+          }
+          if (parsedData.timestamp > walletStats[wallet].lastPixel) {
+            walletStats[wallet].lastPixel = parsedData.timestamp;
+          }
         } catch (parseError) {
-          // Handle legacy pixels (no timestamp) - only include in alltime
-          if (pixelData && typeof pixelData === 'string') {
-            // Legacy pixels don't have wallet info, skip for now
-            continue;
-          }
+          continue;
         }
       }
     }
     
-    // Calculate different leaderboard types for all timeframes
-    const calculateLeaderboard = (walletStats: Record<string, any>, type: string) => {
-      switch (type) {
-        case 'pixels':
-          return Object.entries(walletStats)
-            .map(([wallet, stats]) => ({ walletAddress: wallet, value: stats.pixels, rank: 0 }))
-            .sort((a, b) => b.value - a.value)
-            .slice(0, 20)
-            .map((entry, index) => ({ ...entry, rank: index + 1 }));
-        case 'territory':
-          return Object.entries(walletStats)
-            .map(([wallet, stats]) => {
-              // Simple territory calculation - count pixels in largest connected component
-              const visited = new Set<string>();
-              let maxTerritory = 0;
-              
-              for (const pos of stats.positions) {
-                const key = `${pos.x},${pos.y}`;
-                if (visited.has(key)) continue;
-                
-                const territory = floodFill(stats.positions, pos, visited);
-                maxTerritory = Math.max(maxTerritory, territory);
+    // Calculate different leaderboard types
+    let leaderboard: Array<{ walletAddress: string; value: number; rank: number }> = [];
+    
+    switch (type) {
+      case 'pixels':
+        leaderboard = Object.entries(walletStats)
+          .map(([wallet, stats]) => ({ walletAddress: wallet, value: stats.pixels, rank: 0 }))
+          .sort((a, b) => b.value - a.value)
+          .slice(0, 20)
+          .map((entry, index) => ({ ...entry, rank: index + 1 }));
+        break;
+        
+      case 'colors':
+      case 'colours': // Support both spellings
+        // Count color usage across all pixels
+        const colorCounts: Record<string, number> = {};
+        for (const key of pixelKeys) {
+          const pixelData = await redisClient.get(key);
+          if (pixelData) {
+            try {
+              const parsedData = JSON.parse(pixelData);
+              const color = parsedData.color;
+              if (color) {
+                colorCounts[color] = (colorCounts[color] || 0) + 1;
               }
-              
-              return { walletAddress: wallet, value: maxTerritory, rank: 0 };
-            })
-            .sort((a, b) => b.value - a.value)
-            .slice(0, 20)
-            .map((entry, index) => ({ ...entry, rank: index + 1 }));
-        case 'timeplayed':
-          return Object.entries(walletStats)
-            .map(([wallet, stats]) => ({ 
-              walletAddress: wallet, 
-              value: Math.floor((stats.lastPixel - stats.firstPixel) / 1000), // Convert to seconds
-              rank: 0 
-            }))
-            .sort((a, b) => b.value - a.value)
-            .slice(0, 20)
-            .map((entry, index) => ({ ...entry, rank: index + 1 }));
-        default:
-          return [];
-      }
-    };
-
-    // Calculate colors leaderboard for all timeframes
-    const calculateColorsLeaderboard = async () => {
-      const colorCountsByTimeframe: Record<string, Record<string, number>> = {
-        alltime: {},
-        today: {},
-        week: {},
-        month: {}
-      };
-
-      for (const key of pixelKeys) {
-        const pixelData = await redisClient.get(key);
-        if (pixelData) {
-          try {
-            const parsedData = JSON.parse(pixelData);
-            const color = parsedData.color;
-            
-            if (color) {
-              Object.entries(timeThresholds).forEach(([tf, threshold]) => {
-                if (threshold > 0 && parsedData.timestamp < threshold) {
-                  return;
-                }
-                colorCountsByTimeframe[tf][color] = (colorCountsByTimeframe[tf][color] || 0) + 1;
-              });
-            }
-          } catch (parseError) {
-            // Handle legacy pixels - only include in alltime
-            if (timeThresholds.alltime === 0 && pixelData && typeof pixelData === 'string') {
-              colorCountsByTimeframe.alltime[pixelData] = (colorCountsByTimeframe.alltime[pixelData] || 0) + 1;
+            } catch (parseError) {
+              // Handle legacy pixels that only store color as string
+              if (pixelData && typeof pixelData === 'string') {
+                colorCounts[pixelData] = (colorCounts[pixelData] || 0) + 1;
+              }
             }
           }
         }
-      }
-
-      return Object.fromEntries(
-        Object.entries(colorCountsByTimeframe).map(([tf, colorCounts]) => [
-          tf,
-          Object.entries(colorCounts)
-            .map(([color, count]) => ({ walletAddress: color, value: count, rank: 0 }))
-            .sort((a, b) => b.value - a.value)
-            .map((entry, index) => ({ ...entry, rank: index + 1 }))
-        ])
-      );
-    };
-
-    let leaderboardsByTimeframe: Record<string, Array<{ walletAddress: string; value: number; rank: number }>> = {};
-    
-    if (type === 'colors' || type === 'colours') {
-      leaderboardsByTimeframe = await calculateColorsLeaderboard();
-    } else {
-      Object.entries(walletStatsByTimeframe).forEach(([tf, stats]) => {
-        leaderboardsByTimeframe[tf] = calculateLeaderboard(stats, type);
-      });
+        
+        // Convert to leaderboard format with color as walletAddress and count as value
+        // Show all colors, no limit
+        leaderboard = Object.entries(colorCounts)
+          .map(([color, count]) => ({ walletAddress: color, value: count, rank: 0 }))
+          .sort((a, b) => b.value - a.value)
+          .map((entry, index) => ({ ...entry, rank: index + 1 }));
+        break;
+        
+      case 'territory':
+        // Calculate largest contiguous area claimed
+        leaderboard = Object.entries(walletStats)
+          .map(([wallet, stats]) => {
+            // Simple territory calculation - count pixels in largest connected component
+            const visited = new Set<string>();
+            let maxTerritory = 0;
+            
+            for (const pos of stats.positions) {
+              const key = `${pos.x},${pos.y}`;
+              if (visited.has(key)) continue;
+              
+              const territory = floodFill(stats.positions, pos, visited);
+              maxTerritory = Math.max(maxTerritory, territory);
+            }
+            
+            return { walletAddress: wallet, value: maxTerritory, rank: 0 };
+          })
+          .sort((a, b) => b.value - a.value)
+          .slice(0, 20)
+          .map((entry, index) => ({ ...entry, rank: index + 1 }));
+        break;
+        
+      case 'timeplayed':
+        // Calculate total time spent on canvas (from first to last pixel)
+        leaderboard = Object.entries(walletStats)
+          .map(([wallet, stats]) => ({ 
+            walletAddress: wallet, 
+            value: Math.floor((stats.lastPixel - stats.firstPixel) / 1000), // Convert to seconds
+            rank: 0 
+          }))
+          .sort((a, b) => b.value - a.value)
+          .slice(0, 20)
+          .map((entry, index) => ({ ...entry, rank: index + 1 }));
+        break;
+        
+      default:
+        res.status(400).json({ error: 'Invalid leaderboard type' });
+        return;
     }
     
-    // Debug: Log wallet stats summary
-    console.log(`Wallet stats summary for ${type}:`, {
-      alltime: Object.keys(walletStatsByTimeframe.alltime).length,
-      today: Object.keys(walletStatsByTimeframe.today).length,
-      week: Object.keys(walletStatsByTimeframe.week).length,
-      month: Object.keys(walletStatsByTimeframe.month).length
-    });
-    
-    console.log(`Leaderboard ${type} response:`, {
-      totalTimeframes: Object.keys(leaderboardsByTimeframe).length,
-      timeframes: Object.keys(leaderboardsByTimeframe),
-      requestedTimeframe: timeframe,
-      hasRequestedData: !!leaderboardsByTimeframe[timeframe],
-      requestedDataLength: leaderboardsByTimeframe[timeframe]?.length || 0
-    });
-    
-    res.json({ 
-      leaderboardsByTimeframe,
-      requestedTimeframe: timeframe,
-      currentLeaderboard: leaderboardsByTimeframe[timeframe] || []
-    });
+    res.json({ leaderboard });
   } catch (err) {
     console.error('Error fetching leaderboard:', err);
     res.status(500).send({ message: 'Error fetching leaderboard' });

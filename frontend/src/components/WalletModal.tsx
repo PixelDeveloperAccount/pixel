@@ -16,9 +16,10 @@ interface WalletModalProps {
 
 const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
   const { t } = useLanguage();
-  const { connectWallet, hasWallet } = useBSCWallet();
+  const { connectWallet, hasWallet, connected } = useBSCWallet();
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [isCheckingWallets, setIsCheckingWallets] = useState(false);
+  const [connectingWallet, setConnectingWallet] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -158,6 +159,24 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
     }
   }, [isOpen, connectWallet]);
 
+  // Close modal and reset connecting state when wallet connects successfully
+  useEffect(() => {
+    if (connected && connectingWallet) {
+      setConnectingWallet(null);
+      // Add a small delay to show the success state before closing
+      setTimeout(() => {
+        onClose();
+      }, 500);
+    }
+  }, [connected, connectingWallet, onClose]);
+
+  // Reset connecting state if modal closes while connecting
+  useEffect(() => {
+    if (!isOpen && connectingWallet) {
+      setConnectingWallet(null);
+    }
+  }, [isOpen, connectingWallet]);
+
   if (!isOpen) return null;
 
   // If no wallets are available, show a message
@@ -253,18 +272,44 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
             wallets.map((wallet) => (
               <button
                 key={wallet.name}
-                onClick={() => {
-                  wallet.connector();
-                  onClose();
+                onClick={async () => {
+                  setConnectingWallet(wallet.name);
+                  
+                  // Set a timeout to reset connecting state if it takes too long
+                  const timeoutId = setTimeout(() => {
+                    if (connectingWallet === wallet.name) {
+                      setConnectingWallet(null);
+                    }
+                  }, 30000); // 30 second timeout
+                  
+                  try {
+                    await wallet.connector();
+                    clearTimeout(timeoutId);
+                    // Connection success is handled by useEffect
+                  } catch (error) {
+                    clearTimeout(timeoutId);
+                    // Connection failed, reset connecting state
+                    setConnectingWallet(null);
+                  }
                 }}
-                disabled={!wallet.isInstalled}
-                className={`w-full flex items-center space-x-4 p-4 rounded-lg border-2 transition-all ${
-                  wallet.isInstalled
+                disabled={!wallet.isInstalled || connectingWallet !== null}
+                className={`w-full flex items-center space-x-4 p-4 rounded-lg border-2 transition-all relative ${
+                  wallet.isInstalled && connectingWallet !== wallet.name
                     ? 'border-gray-200 hover:border-blue-500 hover:bg-blue-50'
                     : 'border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed'
-                }`}
+                } ${connectingWallet === wallet.name ? 'border-blue-500 bg-blue-50' : ''}`}
               >
-                <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden">
+                {/* Blur overlay for connecting wallet */}
+                {connectingWallet === wallet.name && (
+                  <div className="absolute inset-0 bg-white/80 backdrop-blur-sm rounded-lg flex items-center justify-center z-10">
+                    <div className="flex flex-col items-center space-y-2">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                      <span className="text-sm text-blue-600 font-['Pixelify_Sans']">Connecting...</span>
+                    </div>
+                  </div>
+                )}
+                
+                <div className={`w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden ${connectingWallet === wallet.name ? 'blur-sm' : ''}`}>
                   <img
                     src={wallet.icon}
                     alt={wallet.name}
@@ -275,7 +320,7 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
                     }}
                   />
                 </div>
-                <div className="flex-1 text-left">
+                <div className={`flex-1 text-left ${connectingWallet === wallet.name ? 'blur-sm' : ''}`}>
                   <div className="font-medium text-gray-900 font-['Pixelify_Sans']">
                     {wallet.name}
                   </div>
@@ -283,10 +328,15 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
                     {wallet.isInstalled ? t('wallet.installed') : t('wallet.not_installed')}
                   </div>
                 </div>
-                {wallet.isInstalled && (
+                {wallet.isInstalled && !connectingWallet && (
                   <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
+                )}
+                {connectingWallet === wallet.name && (
+                  <div className="w-5 h-5 flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                  </div>
                 )}
               </button>
             ))

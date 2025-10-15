@@ -64,8 +64,12 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   // Check if wallet is already connected on mount
   useEffect(() => {
     const initializeWallet = async () => {
+      // First check wallet availability
       await checkWalletAvailability();
-      await checkWalletConnection();
+      // Then check for existing connections (with a small delay to ensure hasWallet is set)
+      setTimeout(async () => {
+        await checkWalletConnection();
+      }, 100);
     };
     initializeWallet();
   }, []);
@@ -156,18 +160,138 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const checkWalletConnection = async () => {
-    // Only check for existing connections if a BSC-compatible wallet is installed
-    if (hasWallet) {
-      try {
-        const accounts = await window.ethereum!.request({ method: 'eth_accounts' });
+    try {
+      // First check if we have a stored connection
+      const storedConnection = localStorage.getItem('wallet-connection');
+      if (storedConnection) {
+        try {
+          const { address, timestamp } = JSON.parse(storedConnection);
+          // Check if the stored connection is recent (within 24 hours)
+          const isRecent = Date.now() - timestamp < 24 * 60 * 60 * 1000;
+          
+          if (isRecent && address) {
+            // Try to verify the connection is still valid
+            let provider = null;
+            
+            // Find working wallet provider
+            if (window.ethereum && window.ethereum.isMetaMask && !window.ethereum.isPhantom) {
+              try {
+                await window.ethereum.request({ method: 'eth_chainId' });
+                provider = window.ethereum;
+              } catch (e) {
+                // MetaMask not responding
+              }
+            } else if (window.ethereum && window.ethereum.providers) {
+              for (const p of window.ethereum.providers) {
+                if (p.isMetaMask || p.isTrust || p.isCoinbaseWallet) {
+                  try {
+                    await p.request({ method: 'eth_chainId' });
+                    provider = p;
+                    break;
+                  } catch (e) {
+                    // Provider not responding, continue
+                  }
+                }
+              }
+            } else if (window.BinanceChain) {
+              try {
+                await window.BinanceChain.request({ method: 'eth_chainId' });
+                provider = window.BinanceChain;
+              } catch (e) {
+                // Binance Chain not responding
+              }
+            }
+
+            if (provider) {
+              // Verify the stored address is still connected
+              const accounts = await provider.request({ method: 'eth_accounts' });
+              if (accounts.length > 0 && accounts.includes(address)) {
+                console.log('🔄 Auto-reconnecting wallet from localStorage:', address);
+                setWalletAddress(address);
+                setConnected(true);
+                await fetchBalances(address);
+                
+                // Show a subtle notification that wallet was reconnected
+                toast.success('Wallet reconnected', {
+                  duration: 2000,
+                  style: {
+                    background: '#10B981',
+                    color: '#fff',
+                    fontFamily: 'Pixelify Sans, sans-serif',
+                  },
+                });
+                return; // Successfully reconnected, exit early
+              }
+            }
+          }
+          
+          // If we get here, the stored connection is invalid or expired
+          localStorage.removeItem('wallet-connection');
+        } catch (e) {
+          // Invalid stored data, remove it
+          localStorage.removeItem('wallet-connection');
+        }
+      }
+
+      // Fallback: Check for any existing connections without localStorage
+      let provider = null;
+      
+      if (window.ethereum && window.ethereum.isMetaMask && !window.ethereum.isPhantom) {
+        try {
+          await window.ethereum.request({ method: 'eth_chainId' });
+          provider = window.ethereum;
+        } catch (e) {
+          // MetaMask not responding
+        }
+      } else if (window.ethereum && window.ethereum.providers) {
+        for (const p of window.ethereum.providers) {
+          if (p.isMetaMask || p.isTrust || p.isCoinbaseWallet) {
+            try {
+              await p.request({ method: 'eth_chainId' });
+              provider = p;
+              break;
+            } catch (e) {
+              // Provider not responding, continue
+            }
+          }
+        }
+      } else if (window.BinanceChain) {
+        try {
+          await window.BinanceChain.request({ method: 'eth_chainId' });
+          provider = window.BinanceChain;
+        } catch (e) {
+          // Binance Chain not responding
+        }
+      }
+
+      if (provider) {
+        const accounts = await provider.request({ method: 'eth_accounts' });
         if (accounts.length > 0) {
+          console.log('🔄 Auto-reconnecting wallet:', accounts[0]);
           setWalletAddress(accounts[0]);
           setConnected(true);
+          
+          // Store this connection for future reconnection
+          localStorage.setItem('wallet-connection', JSON.stringify({
+            address: accounts[0],
+            connected: true,
+            timestamp: Date.now()
+          }));
+          
           await fetchBalances(accounts[0]);
+          
+          toast.success('Wallet reconnected', {
+            duration: 2000,
+            style: {
+              background: '#10B981',
+              color: '#fff',
+              fontFamily: 'Pixelify Sans, sans-serif',
+            },
+          });
         }
-      } catch (error) {
-        console.error('Error checking wallet connection:', error);
       }
+    } catch (error) {
+      console.error('Error checking wallet connection:', error);
     }
   };
 
@@ -314,6 +438,14 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       if (accounts.length > 0) {
         setWalletAddress(accounts[0]);
         setConnected(true);
+        
+        // Store connection info in localStorage for persistence
+        localStorage.setItem('wallet-connection', JSON.stringify({
+          address: accounts[0],
+          connected: true,
+          timestamp: Date.now()
+        }));
+        
         await fetchBalances(accounts[0]);
         
         toast.success(t('network.wallet_connected'), {
@@ -368,6 +500,7 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setCooldownTime(60);
     clearCooldown();
     localStorage.removeItem('pixel-cooldown');
+    localStorage.removeItem('wallet-connection');
     
     if (wasConnected) {
       toast.success(t('network.wallet_disconnected'), {

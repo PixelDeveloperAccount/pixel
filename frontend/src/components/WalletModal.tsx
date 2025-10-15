@@ -313,13 +313,18 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
               >
                 {/* Blur overlay for connecting wallet */}
                 {connectingWallet === wallet.name && (
-                  <div className="absolute inset-0 bg-white backdrop-blur-sm rounded-lg flex items-center justify-center z-10 border-2 border-black">
-                    <img 
-                      src="/loading/binance-loading-img-black.gif" 
-                      alt="Connecting..." 
-                      className="h-12 w-12"
-                    />
-                  </div>
+                  <>
+                    {/* Blur layer for background content */}
+                    <div className="absolute inset-0 bg-white/20 backdrop-blur-sm rounded-lg z-10 border-2 border-gray-800"></div>
+                    {/* GIF layer above the blur */}
+                    <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+                      <img 
+                        src="/loading/binance-loading-img-black.gif" 
+                        alt="Connecting..." 
+                        className="h-12 w-12 opacity-100"
+                      />
+                    </div>
+                  </>
                 )}
                 
                 <div className={`w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden ${connectingWallet === wallet.name ? 'blur-sm' : ''}`}>

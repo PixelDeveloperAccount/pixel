@@ -63,19 +63,94 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   // Check if wallet is already connected on mount
   useEffect(() => {
-    checkWalletAvailability();
-    checkWalletConnection();
+    const initializeWallet = async () => {
+      await checkWalletAvailability();
+      await checkWalletConnection();
+    };
+    initializeWallet();
   }, []);
 
-  const checkWalletAvailability = () => {
-    const hasBSCWallet = typeof window.ethereum !== 'undefined' && (
-      window.ethereum.isMetaMask || 
-      window.ethereum.isTrust || 
-      window.ethereum.isCoinbaseWallet ||
-      (window.ethereum.providers && window.ethereum.providers.some((p: any) => 
-        p.isMetaMask || p.isTrust || p.isCoinbaseWallet
-      ))
-    ) || typeof window.BinanceChain !== 'undefined';
+  const checkWalletAvailability = async () => {
+    let hasBSCWallet = false;
+    
+    try {
+      // Check for MetaMask specifically
+      if (window.ethereum && window.ethereum.isMetaMask && !window.ethereum.isPhantom) {
+        // Try to make a simple request to verify MetaMask is actually working
+        await window.ethereum.request({ method: 'eth_chainId' });
+        hasBSCWallet = true;
+      } else if (window.ethereum && window.ethereum.providers) {
+        // Check providers array for working MetaMask
+        for (const provider of window.ethereum.providers) {
+          if (provider.isMetaMask && !provider.isPhantom) {
+            try {
+              await provider.request({ method: 'eth_chainId' });
+              hasBSCWallet = true;
+              break;
+            } catch (e) {
+              // Provider exists but not working, continue checking
+            }
+          }
+        }
+      }
+      
+      // Check for Trust Wallet
+      if (!hasBSCWallet && window.ethereum && window.ethereum.isTrust) {
+        try {
+          await window.ethereum.request({ method: 'eth_chainId' });
+          hasBSCWallet = true;
+        } catch (e) {
+          // Trust Wallet not working
+        }
+      } else if (!hasBSCWallet && window.ethereum && window.ethereum.providers) {
+        for (const provider of window.ethereum.providers) {
+          if (provider.isTrust) {
+            try {
+              await provider.request({ method: 'eth_chainId' });
+              hasBSCWallet = true;
+              break;
+            } catch (e) {
+              // Provider exists but not working
+            }
+          }
+        }
+      }
+      
+      // Check for Coinbase Wallet
+      if (!hasBSCWallet && window.ethereum && window.ethereum.isCoinbaseWallet) {
+        try {
+          await window.ethereum.request({ method: 'eth_chainId' });
+          hasBSCWallet = true;
+        } catch (e) {
+          // Coinbase Wallet not working
+        }
+      } else if (!hasBSCWallet && window.ethereum && window.ethereum.providers) {
+        for (const provider of window.ethereum.providers) {
+          if (provider.isCoinbaseWallet) {
+            try {
+              await provider.request({ method: 'eth_chainId' });
+              hasBSCWallet = true;
+              break;
+            } catch (e) {
+              // Provider exists but not working
+            }
+          }
+        }
+      }
+      
+      // Check for Binance Wallet
+      if (!hasBSCWallet && window.BinanceChain) {
+        try {
+          await window.BinanceChain.request({ method: 'eth_chainId' });
+          hasBSCWallet = true;
+        } catch (e) {
+          // Binance Wallet not working
+        }
+      }
+    } catch (error) {
+      console.log('No working BSC wallet detected');
+      hasBSCWallet = false;
+    }
     
     setHasWallet(hasBSCWallet);
   };
@@ -99,72 +174,138 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const connectWallet = async (walletType?: string) => {
     let provider = null;
 
-    // Handle different wallet types with specific detection
-    if (walletType === 'metamask') {
-      // Check for MetaMask specifically
-      if (window.ethereum && window.ethereum.isMetaMask && !window.ethereum.isPhantom) {
-        provider = window.ethereum;
-      } else {
-        // Try to find MetaMask in the providers array
-        if (window.ethereum && window.ethereum.providers) {
-          provider = window.ethereum.providers.find((p: any) => p.isMetaMask && !p.isPhantom);
-        }
-      }
-    } else if (walletType === 'trust') {
-      // Check for Trust Wallet specifically
-      if (window.ethereum && window.ethereum.isTrust) {
-        provider = window.ethereum;
-      } else if (window.ethereum && window.ethereum.providers) {
-        provider = window.ethereum.providers.find((p: any) => p.isTrust);
-      }
-    } else if (walletType === 'coinbase') {
-      // Check for Coinbase Wallet specifically
-      if (window.ethereum && window.ethereum.isCoinbaseWallet) {
-        provider = window.ethereum;
-      } else if (window.ethereum && window.ethereum.providers) {
-        provider = window.ethereum.providers.find((p: any) => p.isCoinbaseWallet);
-      }
-    } else if (walletType === 'binance' && window.BinanceChain) {
-      provider = window.BinanceChain;
-    } else if (walletType === 'walletconnect') {
-      // For WalletConnect, we'll use the standard ethereum provider
-      // In a real implementation, you'd integrate WalletConnect here
-      toast.error('WalletConnect integration coming soon!', {
-        duration: 3000,
-        style: {
-          background: '#EF4444',
-          color: '#fff',
-          fontFamily: 'Pixelify Sans, sans-serif',
-        },
-      });
-      return;
-    } else {
-      // Default: try to use the first available BSC-compatible provider
-      if (window.ethereum) {
-        if (window.ethereum.providers) {
-          // Multiple wallets installed, find a BSC-compatible one
-          provider = window.ethereum.providers.find((p: any) => 
-            p.isMetaMask || p.isTrust || p.isCoinbaseWallet
-          );
-        } else if (window.ethereum.isMetaMask || window.ethereum.isTrust || window.ethereum.isCoinbaseWallet) {
-          provider = window.ethereum;
-        }
-      }
-    }
-
-    if (!provider) {
-      toast.error('Please install a BSC-compatible wallet (MetaMask, Trust Wallet, etc.)', {
-        duration: 5000,
-        style: {
-          background: '#EF4444',
-          color: '#fff',
-          fontFamily: 'Pixelify Sans, sans-serif',
-        },
-      });
-      return;
-    }
-
     try {
+      // Handle different wallet types with specific detection and validation
+      if (walletType === 'metamask') {
+        // Check for MetaMask specifically
+        if (window.ethereum && window.ethereum.isMetaMask && !window.ethereum.isPhantom) {
+          // Test if MetaMask actually responds before using it
+          try {
+            await window.ethereum.request({ method: 'eth_chainId' });
+            provider = window.ethereum;
+          } catch (e) {
+            console.log('MetaMask detected but not responding');
+          }
+        } else {
+          // Try to find MetaMask in the providers array
+          if (window.ethereum && window.ethereum.providers) {
+            for (const p of window.ethereum.providers) {
+              if (p.isMetaMask && !p.isPhantom) {
+                try {
+                  await p.request({ method: 'eth_chainId' });
+                  provider = p;
+                  break;
+                } catch (e) {
+                  // Provider exists but not working, continue
+                }
+              }
+            }
+          }
+        }
+      } else if (walletType === 'trust') {
+        // Check for Trust Wallet specifically
+        if (window.ethereum && window.ethereum.isTrust) {
+          try {
+            await window.ethereum.request({ method: 'eth_chainId' });
+            provider = window.ethereum;
+          } catch (e) {
+            console.log('Trust Wallet detected but not responding');
+          }
+        } else if (window.ethereum && window.ethereum.providers) {
+          for (const p of window.ethereum.providers) {
+            if (p.isTrust) {
+              try {
+                await p.request({ method: 'eth_chainId' });
+                provider = p;
+                break;
+              } catch (e) {
+                // Provider exists but not working, continue
+              }
+            }
+          }
+        }
+      } else if (walletType === 'coinbase') {
+        // Check for Coinbase Wallet specifically
+        if (window.ethereum && window.ethereum.isCoinbaseWallet) {
+          try {
+            await window.ethereum.request({ method: 'eth_chainId' });
+            provider = window.ethereum;
+          } catch (e) {
+            console.log('Coinbase Wallet detected but not responding');
+          }
+        } else if (window.ethereum && window.ethereum.providers) {
+          for (const p of window.ethereum.providers) {
+            if (p.isCoinbaseWallet) {
+              try {
+                await p.request({ method: 'eth_chainId' });
+                provider = p;
+                break;
+              } catch (e) {
+                // Provider exists but not working, continue
+              }
+            }
+          }
+        }
+      } else if (walletType === 'binance') {
+        if (window.BinanceChain) {
+          try {
+            await window.BinanceChain.request({ method: 'eth_chainId' });
+            provider = window.BinanceChain;
+          } catch (e) {
+            console.log('Binance Wallet detected but not responding');
+          }
+        }
+      } else if (walletType === 'walletconnect') {
+        // For WalletConnect, we'll use the standard ethereum provider
+        // In a real implementation, you'd integrate WalletConnect here
+        toast.error('WalletConnect integration coming soon!', {
+          duration: 3000,
+          style: {
+            background: '#EF4444',
+            color: '#fff',
+            fontFamily: 'Pixelify Sans, sans-serif',
+          },
+        });
+        return;
+      } else {
+        // Default: try to use the first available BSC-compatible provider
+        if (window.ethereum) {
+          if (window.ethereum.providers) {
+            // Multiple wallets installed, find a BSC-compatible one
+            for (const p of window.ethereum.providers) {
+              if (p.isMetaMask || p.isTrust || p.isCoinbaseWallet) {
+                try {
+                  await p.request({ method: 'eth_chainId' });
+                  provider = p;
+                  break;
+                } catch (e) {
+                  // Provider exists but not working, continue
+                }
+              }
+            }
+          } else if (window.ethereum.isMetaMask || window.ethereum.isTrust || window.ethereum.isCoinbaseWallet) {
+            try {
+              await window.ethereum.request({ method: 'eth_chainId' });
+              provider = window.ethereum;
+            } catch (e) {
+              console.log('Wallet detected but not responding');
+            }
+          }
+        }
+      }
+
+      if (!provider) {
+        toast.error('Wallet not found or not responding. Please ensure your wallet is installed and unlocked.', {
+          duration: 5000,
+          style: {
+            background: '#EF4444',
+            color: '#fff',
+            fontFamily: 'Pixelify Sans, sans-serif',
+          },
+        });
+        return;
+      }
+
       // Request account access
       const accounts = await provider.request({
         method: 'eth_requestAccounts',
@@ -195,8 +336,17 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             fontFamily: 'Pixelify Sans, sans-serif',
           },
         });
+      } else if (error.code === -32002) {
+        toast.error('Connection request already pending. Please check your wallet.', {
+          duration: 3000,
+          style: {
+            background: '#EF4444',
+            color: '#fff',
+            fontFamily: 'Pixelify Sans, sans-serif',
+          },
+        });
       } else {
-        toast.error(t('network.connection_failed'), {
+        toast.error('Wallet connection failed. Please try again.', {
           duration: 3000,
           style: {
             background: '#EF4444',

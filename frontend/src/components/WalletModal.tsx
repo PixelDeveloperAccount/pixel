@@ -18,75 +18,143 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
   const { t } = useLanguage();
   const { connectWallet, hasWallet } = useBSCWallet();
   const [wallets, setWallets] = useState<Wallet[]>([]);
+  const [isCheckingWallets, setIsCheckingWallets] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       // Check which wallets are installed with better detection
-      const checkWalletInstalled = (walletType: string) => {
-        if (walletType === 'metamask') {
-          if (window.ethereum && window.ethereum.isMetaMask && !window.ethereum.isPhantom) {
-            return true;
-          }
-          if (window.ethereum && window.ethereum.providers) {
-            return window.ethereum.providers.some((p: any) => p.isMetaMask && !p.isPhantom);
+      const checkWalletInstalled = async (walletType: string): Promise<boolean> => {
+        try {
+          if (walletType === 'metamask') {
+            if (window.ethereum && window.ethereum.isMetaMask && !window.ethereum.isPhantom) {
+              // Test if MetaMask actually responds
+              await window.ethereum.request({ method: 'eth_chainId' });
+              return true;
+            }
+            if (window.ethereum && window.ethereum.providers) {
+              for (const provider of window.ethereum.providers) {
+                if (provider.isMetaMask && !provider.isPhantom) {
+                  try {
+                    await provider.request({ method: 'eth_chainId' });
+                    return true;
+                  } catch (e) {
+                    // Provider exists but not working
+                  }
+                }
+              }
+            }
+            return false;
+          } else if (walletType === 'trust') {
+            if (window.ethereum && window.ethereum.isTrust) {
+              try {
+                await window.ethereum.request({ method: 'eth_chainId' });
+                return true;
+              } catch (e) {
+                return false;
+              }
+            }
+            if (window.ethereum && window.ethereum.providers) {
+              for (const provider of window.ethereum.providers) {
+                if (provider.isTrust) {
+                  try {
+                    await provider.request({ method: 'eth_chainId' });
+                    return true;
+                  } catch (e) {
+                    // Provider exists but not working
+                  }
+                }
+              }
+            }
+            return false;
+          } else if (walletType === 'coinbase') {
+            if (window.ethereum && window.ethereum.isCoinbaseWallet) {
+              try {
+                await window.ethereum.request({ method: 'eth_chainId' });
+                return true;
+              } catch (e) {
+                return false;
+              }
+            }
+            if (window.ethereum && window.ethereum.providers) {
+              for (const provider of window.ethereum.providers) {
+                if (provider.isCoinbaseWallet) {
+                  try {
+                    await provider.request({ method: 'eth_chainId' });
+                    return true;
+                  } catch (e) {
+                    // Provider exists but not working
+                  }
+                }
+              }
+            }
+            return false;
+          } else if (walletType === 'binance') {
+            if (window.BinanceChain) {
+              try {
+                await window.BinanceChain.request({ method: 'eth_chainId' });
+                return true;
+              } catch (e) {
+                return false;
+              }
+            }
+            return false;
           }
           return false;
-        } else if (walletType === 'trust') {
-          if (window.ethereum && window.ethereum.isTrust) {
-            return true;
-          }
-          if (window.ethereum && window.ethereum.providers) {
-            return window.ethereum.providers.some((p: any) => p.isTrust);
-          }
+        } catch (error) {
           return false;
-        } else if (walletType === 'coinbase') {
-          if (window.ethereum && window.ethereum.isCoinbaseWallet) {
-            return true;
-          }
-          if (window.ethereum && window.ethereum.providers) {
-            return window.ethereum.providers.some((p: any) => p.isCoinbaseWallet);
-          }
-          return false;
-        } else if (walletType === 'binance') {
-          return typeof window.BinanceChain !== 'undefined';
         }
-        return false;
       };
 
-      const availableWallets: Wallet[] = [
-        {
-          name: 'MetaMask',
-          icon: '/wallet-icons/MetaMaskIcon.png',
-          connector: () => connectWallet('metamask'),
-          isInstalled: checkWalletInstalled('metamask')
-        },
-        {
-          name: 'Trust Wallet',
-          icon: '/wallet-icons/TrustWalletIcon.png',
-          connector: () => connectWallet('trust'),
-          isInstalled: checkWalletInstalled('trust')
-        },
-        {
-          name: 'Binance Wallet',
-          icon: '/wallet-icons/BinanceIcon.png',
-          connector: () => connectWallet('binance'),
-          isInstalled: checkWalletInstalled('binance')
-        },
-        {
-          name: 'Coinbase Wallet',
-          icon: '/wallet-icons/CoinbaseIcon.png',
-          connector: () => connectWallet('coinbase'),
-          isInstalled: checkWalletInstalled('coinbase')
-        },
-        {
-          name: 'WalletConnect',
-          icon: '/wallet-icons/WalletconnectIcon.png',
-          connector: () => connectWallet('walletconnect'),
-          isInstalled: true // WalletConnect can always be used
-        }
-      ];
+      const checkAllWallets = async () => {
+        setIsCheckingWallets(true);
+        try {
+          const walletChecks = await Promise.all([
+            checkWalletInstalled('metamask'),
+            checkWalletInstalled('trust'),
+            checkWalletInstalled('binance'),
+            checkWalletInstalled('coinbase')
+          ]);
 
-      setWallets(availableWallets);
+          const availableWallets: Wallet[] = [
+            {
+              name: 'MetaMask',
+              icon: '/wallet-icons/MetaMaskIcon.png',
+              connector: () => connectWallet('metamask'),
+              isInstalled: walletChecks[0]
+            },
+            {
+              name: 'Trust Wallet',
+              icon: '/wallet-icons/TrustWalletIcon.png',
+              connector: () => connectWallet('trust'),
+              isInstalled: walletChecks[1]
+            },
+            {
+              name: 'Binance Wallet',
+              icon: '/wallet-icons/BinanceIcon.png',
+              connector: () => connectWallet('binance'),
+              isInstalled: walletChecks[2]
+            },
+            {
+              name: 'Coinbase Wallet',
+              icon: '/wallet-icons/CoinbaseIcon.png',
+              connector: () => connectWallet('coinbase'),
+              isInstalled: walletChecks[3]
+            },
+            {
+              name: 'WalletConnect',
+              icon: '/wallet-icons/WalletconnectIcon.png',
+              connector: () => connectWallet('walletconnect'),
+              isInstalled: true // WalletConnect can always be used
+            }
+          ];
+
+          setWallets(availableWallets);
+        } finally {
+          setIsCheckingWallets(false);
+        }
+      };
+
+      checkAllWallets();
     }
   }, [isOpen, connectWallet]);
 
@@ -174,46 +242,55 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
         </div>
 
         <div className="space-y-3">
-          {wallets.map((wallet) => (
-            <button
-              key={wallet.name}
-              onClick={() => {
-                wallet.connector();
-                onClose();
-              }}
-              disabled={!wallet.isInstalled}
-              className={`w-full flex items-center space-x-4 p-4 rounded-lg border-2 transition-all ${
-                wallet.isInstalled
-                  ? 'border-gray-200 hover:border-blue-500 hover:bg-blue-50'
-                  : 'border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed'
-              }`}
-            >
-              <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden">
-                <img
-                  src={wallet.icon}
-                  alt={wallet.name}
-                  className="w-8 h-8 object-contain"
-                  onError={(e) => {
-                    // Fallback icon if the image fails to load
-                    e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iMTYiIGZpbGw9IiM2MzY2RjEiLz4KPHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSI4IiB5PSI4Ij4KPHBhdGggZD0iTTggMkM0LjY4NjI5IDIgMiA0LjY4NjI5IDIgOEMyIDExLjMxMzcgNC42ODYyOSAxNCA4IDE0QzExLjMxMzcgMTQgMTQgMTEuMzEzNyAxNCA4QzE0IDQuNjg2MjkgMTEuMzEzNyAyIDggMloiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo8L3N2Zz4K';
-                  }}
-                />
+          {isCheckingWallets ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="flex items-center space-x-3">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                <span className="text-gray-600 font-['Pixelify_Sans']">Checking for wallets...</span>
               </div>
-              <div className="flex-1 text-left">
-                <div className="font-medium text-gray-900 font-['Pixelify_Sans']">
-                  {wallet.name}
+            </div>
+          ) : (
+            wallets.map((wallet) => (
+              <button
+                key={wallet.name}
+                onClick={() => {
+                  wallet.connector();
+                  onClose();
+                }}
+                disabled={!wallet.isInstalled}
+                className={`w-full flex items-center space-x-4 p-4 rounded-lg border-2 transition-all ${
+                  wallet.isInstalled
+                    ? 'border-gray-200 hover:border-blue-500 hover:bg-blue-50'
+                    : 'border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed'
+                }`}
+              >
+                <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden">
+                  <img
+                    src={wallet.icon}
+                    alt={wallet.name}
+                    className="w-8 h-8 object-contain"
+                    onError={(e) => {
+                      // Fallback icon if the image fails to load
+                      e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iMTYiIGZpbGw9IiM2MzY2RjEiLz4KPHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSI4IiB5PSI4Ij4KPHBhdGggZD0iTTggMkM0LjY4NjI5IDIgMiA0LjY4NjI5IDIgOEMyIDExLjMxMzcgNC42ODYyOSAxNCA4IDE0QzExLjMxMzcgMTQgMTQgMTEuMzEzNyAxNCA4QzE0IDQuNjg2MjkgMTEuMzEzNyAyIDggMloiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo8L3N2Zz4K';
+                    }}
+                  />
                 </div>
-                <div className="text-sm text-gray-500">
-                  {wallet.isInstalled ? t('wallet.installed') : t('wallet.not_installed')}
+                <div className="flex-1 text-left">
+                  <div className="font-medium text-gray-900 font-['Pixelify_Sans']">
+                    {wallet.name}
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    {wallet.isInstalled ? t('wallet.installed') : t('wallet.not_installed')}
+                  </div>
                 </div>
-              </div>
-              {wallet.isInstalled && (
-                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              )}
-            </button>
-          ))}
+                {wallet.isInstalled && (
+                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                )}
+              </button>
+            ))
+          )}
         </div>
 
         <div className="mt-6 text-center">

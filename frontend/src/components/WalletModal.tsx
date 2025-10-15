@@ -307,13 +307,13 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
                 disabled={!wallet.isInstalled || connectingWallet !== null}
                 className={`w-full flex items-center space-x-4 p-4 rounded-lg border-2 transition-all relative min-h-[80px] ${
                   wallet.isInstalled && connectingWallet !== wallet.name
-                    ? 'border-gray-200 hover:border-blue-500 hover:bg-blue-50'
+                    ? connectingWallet ? 'border-gray-200 bg-gray-50 opacity-30 cursor-not-allowed' : 'border-gray-200 hover:border-blue-500 hover:bg-blue-50'
                     : 'border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed'
                 } ${connectingWallet === wallet.name ? 'border-blue-500 bg-blue-50' : ''}`}
               >
                 {/* Blur overlay for connecting wallet */}
                 {connectingWallet === wallet.name && (
-                  <div className="absolute inset-0 bg-white/80 backdrop-blur-sm rounded-lg flex items-center justify-center z-10">
+                  <div className="absolute inset-0 bg-white backdrop-blur-sm rounded-lg flex items-center justify-center z-10 border-2 border-black">
                     <img 
                       src="/loading/binance-loading-img-black.gif" 
                       alt="Connecting..." 

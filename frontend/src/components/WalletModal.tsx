@@ -305,7 +305,7 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
                   }
                 }}
                 disabled={!wallet.isInstalled || connectingWallet !== null}
-                className={`w-full flex items-center space-x-4 p-4 rounded-lg border-2 transition-all relative ${
+                className={`w-full flex items-center space-x-4 p-4 rounded-lg border-2 transition-all relative min-h-[80px] ${
                   wallet.isInstalled && connectingWallet !== wallet.name
                     ? 'border-gray-200 hover:border-blue-500 hover:bg-blue-50'
                     : 'border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed'
@@ -315,8 +315,12 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
                 {connectingWallet === wallet.name && (
                   <div className="absolute inset-0 bg-white/80 backdrop-blur-sm rounded-lg flex items-center justify-center z-10">
                     <div className="flex flex-col items-center space-y-2">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                      <span className="text-sm text-blue-600 font-['Pixelify_Sans']">Connecting...</span>
+                      <img 
+                        src="/loading/binance-loading-img-black.gif" 
+                        alt="Connecting..." 
+                        className="h-12 w-12"
+                      />
+                      <span className="text-sm text-black font-['Pixelify_Sans']">Connecting...</span>
                     </div>
                   </div>
                 )}
@@ -347,7 +351,11 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
                 )}
                 {connectingWallet === wallet.name && (
                   <div className="w-5 h-5 flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                    <img 
+                      src="/loading/binance-loading-img-black.gif" 
+                      alt="Loading..." 
+                      className="h-5 w-5"
+                    />
                   </div>
                 )}
               </button>

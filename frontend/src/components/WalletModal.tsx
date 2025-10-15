@@ -282,14 +282,26 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
                     }
                   }, 30000); // 30 second timeout
                   
+                  const handleError = () => {
+                    clearTimeout(timeoutId);
+                    setConnectingWallet(null);
+                  };
+                  
                   try {
-                    await wallet.connector();
+                    // Map wallet names to the correct wallet types
+                    const walletTypeMap: Record<string, string> = {
+                      'MetaMask': 'metamask',
+                      'Trust Wallet': 'trust',
+                      'Binance Wallet': 'binance',
+                      'Coinbase Wallet': 'coinbase',
+                      'WalletConnect': 'walletconnect'
+                    };
+                    
+                    await connectWallet(walletTypeMap[wallet.name] || wallet.name.toLowerCase().replace(' ', ''), handleError);
                     clearTimeout(timeoutId);
                     // Connection success is handled by useEffect
                   } catch (error) {
-                    clearTimeout(timeoutId);
-                    // Connection failed, reset connecting state
-                    setConnectingWallet(null);
+                    handleError();
                   }
                 }}
                 disabled={!wallet.isInstalled || connectingWallet !== null}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Wallet } from 'lucide-react';
 import { useBSCWallet } from '../context/BSCWalletContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -9,6 +9,13 @@ const BSCConnectButton: React.FC = () => {
   const { connected, walletAddress, disconnectWallet } = useBSCWallet();
   const { t } = useLanguage();
   const { isWalletModalOpen, setIsWalletModalOpen } = useModal();
+
+  // Close wallet modal when wallet disconnects
+  useEffect(() => {
+    if (!connected && isWalletModalOpen) {
+      setIsWalletModalOpen(false);
+    }
+  }, [connected, isWalletModalOpen, setIsWalletModalOpen]);
 
   if (connected && walletAddress) {
     return (
@@ -48,10 +55,12 @@ const BSCConnectButton: React.FC = () => {
         </button>
       </div>
       
-      <WalletModal 
-        isOpen={isWalletModalOpen} 
-        onClose={() => setIsWalletModalOpen(false)} 
-      />
+      {isWalletModalOpen && (
+        <WalletModal 
+          isOpen={isWalletModalOpen} 
+          onClose={() => setIsWalletModalOpen(false)} 
+        />
+      )}
     </>
   );
 };

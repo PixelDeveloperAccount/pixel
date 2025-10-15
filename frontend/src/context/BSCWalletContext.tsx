@@ -11,7 +11,7 @@ interface BSCWalletContextType {
   walletAddress: string | null;
   balance: number;
   tokenBalance: number;
-  connectWallet: (walletType?: string) => void;
+  connectWallet: (walletType?: string, onError?: () => void) => Promise<void>;
   disconnectWallet: () => void;
   pixelQuota: number;
   pixelsRemaining: number;
@@ -295,7 +295,7 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   };
 
-  const connectWallet = async (walletType?: string) => {
+  const connectWallet = async (walletType?: string, onError?: () => void) => {
     let provider = null;
 
     try {
@@ -419,6 +419,11 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       }
 
       if (!provider) {
+        // Call the error callback to reset loading state in UI
+        if (onError) {
+          onError();
+        }
+        
         toast.error('Wallet not found or not responding. Please ensure your wallet is installed and unlocked.', {
           duration: 5000,
           style: {
@@ -459,6 +464,12 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       }
     } catch (error: any) {
       console.error('Error connecting wallet:', error);
+      
+      // Call the error callback to reset loading state in UI
+      if (onError) {
+        onError();
+      }
+      
       if (error.code === 4001) {
         toast.error(t('network.connection_rejected'), {
           duration: 3000,

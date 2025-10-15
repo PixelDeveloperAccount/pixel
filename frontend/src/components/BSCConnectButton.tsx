@@ -13,7 +13,9 @@ const BSCConnectButton: React.FC = () => {
 
   // Close wallet modal when wallet disconnects (only if it was previously connected)
   useEffect(() => {
+    console.log('useEffect triggered:', { wasConnected, connected, isWalletModalOpen });
     if (wasConnected && !connected && isWalletModalOpen) {
+      console.log('Closing modal due to disconnect');
       setIsWalletModalOpen(false);
     }
     setWasConnected(connected);
@@ -49,7 +51,11 @@ const BSCConnectButton: React.FC = () => {
     <>
       <div className="w-full flex items-center justify-center">
         <button
-          onClick={() => setIsWalletModalOpen(true)}
+          onClick={() => {
+            console.log('Connect button clicked, current modal state:', isWalletModalOpen);
+            setIsWalletModalOpen(true);
+            console.log('Modal state set to true');
+          }}
           className="w-full font-['Pixelify_Sans'] flex items-center justify-center space-x-2 px-5 py-3 rounded-lg transition-all text-lg bg-blue-600 hover:bg-blue-700 text-white"
         >
           <Wallet className="h-5 w-5" />
@@ -57,12 +63,10 @@ const BSCConnectButton: React.FC = () => {
         </button>
       </div>
       
-      {isWalletModalOpen && (
-        <WalletModal 
-          isOpen={isWalletModalOpen} 
-          onClose={() => setIsWalletModalOpen(false)} 
-        />
-      )}
+      <WalletModal 
+        isOpen={isWalletModalOpen} 
+        onClose={() => setIsWalletModalOpen(false)} 
+      />
     </>
   );
 };

@@ -314,14 +314,11 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
                 {/* Blur overlay for connecting wallet */}
                 {connectingWallet === wallet.name && (
                   <div className="absolute inset-0 bg-white/80 backdrop-blur-sm rounded-lg flex items-center justify-center z-10">
-                    <div className="flex flex-col items-center space-y-2">
-                      <img 
-                        src="/loading/binance-loading-img-black.gif" 
-                        alt="Connecting..." 
-                        className="h-12 w-12"
-                      />
-                      <span className="text-sm text-black font-['Pixelify_Sans']">Connecting...</span>
-                    </div>
+                    <img 
+                      src="/loading/binance-loading-img-black.gif" 
+                      alt="Connecting..." 
+                      className="h-12 w-12"
+                    />
                   </div>
                 )}
                 
@@ -344,20 +341,20 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
                     {wallet.isInstalled ? t('wallet.installed') : t('wallet.not_installed')}
                   </div>
                 </div>
-                {wallet.isInstalled && !connectingWallet && (
-                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                )}
-                {connectingWallet === wallet.name && (
-                  <div className="w-5 h-5 flex items-center justify-center">
+                <div className="w-5 h-5 flex items-center justify-center">
+                  {wallet.isInstalled && !connectingWallet && (
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  )}
+                  {connectingWallet === wallet.name && (
                     <img 
                       src="/loading/binance-loading-img-black.gif" 
                       alt="Loading..." 
                       className="h-5 w-5"
                     />
-                  </div>
-                )}
+                  )}
+                </div>
               </button>
             ))
           )}

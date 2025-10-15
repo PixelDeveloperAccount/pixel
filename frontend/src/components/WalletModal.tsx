@@ -21,9 +21,6 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
   const [isCheckingWallets, setIsCheckingWallets] = useState(false);
   const [connectingWallet, setConnectingWallet] = useState<string | null>(null);
 
-  // Debug logging
-  console.log('WalletModal render:', { isOpen, hasWallet });
-
   useEffect(() => {
     if (isOpen) {
       // Check which wallets are installed with better detection

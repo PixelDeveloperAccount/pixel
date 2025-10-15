@@ -161,6 +161,13 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const checkWalletConnection = async () => {
     try {
+      // Check if user has manually disconnected - if so, don't auto-reconnect
+      const manuallyDisconnected = localStorage.getItem('wallet-manually-disconnected');
+      if (manuallyDisconnected === 'true') {
+        console.log('User manually disconnected, skipping auto-reconnection');
+        return;
+      }
+
       // First check if we have a stored connection
       const storedConnection = localStorage.getItem('wallet-connection');
       if (storedConnection) {
@@ -209,6 +216,10 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
                 console.log('🔄 Auto-reconnecting wallet from localStorage:', address);
                 setWalletAddress(address);
                 setConnected(true);
+                
+                // Clear the manual disconnect flag since we successfully reconnected
+                localStorage.removeItem('wallet-manually-disconnected');
+                
                 await fetchBalances(address);
                 
                 // Show a subtle notification that wallet was reconnected
@@ -277,6 +288,9 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             connected: true,
             timestamp: Date.now()
           }));
+          
+          // Clear the manual disconnect flag since we successfully reconnected
+          localStorage.removeItem('wallet-manually-disconnected');
           
           await fetchBalances(accounts[0]);
           
@@ -451,6 +465,9 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           timestamp: Date.now()
         }));
         
+        // Clear the manual disconnect flag since user is connecting again
+        localStorage.removeItem('wallet-manually-disconnected');
+        
         await fetchBalances(accounts[0]);
         
         toast.success(t('network.wallet_connected'), {
@@ -512,6 +529,9 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     clearCooldown();
     localStorage.removeItem('pixel-cooldown');
     localStorage.removeItem('wallet-connection');
+    
+    // Set a flag to prevent auto-reconnection after manual disconnect
+    localStorage.setItem('wallet-manually-disconnected', 'true');
     
     if (wasConnected) {
       toast.success(t('network.wallet_disconnected'), {

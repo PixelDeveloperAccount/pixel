@@ -9,13 +9,15 @@ const BSCConnectButton: React.FC = () => {
   const { connected, walletAddress, disconnectWallet } = useBSCWallet();
   const { t } = useLanguage();
   const { isWalletModalOpen, setIsWalletModalOpen } = useModal();
+  const [wasConnected, setWasConnected] = useState(connected);
 
-  // Close wallet modal when wallet disconnects
+  // Close wallet modal when wallet disconnects (only if it was previously connected)
   useEffect(() => {
-    if (!connected && isWalletModalOpen) {
+    if (wasConnected && !connected && isWalletModalOpen) {
       setIsWalletModalOpen(false);
     }
-  }, [connected, isWalletModalOpen, setIsWalletModalOpen]);
+    setWasConnected(connected);
+  }, [connected, isWalletModalOpen, setIsWalletModalOpen, wasConnected]);
 
   if (connected && walletAddress) {
     return (

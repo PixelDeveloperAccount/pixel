@@ -545,6 +545,24 @@ const Canvas: React.FC = () => {
         </button>
       </div>
 
+      {/* X Social Media Link - Bottom Right */}
+      <div className="absolute bottom-4 right-4 z-50">
+        <a
+          href="https://x.com/bnb_pixel"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="p-2 rounded-lg bg-white hover:bg-gray-100 transition-colors text-gray-900 shadow-lg block"
+          aria-label="Follow us on X"
+          title="Follow us on X"
+        >
+          <img 
+            src="/logo/xicon.png" 
+            alt="Follow us on X" 
+            className="h-7 w-7" 
+          />
+        </a>
+      </div>
+
       {showLeaderboard && <LeaderboardModal onClose={() => setShowLeaderboard(false)} />}
       {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
 

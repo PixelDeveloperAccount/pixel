@@ -122,17 +122,18 @@ app.post('/api/place-pixel', async (req, res) => {
 
   const { x, y, color, walletAddress } = req.body;
 
-  if (x === undefined || y === undefined || color === undefined || !walletAddress) {
-    res.status(400).send({ message: 'Bad Request: Missing x, y, color, or wallet address' });
+  if (x === undefined || y === undefined || color === undefined) {
+    res.status(400).send({ message: 'Bad Request: Missing x, y, or color' });
     return;
   }
 
   try {
     const pixelKey = `pixel:${x}:${y}`;
-    const pixelData = JSON.stringify({ color, walletAddress, timestamp: Date.now() });
+    // Allow walletAddress to be null for anonymous users
+    const pixelData = JSON.stringify({ color, walletAddress: walletAddress || null, timestamp: Date.now() });
     await redisClient.set(pixelKey, pixelData);
 
-    const newPixel = { x: Number(x), y: Number(y), color, walletAddress };
+    const newPixel = { x: Number(x), y: Number(y), color, walletAddress: walletAddress || null };
     io.emit('new_pixel', newPixel);
     console.log('Broadcasted new pixel:', newPixel);
 

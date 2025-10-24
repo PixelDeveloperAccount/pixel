@@ -31,9 +31,9 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [balance, setBalance] = useState(0);
   const [tokenBalance, setTokenBalance] = useState(0);
-  const [pixelsRemaining, setPixelsRemaining] = useState(1);
+  const [pixelsRemaining, setPixelsRemaining] = useState(5);
   const [isOnCooldown, setIsOnCooldown] = useState(false);
-  const [cooldownTime, setCooldownTime] = useState(5);
+  const [cooldownTime, setCooldownTime] = useState(60);
   const [cooldownTimeLeft, setCooldownTimeLeft] = useState(0);
   const [hasWallet, setHasWallet] = useState(false);
   const cooldownIntervalRef = useRef<number>();
@@ -524,7 +524,7 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setWalletAddress(null);
     setBalance(0);
     setTokenBalance(0);
-    setPixelsRemaining(1);
+    setPixelsRemaining(5);
     setCooldownTime(60);
     clearCooldown();
     localStorage.removeItem('pixel-cooldown');
@@ -578,18 +578,18 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const calculateQuota = (balance: number): number => {
-    if (balance >= 1000) return Infinity;
-    if (balance >= 100) return 10;
-    if (balance >= 10) return 5;
-    if (balance >= 1) return 3;
-    return 1;
+    if (balance >= 1000000) return Infinity;
+    if (balance >= 300001) return 70;
+    if (balance >= 50001) return 45;
+    if (balance >= 1) return 30;
+    return 5;
   };
 
   const calculateCooldown = (balance: number): number => {
-    if (balance >= 1000) return 1;
-    if (balance >= 100) return 3;
-    if (balance >= 10) return 5;
-    if (balance >= 1) return 10;
+    if (balance >= 1000000) return 0;
+    if (balance >= 300001) return 15;
+    if (balance >= 50001) return 25;
+    if (balance >= 1) return 30;
     return 60;
   };
 

@@ -135,11 +135,6 @@ export const CanvasProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }, []);
   
   const placePixel = async (x: number, y: number, color: string) => {
-    if (!walletAddress) {
-      toast.error(t('canvas.connect_first'));
-      return;
-    }
-
     try {
       const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
       const response = await fetch(`${backendUrl}/api/place-pixel`, {
@@ -151,7 +146,7 @@ export const CanvasProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           x,
           y,
           color,
-          walletAddress,
+          walletAddress: walletAddress || null,
         }),
       });
 

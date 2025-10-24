@@ -30,8 +30,7 @@ const ColorPalette: React.FC = () => {
     pixelsRemaining,
     isOnCooldown,
     cooldownTimeLeft,
-    connected,
-    tokenBalance
+    pixelQuota
   } = useBSCWallet();
   const { isMuted } = useSound();
 
@@ -140,7 +139,7 @@ const ColorPalette: React.FC = () => {
               ))}
             </div>
           </div>
-          {isOnCooldown && (!connected || tokenBalance < 5000) && (
+          {isOnCooldown && pixelQuota !== Infinity && (
             <div className="absolute inset-0 flex items-center justify-center bg-white">
               <div className="flex items-center space-x-2 text-gray-900 font-['Pixelify_Sans'] text-lg">
                 <img 
@@ -155,7 +154,7 @@ const ColorPalette: React.FC = () => {
         </div>
 
         <div className="flex items-center space-x-2 ml-4">
-          {(!isOnCooldown || (connected && tokenBalance >= 5000)) && (
+          {(!isOnCooldown || pixelQuota === Infinity) && (
             <button
               onClick={handleConfirm}
               disabled={!selectedPosition || !selectedColor}

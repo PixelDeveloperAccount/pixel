@@ -1,6 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useCanvas } from '../context/CanvasContext';
-import { useBSCWallet } from '../context/BSCWalletContext';
 import { useSound } from '../context/SoundContext';
 import { useLanguage } from '../context/LanguageContext';
 import HelpModal from './HelpModal';
@@ -25,7 +24,6 @@ const Canvas: React.FC = () => {
     sampleColor,
     setSelectedColor
   } = useCanvas();
-  const { connected } = useBSCWallet();
   const { isMuted, setIsMuted } = useSound();
   const { t } = useLanguage();
   
@@ -59,14 +57,6 @@ const Canvas: React.FC = () => {
     const randomSound = clickSounds[Math.floor(Math.random() * clickSounds.length)];
     const audio = new Audio(randomSound);
     audio.volume = 0.3;
-    audio.play().catch(() => {}); // Ignore errors if audio fails to play
-  };
-
-  const playPixelPaintSound = () => {
-    if (isMuted) return; // Don't play sound if muted
-    // Sound for confirming/painting a pixel
-    const audio = new Audio('/sounds/pixel-confirm1.mp3');
-    audio.volume = 0.4;
     audio.play().catch(() => {}); // Ignore errors if audio fails to play
   };
 
@@ -638,16 +628,14 @@ const Canvas: React.FC = () => {
             )}
             
             {/* Place Button */}
-            {connected && (
-              <div className="pt-2 border-t border-gray-200">
-                <button
-                  onClick={handlePlacePixel}
-                  className="w-full bg-indigo-600 text-white px-3 py-2 rounded-md hover:bg-indigo-700 transition-colors text-sm font-medium"
-                >
-                  Place Pixel Here
-                </button>
-              </div>
-            )}
+            <div className="pt-2 border-t border-gray-200">
+              <button
+                onClick={handlePlacePixel}
+                className="w-full bg-indigo-600 text-white px-3 py-2 rounded-md hover:bg-indigo-700 transition-colors text-sm font-medium"
+              >
+                Place Pixel Here
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -37,6 +37,8 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [cooldownTimeLeft, setCooldownTimeLeft] = useState(0);
   const [hasWallet, setHasWallet] = useState(false);
   const cooldownIntervalRef = useRef<number>();
+  // Store pre-connection state to restore on disconnect
+  const preConnectionStateRef = useRef<{ pixelsRemaining: number; isOnCooldown: boolean; cooldownTimeLeft: number } | null>(null);
 
   // Load cooldown state from localStorage on mount
   useEffect(() => {
@@ -455,6 +457,13 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       });
 
       if (accounts.length > 0) {
+        // Save pre-connection state before upgrading to new tier
+        preConnectionStateRef.current = {
+          pixelsRemaining,
+          isOnCooldown,
+          cooldownTimeLeft
+        };
+        
         setWalletAddress(accounts[0]);
         setConnected(true);
         
@@ -524,10 +533,24 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setWalletAddress(null);
     setBalance(0);
     setTokenBalance(0);
-    setPixelsRemaining(5);
+    
+    // Restore pre-connection state if it exists
+    if (preConnectionStateRef.current) {
+      setPixelsRemaining(preConnectionStateRef.current.pixelsRemaining);
+      setIsOnCooldown(preConnectionStateRef.current.isOnCooldown);
+      if (preConnectionStateRef.current.isOnCooldown) {
+        setCooldownTimeLeft(preConnectionStateRef.current.cooldownTimeLeft);
+        startCooldownTimer();
+      }
+      // Clear the saved state after restoring
+      preConnectionStateRef.current = null;
+    } else {
+      // No pre-connection state - this means they connected before placing any pixels
+      // or this is a page reload. Reset to base tier defaults.
+      setPixelsRemaining(5);
+    }
+    
     setCooldownTime(60);
-    clearCooldown();
-    localStorage.removeItem('pixel-cooldown');
     localStorage.removeItem('wallet-connection');
     
     // Set a flag to prevent auto-reconnection after manual disconnect
@@ -626,12 +649,6 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         endTime,
         pixelsRemaining: 0
       }));
-    }
-  };
-
-  const clearCooldown = () => {
-    if (cooldownIntervalRef.current) {
-      clearInterval(cooldownIntervalRef.current);
     }
   };
 

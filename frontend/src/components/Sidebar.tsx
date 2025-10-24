@@ -3,7 +3,6 @@ import BSCUserInfo from './BSCUserInfo';
 import UserPixels from './UserPixels';
 import UserColors from './UserColors';
 import { useLanguage } from '../context/LanguageContext';
-import { useBSCWallet } from '../context/BSCWalletContext';
 import { useModal } from '../context/ModalContext';
 import toast from 'react-hot-toast'; // Ensure toast is imported
 
@@ -108,30 +107,17 @@ const Sidebar: React.FC = () => {
                   <span>{t('social.github')}</span>
                 </a>
                 <a
-                  href="https://twitter.com"
+                  href="https://x.com/bnb_pixel"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center space-x-2 text-gray-900 hover:text-gray-600 transition-colors"
                 >
                   <img
                       src="https://unpkg.com/pixelarticons@1.8.1/svg/user.svg"
-                      alt={t('social.twitter')}
+                      alt="X"
                       className="h-6 w-6"
                     />
-                  <span>{t('social.twitter')}</span>
-                </a>
-                <a
-                  href="https://t.me"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center space-x-2 text-gray-900 hover:text-gray-600 transition-colors"
-                >
-                  <img
-                      src="https://unpkg.com/pixelarticons@1.8.1/svg/chat.svg"
-                      alt={t('social.telegram')}
-                      className="h-6 w-6"
-                    />
-                  <span>{t('social.telegram')}</span>
+                  <span>X</span>
                 </a>
                 <a
                   href="/docs"

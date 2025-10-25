@@ -16,87 +16,55 @@ interface WalletModalProps {
 
 const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
   const { t } = useLanguage();
-  const { connectWallet, hasWallet, connected } = useBSCWallet();
+  const { connectWallet, connected } = useBSCWallet();
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [isCheckingWallets, setIsCheckingWallets] = useState(false);
   const [connectingWallet, setConnectingWallet] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
-      // Check which wallets are installed with better detection
-      const checkWalletInstalled = async (walletType: string): Promise<boolean> => {
+      // Check which wallets are installed with passive detection (no requests)
+      const checkWalletInstalled = (walletType: string): boolean => {
         try {
           if (walletType === 'metamask') {
             if (window.ethereum && window.ethereum.isMetaMask && !window.ethereum.isPhantom) {
-              // Test if MetaMask actually responds
-              await window.ethereum.request({ method: 'eth_chainId' });
               return true;
             }
             if (window.ethereum && window.ethereum.providers) {
               for (const provider of window.ethereum.providers) {
                 if (provider.isMetaMask && !provider.isPhantom) {
-                  try {
-                    await provider.request({ method: 'eth_chainId' });
-                    return true;
-                  } catch (e) {
-                    // Provider exists but not working
-                  }
+                  return true;
                 }
               }
             }
             return false;
           } else if (walletType === 'trust') {
             if (window.ethereum && window.ethereum.isTrust) {
-              try {
-                await window.ethereum.request({ method: 'eth_chainId' });
-                return true;
-              } catch (e) {
-                return false;
-              }
+              return true;
             }
             if (window.ethereum && window.ethereum.providers) {
               for (const provider of window.ethereum.providers) {
                 if (provider.isTrust) {
-                  try {
-                    await provider.request({ method: 'eth_chainId' });
-                    return true;
-                  } catch (e) {
-                    // Provider exists but not working
-                  }
+                  return true;
                 }
               }
             }
             return false;
           } else if (walletType === 'coinbase') {
             if (window.ethereum && window.ethereum.isCoinbaseWallet) {
-              try {
-                await window.ethereum.request({ method: 'eth_chainId' });
-                return true;
-              } catch (e) {
-                return false;
-              }
+              return true;
             }
             if (window.ethereum && window.ethereum.providers) {
               for (const provider of window.ethereum.providers) {
                 if (provider.isCoinbaseWallet) {
-                  try {
-                    await provider.request({ method: 'eth_chainId' });
-                    return true;
-                  } catch (e) {
-                    // Provider exists but not working
-                  }
+                  return true;
                 }
               }
             }
             return false;
           } else if (walletType === 'binance') {
             if (window.BinanceChain) {
-              try {
-                await window.BinanceChain.request({ method: 'eth_chainId' });
-                return true;
-              } catch (e) {
-                return false;
-              }
+              return true;
             }
             return false;
           }
@@ -106,40 +74,33 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
         }
       };
 
-      const checkAllWallets = async () => {
+      const checkAllWallets = () => {
         setIsCheckingWallets(true);
         try {
-          const walletChecks = await Promise.all([
-            checkWalletInstalled('metamask'),
-            checkWalletInstalled('trust'),
-            checkWalletInstalled('binance'),
-            checkWalletInstalled('coinbase')
-          ]);
-
           const availableWallets: Wallet[] = [
             {
               name: 'MetaMask',
               icon: '/wallet-icons/MetaMaskIcon.png',
               connector: () => connectWallet('metamask'),
-              isInstalled: walletChecks[0]
+              isInstalled: checkWalletInstalled('metamask')
             },
             {
               name: 'Trust Wallet',
               icon: '/wallet-icons/TrustWalletIcon.png',
               connector: () => connectWallet('trust'),
-              isInstalled: walletChecks[1]
+              isInstalled: checkWalletInstalled('trust')
             },
             {
               name: 'Binance Wallet',
               icon: '/wallet-icons/BinanceIcon.png',
               connector: () => connectWallet('binance'),
-              isInstalled: walletChecks[2]
+              isInstalled: checkWalletInstalled('binance')
             },
             {
               name: 'Coinbase Wallet',
               icon: '/wallet-icons/CoinbaseIcon.png',
               connector: () => connectWallet('coinbase'),
-              isInstalled: walletChecks[3]
+              isInstalled: checkWalletInstalled('coinbase')
             },
             {
               name: 'WalletConnect',
@@ -178,66 +139,6 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
   }, [isOpen, connectingWallet]);
 
   if (!isOpen) return null;
-
-  // If no wallets are available, show a message
-  if (!hasWallet) {
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50">
-        <div className="bg-white rounded-t-xl p-6 w-full max-w-md mx-4">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 font-['Pixelify_Sans']">
-              {t('wallet.connect')}
-            </h2>
-            <button
-              onClick={onClose}
-              className="p-1 rounded-xl hover:bg-gray-100 transition-colors"
-              aria-label="Close"
-              title="Close"
-            >
-              <img 
-                src="https://unpkg.com/pixelarticons@1.8.1/svg/close.svg" 
-                alt="Close" 
-                className="h-5 w-5"
-              />
-            </button>
-          </div>
-          
-          <div className="text-center">
-            <div className="mb-4">
-              <svg className="w-16 h-16 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2 font-['Pixelify_Sans']">
-              No Wallet Detected
-            </h3>
-            <p className="text-gray-600 mb-6 font-['Pixelify_Sans']">
-              Please install a BSC-compatible wallet to continue.
-            </p>
-            
-            <div className="space-y-3">
-              <a
-                href="https://metamask.io/download/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-['Pixelify_Sans']"
-              >
-                Install MetaMask
-              </a>
-              <a
-                href="https://trustwallet.com/download"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full bg-gray-600 text-white py-3 px-4 rounded-lg hover:bg-gray-700 transition-colors font-['Pixelify_Sans']"
-              >
-                Install Trust Wallet
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50">

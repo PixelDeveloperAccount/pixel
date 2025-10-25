@@ -68,324 +68,104 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     checkWalletAvailability();
   }, []);
 
-  const checkWalletAvailability = async () => {
+  const checkWalletAvailability = () => {
     let hasBSCWallet = false;
     
     try {
-      // Check for MetaMask specifically
+      // Check for MetaMask specifically (passive check - no requests)
       if (window.ethereum && window.ethereum.isMetaMask && !window.ethereum.isPhantom) {
-        // Try to make a simple request to verify MetaMask is actually working
-        await window.ethereum.request({ method: 'eth_chainId' });
         hasBSCWallet = true;
       } else if (window.ethereum && window.ethereum.providers) {
-        // Check providers array for working MetaMask
+        // Check providers array for MetaMask
         for (const provider of window.ethereum.providers) {
           if (provider.isMetaMask && !provider.isPhantom) {
-            try {
-              await provider.request({ method: 'eth_chainId' });
-              hasBSCWallet = true;
-              break;
-            } catch (e) {
-              // Provider exists but not working, continue checking
-            }
+            hasBSCWallet = true;
+            break;
           }
         }
       }
       
       // Check for Trust Wallet
       if (!hasBSCWallet && window.ethereum && window.ethereum.isTrust) {
-        try {
-          await window.ethereum.request({ method: 'eth_chainId' });
-          hasBSCWallet = true;
-        } catch (e) {
-          // Trust Wallet not working
-        }
+        hasBSCWallet = true;
       } else if (!hasBSCWallet && window.ethereum && window.ethereum.providers) {
         for (const provider of window.ethereum.providers) {
           if (provider.isTrust) {
-            try {
-              await provider.request({ method: 'eth_chainId' });
-              hasBSCWallet = true;
-              break;
-            } catch (e) {
-              // Provider exists but not working
-            }
+            hasBSCWallet = true;
+            break;
           }
         }
       }
       
       // Check for Coinbase Wallet
       if (!hasBSCWallet && window.ethereum && window.ethereum.isCoinbaseWallet) {
-        try {
-          await window.ethereum.request({ method: 'eth_chainId' });
-          hasBSCWallet = true;
-        } catch (e) {
-          // Coinbase Wallet not working
-        }
+        hasBSCWallet = true;
       } else if (!hasBSCWallet && window.ethereum && window.ethereum.providers) {
         for (const provider of window.ethereum.providers) {
           if (provider.isCoinbaseWallet) {
-            try {
-              await provider.request({ method: 'eth_chainId' });
-              hasBSCWallet = true;
-              break;
-            } catch (e) {
-              // Provider exists but not working
-            }
+            hasBSCWallet = true;
+            break;
           }
         }
       }
       
       // Check for Binance Wallet
       if (!hasBSCWallet && window.BinanceChain) {
-        try {
-          await window.BinanceChain.request({ method: 'eth_chainId' });
-          hasBSCWallet = true;
-        } catch (e) {
-          // Binance Wallet not working
-        }
+        hasBSCWallet = true;
       }
     } catch (error) {
-      console.log('No working BSC wallet detected');
+      console.log('No BSC wallet detected');
       hasBSCWallet = false;
     }
     
     setHasWallet(hasBSCWallet);
   };
 
-  const checkWalletConnection = async () => {
-    try {
-      // Check if user has manually disconnected - if so, don't auto-reconnect
-      const manuallyDisconnected = localStorage.getItem('wallet-manually-disconnected');
-      if (manuallyDisconnected === 'true') {
-        console.log('User manually disconnected, skipping auto-reconnection');
-        return;
-      }
-
-      // First check if we have a stored connection
-      const storedConnection = localStorage.getItem('wallet-connection');
-      if (storedConnection) {
-        try {
-          const { address, timestamp } = JSON.parse(storedConnection);
-          // Check if the stored connection is recent (within 24 hours)
-          const isRecent = Date.now() - timestamp < 24 * 60 * 60 * 1000;
-          
-          if (isRecent && address) {
-            // Try to verify the connection is still valid
-            let provider = null;
-            
-            // Find working wallet provider
-            if (window.ethereum && window.ethereum.isMetaMask && !window.ethereum.isPhantom) {
-              try {
-                await window.ethereum.request({ method: 'eth_chainId' });
-                provider = window.ethereum;
-              } catch (e) {
-                // MetaMask not responding
-              }
-            } else if (window.ethereum && window.ethereum.providers) {
-              for (const p of window.ethereum.providers) {
-                if (p.isMetaMask || p.isTrust || p.isCoinbaseWallet) {
-                  try {
-                    await p.request({ method: 'eth_chainId' });
-                    provider = p;
-                    break;
-                  } catch (e) {
-                    // Provider not responding, continue
-                  }
-                }
-              }
-            } else if (window.BinanceChain) {
-              try {
-                await window.BinanceChain.request({ method: 'eth_chainId' });
-                provider = window.BinanceChain;
-              } catch (e) {
-                // Binance Chain not responding
-              }
-            }
-
-            if (provider) {
-              // Verify the stored address is still connected
-              const accounts = await provider.request({ method: 'eth_accounts' });
-              if (accounts.length > 0 && accounts.includes(address)) {
-                console.log('🔄 Auto-reconnecting wallet from localStorage:', address);
-                setWalletAddress(address);
-                setConnected(true);
-                
-                // Clear the manual disconnect flag since we successfully reconnected
-                localStorage.removeItem('wallet-manually-disconnected');
-                
-                await fetchBalances(address);
-                
-                // Show a subtle notification that wallet was reconnected
-                toast.success('Wallet reconnected', {
-                  duration: 2000,
-                  style: {
-                    background: '#10B981',
-                    color: '#fff',
-                    fontFamily: 'Pixelify Sans, sans-serif',
-                  },
-                });
-                return; // Successfully reconnected, exit early
-              }
-            }
-          }
-          
-          // If we get here, the stored connection is invalid or expired
-          localStorage.removeItem('wallet-connection');
-        } catch (e) {
-          // Invalid stored data, remove it
-          localStorage.removeItem('wallet-connection');
-        }
-      }
-
-      // Fallback: Check for any existing connections without localStorage
-      let provider = null;
-      
-      if (window.ethereum && window.ethereum.isMetaMask && !window.ethereum.isPhantom) {
-        try {
-          await window.ethereum.request({ method: 'eth_chainId' });
-          provider = window.ethereum;
-        } catch (e) {
-          // MetaMask not responding
-        }
-      } else if (window.ethereum && window.ethereum.providers) {
-        for (const p of window.ethereum.providers) {
-          if (p.isMetaMask || p.isTrust || p.isCoinbaseWallet) {
-            try {
-              await p.request({ method: 'eth_chainId' });
-              provider = p;
-              break;
-            } catch (e) {
-              // Provider not responding, continue
-            }
-          }
-        }
-      } else if (window.BinanceChain) {
-        try {
-          await window.BinanceChain.request({ method: 'eth_chainId' });
-          provider = window.BinanceChain;
-        } catch (e) {
-          // Binance Chain not responding
-        }
-      }
-
-      if (provider) {
-        const accounts = await provider.request({ method: 'eth_accounts' });
-        if (accounts.length > 0) {
-          console.log('🔄 Auto-reconnecting wallet:', accounts[0]);
-          setWalletAddress(accounts[0]);
-          setConnected(true);
-          
-          // Store this connection for future reconnection
-          localStorage.setItem('wallet-connection', JSON.stringify({
-            address: accounts[0],
-            connected: true,
-            timestamp: Date.now()
-          }));
-          
-          // Clear the manual disconnect flag since we successfully reconnected
-          localStorage.removeItem('wallet-manually-disconnected');
-          
-          await fetchBalances(accounts[0]);
-          
-          toast.success('Wallet reconnected', {
-            duration: 2000,
-            style: {
-              background: '#10B981',
-              color: '#fff',
-              fontFamily: 'Pixelify Sans, sans-serif',
-            },
-          });
-        }
-      }
-    } catch (error) {
-      console.error('Error checking wallet connection:', error);
-    }
-  };
-
   const connectWallet = async (walletType?: string, onError?: () => void) => {
     let provider = null;
 
     try {
-      // Handle different wallet types with specific detection and validation
+      // Handle different wallet types with passive detection (no pre-connection requests)
       if (walletType === 'metamask') {
         // Check for MetaMask specifically
         if (window.ethereum && window.ethereum.isMetaMask && !window.ethereum.isPhantom) {
-          // Test if MetaMask actually responds before using it
-          try {
-            await window.ethereum.request({ method: 'eth_chainId' });
-            provider = window.ethereum;
-          } catch (e) {
-            console.log('MetaMask detected but not responding');
-          }
-        } else {
+          provider = window.ethereum;
+        } else if (window.ethereum && window.ethereum.providers) {
           // Try to find MetaMask in the providers array
-          if (window.ethereum && window.ethereum.providers) {
-            for (const p of window.ethereum.providers) {
-              if (p.isMetaMask && !p.isPhantom) {
-                try {
-                  await p.request({ method: 'eth_chainId' });
-                  provider = p;
-                  break;
-                } catch (e) {
-                  // Provider exists but not working, continue
-                }
-              }
+          for (const p of window.ethereum.providers) {
+            if (p.isMetaMask && !p.isPhantom) {
+              provider = p;
+              break;
             }
           }
         }
       } else if (walletType === 'trust') {
         // Check for Trust Wallet specifically
         if (window.ethereum && window.ethereum.isTrust) {
-          try {
-            await window.ethereum.request({ method: 'eth_chainId' });
-            provider = window.ethereum;
-          } catch (e) {
-            console.log('Trust Wallet detected but not responding');
-          }
+          provider = window.ethereum;
         } else if (window.ethereum && window.ethereum.providers) {
           for (const p of window.ethereum.providers) {
             if (p.isTrust) {
-              try {
-                await p.request({ method: 'eth_chainId' });
-                provider = p;
-                break;
-              } catch (e) {
-                // Provider exists but not working, continue
-              }
+              provider = p;
+              break;
             }
           }
         }
       } else if (walletType === 'coinbase') {
         // Check for Coinbase Wallet specifically
         if (window.ethereum && window.ethereum.isCoinbaseWallet) {
-          try {
-            await window.ethereum.request({ method: 'eth_chainId' });
-            provider = window.ethereum;
-          } catch (e) {
-            console.log('Coinbase Wallet detected but not responding');
-          }
+          provider = window.ethereum;
         } else if (window.ethereum && window.ethereum.providers) {
           for (const p of window.ethereum.providers) {
             if (p.isCoinbaseWallet) {
-              try {
-                await p.request({ method: 'eth_chainId' });
-                provider = p;
-                break;
-              } catch (e) {
-                // Provider exists but not working, continue
-              }
+              provider = p;
+              break;
             }
           }
         }
       } else if (walletType === 'binance') {
         if (window.BinanceChain) {
-          try {
-            await window.BinanceChain.request({ method: 'eth_chainId' });
-            provider = window.BinanceChain;
-          } catch (e) {
-            console.log('Binance Wallet detected but not responding');
-          }
+          provider = window.BinanceChain;
         }
       } else if (walletType === 'walletconnect') {
         // For WalletConnect, we'll use the standard ethereum provider
@@ -406,22 +186,12 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             // Multiple wallets installed, find a BSC-compatible one
             for (const p of window.ethereum.providers) {
               if (p.isMetaMask || p.isTrust || p.isCoinbaseWallet) {
-                try {
-                  await p.request({ method: 'eth_chainId' });
-                  provider = p;
-                  break;
-                } catch (e) {
-                  // Provider exists but not working, continue
-                }
+                provider = p;
+                break;
               }
             }
           } else if (window.ethereum.isMetaMask || window.ethereum.isTrust || window.ethereum.isCoinbaseWallet) {
-            try {
-              await window.ethereum.request({ method: 'eth_chainId' });
-              provider = window.ethereum;
-            } catch (e) {
-              console.log('Wallet detected but not responding');
-            }
+            provider = window.ethereum;
           }
         }
       }

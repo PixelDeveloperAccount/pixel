@@ -5,6 +5,7 @@ import UserColors from './UserColors';
 import { useLanguage } from '../context/LanguageContext';
 import { useModal } from '../context/ModalContext';
 import toast from 'react-hot-toast'; // Ensure toast is imported
+import { Link } from 'react-router-dom';
 
 const CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000"; // Replace with your BSC token contract address
 
@@ -119,9 +120,8 @@ const Sidebar: React.FC = () => {
                     />
                   <span>X</span>
                 </a>
-                <a
-                  href="/docs"
-                  target="_blank"
+                <Link
+                  to="/docs"
                   className="flex items-center space-x-2 text-gray-900 hover:text-gray-600 transition-colors"
                 >
                   <img
@@ -130,7 +130,7 @@ const Sidebar: React.FC = () => {
                       className="h-6 w-6"
                     />
                   <span>{t('social.docs')}</span>
-                </a>
+                </Link>
               </div>
             </div>
 

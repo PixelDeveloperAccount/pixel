@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Coins, MousePointer, Timer } from 'lucide-react';
+import { Timer } from 'lucide-react';
 import { useBSCWallet } from '../context/BSCWalletContext';
 import { useLanguage } from '../context/LanguageContext';
 import BSCConnectButton from './BSCConnectButton';
@@ -87,7 +87,7 @@ const BSCUserInfo: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2 text-gray-900">
               <img 
-                src="https://unpkg.com/pixelarticons@1.8.1/svg/coins.svg" 
+                src="https://unpkg.com/pixelarticons@1.8.1/svg/shopping-bag.svg" 
                 alt="Token" 
                 className="h-6 w-6" 
               />

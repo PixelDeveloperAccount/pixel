@@ -143,10 +143,8 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           provider = window.ethereum;
         }
       } else if (walletType === 'trust') {
-        // Check for Trust Wallet specifically
-        if (window.ethereum && window.ethereum.isTrust) {
-          provider = window.ethereum;
-        } else if (window.ethereum && window.ethereum.providers) {
+        // Always check providers array first for consistency
+        if (window.ethereum && window.ethereum.providers) {
           for (const p of window.ethereum.providers) {
             if (p.isTrust) {
               provider = p;
@@ -154,11 +152,13 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             }
           }
         }
-      } else if (walletType === 'coinbase') {
-        // Check for Coinbase Wallet specifically
-        if (window.ethereum && window.ethereum.isCoinbaseWallet) {
+        // Only use window.ethereum directly if no providers array and it's Trust Wallet
+        if (!provider && window.ethereum && window.ethereum.isTrust) {
           provider = window.ethereum;
-        } else if (window.ethereum && window.ethereum.providers) {
+        }
+      } else if (walletType === 'coinbase') {
+        // Always check providers array first for consistency
+        if (window.ethereum && window.ethereum.providers) {
           for (const p of window.ethereum.providers) {
             if (p.isCoinbaseWallet) {
               provider = p;
@@ -166,7 +166,12 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             }
           }
         }
+        // Only use window.ethereum directly if no providers array and it's Coinbase
+        if (!provider && window.ethereum && window.ethereum.isCoinbaseWallet) {
+          provider = window.ethereum;
+        }
       } else if (walletType === 'binance') {
+        // Binance Wallet uses a separate global object
         if (window.BinanceChain) {
           provider = window.BinanceChain;
         }
@@ -193,7 +198,11 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           onError();
         }
         
-        toast.error('Wallet not found or not responding. Please ensure your wallet is installed and unlocked.', {
+        const walletName = walletType 
+          ? walletType.charAt(0).toUpperCase() + walletType.slice(1) 
+          : 'Wallet';
+        
+        toast.error(`${walletName} not found. Please ensure it is installed and unlocked.`, {
           duration: 5000,
           style: {
             background: '#EF4444',
@@ -201,10 +210,13 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             fontFamily: 'Pixelify Sans, sans-serif',
           },
         });
+        console.error(`❌ Failed to find provider for ${walletType}`);
         return;
       }
 
-      // Request account access
+      console.log(`✅ Found provider for ${walletType}. Requesting accounts...`);
+      
+      // Request account access from the SPECIFIC provider we found
       const accounts = await provider.request({
         method: 'eth_requestAccounts',
       });

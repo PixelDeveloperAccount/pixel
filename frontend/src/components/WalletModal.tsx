@@ -27,15 +27,16 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
       const checkWalletInstalled = (walletType: string): boolean => {
         try {
           if (walletType === 'metamask') {
-            if (window.ethereum && window.ethereum.isMetaMask && !window.ethereum.isPhantom) {
-              return true;
-            }
+            // Check providers array first to avoid Phantom hijacking
             if (window.ethereum && window.ethereum.providers) {
               for (const provider of window.ethereum.providers) {
                 if (provider.isMetaMask && !provider.isPhantom) {
                   return true;
                 }
               }
+            }
+            if (window.ethereum && window.ethereum.isMetaMask && !window.ethereum.isPhantom) {
+              return true;
             }
             return false;
           } else if (walletType === 'trust') {

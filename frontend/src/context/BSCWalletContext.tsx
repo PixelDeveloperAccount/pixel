@@ -72,17 +72,18 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     let hasBSCWallet = false;
     
     try {
-      // Check for MetaMask specifically (passive check - no requests)
-      if (window.ethereum && window.ethereum.isMetaMask && !window.ethereum.isPhantom) {
-        hasBSCWallet = true;
-      } else if (window.ethereum && window.ethereum.providers) {
-        // Check providers array for MetaMask
+      // Check for MetaMask - prioritize providers array to avoid Phantom hijacking
+      if (window.ethereum && window.ethereum.providers) {
+        // Check providers array for MetaMask first
         for (const provider of window.ethereum.providers) {
           if (provider.isMetaMask && !provider.isPhantom) {
             hasBSCWallet = true;
             break;
           }
         }
+      }
+      if (!hasBSCWallet && window.ethereum && window.ethereum.isMetaMask && !window.ethereum.isPhantom) {
+        hasBSCWallet = true;
       }
       
       // Check for Trust Wallet
@@ -127,10 +128,8 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     try {
       // Handle different wallet types with passive detection (no pre-connection requests)
       if (walletType === 'metamask') {
-        // Check for MetaMask specifically
-        if (window.ethereum && window.ethereum.isMetaMask && !window.ethereum.isPhantom) {
-          provider = window.ethereum;
-        } else if (window.ethereum && window.ethereum.providers) {
+        // Always check providers array first to avoid Phantom hijacking
+        if (window.ethereum && window.ethereum.providers) {
           // Try to find MetaMask in the providers array
           for (const p of window.ethereum.providers) {
             if (p.isMetaMask && !p.isPhantom) {
@@ -138,6 +137,10 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
               break;
             }
           }
+        } 
+        // Only use window.ethereum directly if no providers array and it's MetaMask
+        if (!provider && window.ethereum && window.ethereum.isMetaMask && !window.ethereum.isPhantom) {
+          provider = window.ethereum;
         }
       } else if (walletType === 'trust') {
         // Check for Trust Wallet specifically

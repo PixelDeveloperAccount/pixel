@@ -593,7 +593,7 @@ const Canvas: React.FC = () => {
           <div className="space-y-3">
             {/* Pixel Info */}
             <div className="flex items-center space-x-3">
-              {clickedPixel.walletAddress ? (
+              {clickedPixel.color && clickedPixel.color !== '#ffffff' ? (
                 <div 
                   className="w-10 h-10 rounded border-2 border-gray-300 shadow-sm"
                   style={{ backgroundColor: clickedPixel.color }}
@@ -607,7 +607,7 @@ const Canvas: React.FC = () => {
                 <p className="font-semibold text-gray-900 text-2xl">
                   {t('canvas.pixel_coordinates', { x: clickedPixel.x, y: clickedPixel.y })}
                 </p>
-                {!clickedPixel.walletAddress && (
+                {(!clickedPixel.color || clickedPixel.color === '#ffffff') && (
                   <p className="text-base text-gray-500">
                     {t('canvas.not_painted_yet')}
                   </p>
@@ -619,10 +619,22 @@ const Canvas: React.FC = () => {
             {clickedPixel.walletAddress && (
               <div className="pt-2 border-t border-gray-200">
                 <p className="text-base text-gray-700">
-                  <span className="font-medium">Painted by:</span>
+                  <span className="font-medium">{t('canvas.painted_by')}</span>
                 </p>
                 <p className="text-base text-gray-600 font-mono">
                   {clickedPixel.walletAddress.slice(0, 8)}...{clickedPixel.walletAddress.slice(-8)}
+                </p>
+              </div>
+            )}
+            
+            {/* Anonymous Painter Info */}
+            {!clickedPixel.walletAddress && clickedPixel.color && clickedPixel.color !== '#ffffff' && (
+              <div className="pt-2 border-t border-gray-200">
+                <p className="text-base text-gray-700">
+                  <span className="font-medium">{t('canvas.painted_by')}</span>
+                </p>
+                <p className="text-base text-gray-600">
+                  {t('canvas.anonymous')}
                 </p>
               </div>
             )}

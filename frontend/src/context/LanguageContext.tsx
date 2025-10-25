@@ -37,6 +37,8 @@ const translations = {
     'canvas.connect_first': 'Please connect your wallet first',
     'canvas.pixel_coordinates': 'Pixel: {x}, {y}',
     'canvas.not_painted_yet': 'Not painted yet',
+    'canvas.painted_by': 'Painted by:',
+    'canvas.anonymous': 'Anonymous',
     
     // User Info
     'user.your_info': 'Your Info',
@@ -175,6 +177,8 @@ const translations = {
     'canvas.connect_first': '请先连接您的钱包',
     'canvas.pixel_coordinates': '像素: {x}, {y}',
     'canvas.not_painted_yet': '尚未绘制',
+    'canvas.painted_by': '绘制者:',
+    'canvas.anonymous': '匿名',
     
     // User Info
     'user.your_info': '您的信息',

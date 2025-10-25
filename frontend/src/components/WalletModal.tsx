@@ -102,12 +102,6 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
               icon: '/wallet-icons/CoinbaseIcon.png',
               connector: () => connectWallet('coinbase'),
               isInstalled: checkWalletInstalled('coinbase')
-            },
-            {
-              name: 'WalletConnect',
-              icon: '/wallet-icons/WalletconnectIcon.png',
-              connector: () => connectWallet('walletconnect'),
-              isInstalled: true // WalletConnect can always be used
             }
           ];
 

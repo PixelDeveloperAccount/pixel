@@ -170,18 +170,6 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         if (window.BinanceChain) {
           provider = window.BinanceChain;
         }
-      } else if (walletType === 'walletconnect') {
-        // For WalletConnect, we'll use the standard ethereum provider
-        // In a real implementation, you'd integrate WalletConnect here
-        toast.error('WalletConnect integration coming soon!', {
-          duration: 3000,
-          style: {
-            background: '#EF4444',
-            color: '#fff',
-            fontFamily: 'Pixelify Sans, sans-serif',
-          },
-        });
-        return;
       } else {
         // Default: try to use the first available BSC-compatible provider
         if (window.ethereum) {

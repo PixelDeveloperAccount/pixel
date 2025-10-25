@@ -127,78 +127,144 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     try {
       console.log(`🔍 Attempting to connect to: ${walletType}`);
-      console.log('Available providers:', window.ethereum?.providers);
+      console.log('window.ethereum exists:', !!window.ethereum);
+      console.log('window.ethereum.providers:', window.ethereum?.providers);
+      console.log('Number of providers:', window.ethereum?.providers?.length);
       
       // Handle different wallet types with explicit provider isolation
       if (walletType === 'metamask') {
-        // Strategy: Find MetaMask and explicitly exclude Trust Wallet and others
+        // Strategy: Find MetaMask with preference scoring
         if (window.ethereum && window.ethereum.providers && Array.isArray(window.ethereum.providers)) {
-          console.log('Searching in providers array for MetaMask...');
-          for (const p of window.ethereum.providers) {
-            console.log('Provider flags:', {
-              isMetaMask: p.isMetaMask,
-              isTrust: p.isTrust,
-              isCoinbaseWallet: p.isCoinbaseWallet,
-              isPhantom: p.isPhantom
-            });
+          console.log(`Searching ${window.ethereum.providers.length} providers for MetaMask...`);
+          
+          let bestMatch = null;
+          let bestScore = 0;
+          
+          for (let i = 0; i < window.ethereum.providers.length; i++) {
+            const p = window.ethereum.providers[i];
+            const flags = {
+              isMetaMask: p.isMetaMask || false,
+              isTrust: p.isTrust || false,
+              isCoinbaseWallet: p.isCoinbaseWallet || false,
+              isPhantom: p.isPhantom || false
+            };
+            console.log(`Provider ${i} flags:`, flags);
             
-            // Must be MetaMask AND must NOT be Trust Wallet or Phantom
-            if (p.isMetaMask && !p.isTrust && !p.isPhantom) {
-              provider = p;
-              console.log('✅ Found isolated MetaMask provider');
-              break;
+            // Score system: positive points for correct wallet, negative for wrong ones
+            let score = 0;
+            if (flags.isMetaMask) score += 10;
+            if (flags.isTrust) score -= 20;  // Trust Wallet hijacking
+            if (flags.isPhantom) score -= 20; // Phantom hijacking
+            if (flags.isCoinbaseWallet) score -= 5;
+            
+            console.log(`Provider ${i} score:`, score);
+            
+            if (score > bestScore && score > 0) {
+              bestScore = score;
+              bestMatch = p;
+              console.log(`New best match at index ${i} with score ${score}`);
             }
+          }
+          
+          if (bestMatch) {
+            provider = bestMatch;
+            console.log('✅ Found best MetaMask provider with score:', bestScore);
           }
         } 
-        // Fallback: Only use window.ethereum if it's ONLY MetaMask
-        if (!provider && window.ethereum && window.ethereum.isMetaMask && !window.ethereum.isTrust && !window.ethereum.isPhantom) {
-          provider = window.ethereum;
-          console.log('✅ Using window.ethereum as MetaMask (no other wallets detected)');
-        }
-      } else if (walletType === 'trust') {
-        // Strategy: Find Trust Wallet explicitly
-        if (window.ethereum && window.ethereum.providers && Array.isArray(window.ethereum.providers)) {
-          console.log('Searching in providers array for Trust Wallet...');
-          for (const p of window.ethereum.providers) {
-            console.log('Provider flags:', {
-              isMetaMask: p.isMetaMask,
-              isTrust: p.isTrust,
-              isCoinbaseWallet: p.isCoinbaseWallet
-            });
-            
-            // Must be Trust Wallet AND must NOT be MetaMask
-            if (p.isTrust && !p.isMetaMask) {
-              provider = p;
-              console.log('✅ Found isolated Trust Wallet provider');
-              break;
-            }
+        
+        // Fallback: Check window.ethereum directly
+        if (!provider && window.ethereum) {
+          const flags = {
+            isMetaMask: window.ethereum.isMetaMask || false,
+            isTrust: window.ethereum.isTrust || false,
+            isPhantom: window.ethereum.isPhantom || false
+          };
+          console.log('window.ethereum flags:', flags);
+          
+          // If it claims to be MetaMask, use it (even if other flags are present)
+          if (flags.isMetaMask) {
+            provider = window.ethereum;
+            console.log('✅ Using window.ethereum as MetaMask (direct access)');
           }
         }
-        // Fallback: Only use window.ethereum if it's clearly Trust Wallet
+      } else if (walletType === 'trust') {
+        // Strategy: Find Trust Wallet with scoring
+        if (window.ethereum && window.ethereum.providers && Array.isArray(window.ethereum.providers)) {
+          console.log(`Searching ${window.ethereum.providers.length} providers for Trust Wallet...`);
+          
+          let bestMatch = null;
+          let bestScore = 0;
+          
+          for (let i = 0; i < window.ethereum.providers.length; i++) {
+            const p = window.ethereum.providers[i];
+            const flags = {
+              isMetaMask: p.isMetaMask || false,
+              isTrust: p.isTrust || false,
+              isCoinbaseWallet: p.isCoinbaseWallet || false
+            };
+            console.log(`Provider ${i} flags:`, flags);
+            
+            let score = 0;
+            if (flags.isTrust) score += 10;
+            if (flags.isMetaMask) score -= 5;
+            if (flags.isCoinbaseWallet) score -= 5;
+            
+            console.log(`Provider ${i} score:`, score);
+            
+            if (score > bestScore && score > 0) {
+              bestScore = score;
+              bestMatch = p;
+            }
+          }
+          
+          if (bestMatch) {
+            provider = bestMatch;
+            console.log('✅ Found best Trust Wallet provider with score:', bestScore);
+          }
+        }
+        
+        // Fallback: Check window.ethereum directly
         if (!provider && window.ethereum && window.ethereum.isTrust) {
           provider = window.ethereum;
           console.log('✅ Using window.ethereum as Trust Wallet');
         }
       } else if (walletType === 'coinbase') {
-        // Strategy: Find Coinbase Wallet explicitly
+        // Strategy: Find Coinbase Wallet with scoring
         if (window.ethereum && window.ethereum.providers && Array.isArray(window.ethereum.providers)) {
-          console.log('Searching in providers array for Coinbase Wallet...');
-          for (const p of window.ethereum.providers) {
-            console.log('Provider flags:', {
-              isMetaMask: p.isMetaMask,
-              isTrust: p.isTrust,
-              isCoinbaseWallet: p.isCoinbaseWallet
-            });
+          console.log(`Searching ${window.ethereum.providers.length} providers for Coinbase Wallet...`);
+          
+          let bestMatch = null;
+          let bestScore = 0;
+          
+          for (let i = 0; i < window.ethereum.providers.length; i++) {
+            const p = window.ethereum.providers[i];
+            const flags = {
+              isMetaMask: p.isMetaMask || false,
+              isTrust: p.isTrust || false,
+              isCoinbaseWallet: p.isCoinbaseWallet || false
+            };
+            console.log(`Provider ${i} flags:`, flags);
             
-            // Must be Coinbase AND must NOT be others
-            if (p.isCoinbaseWallet && !p.isMetaMask && !p.isTrust) {
-              provider = p;
-              console.log('✅ Found isolated Coinbase Wallet provider');
-              break;
+            let score = 0;
+            if (flags.isCoinbaseWallet) score += 10;
+            if (flags.isMetaMask) score -= 5;
+            if (flags.isTrust) score -= 5;
+            
+            console.log(`Provider ${i} score:`, score);
+            
+            if (score > bestScore && score > 0) {
+              bestScore = score;
+              bestMatch = p;
             }
           }
+          
+          if (bestMatch) {
+            provider = bestMatch;
+            console.log('✅ Found best Coinbase Wallet provider with score:', bestScore);
+          }
         }
-        // Fallback: Only use window.ethereum if it's clearly Coinbase
+        
+        // Fallback: Check window.ethereum directly
         if (!provider && window.ethereum && window.ethereum.isCoinbaseWallet) {
           provider = window.ethereum;
           console.log('✅ Using window.ethereum as Coinbase Wallet');
@@ -227,6 +293,12 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       }
 
       if (!provider) {
+        // Detailed logging for debugging
+        console.error(`❌ Failed to find provider for ${walletType}`);
+        console.error('window.ethereum:', window.ethereum);
+        console.error('window.ethereum.providers:', window.ethereum?.providers);
+        console.error('window.BinanceChain:', window.BinanceChain);
+        
         // Call the error callback to reset loading state in UI
         if (onError) {
           onError();
@@ -244,7 +316,6 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             fontFamily: 'Pixelify Sans, sans-serif',
           },
         });
-        console.error(`❌ Failed to find provider for ${walletType}`);
         return;
       }
 

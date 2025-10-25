@@ -136,8 +136,8 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-start justify-start">
-      <div className="bg-white h-full w-72 shadow-2xl flex flex-col">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+      <div className="bg-white rounded-xl shadow-2xl w-72 max-h-[80vh] flex flex-col">
         <div className="flex justify-between items-center p-4 border-b border-gray-100">
           <h2 className="text-xl font-bold text-gray-900 font-['Pixelify_Sans']">
             {t('wallet.connect')}
@@ -156,7 +156,7 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className="overflow-y-auto p-4">
           <div className="space-y-3">
             {isCheckingWallets ? (
               <div className="flex items-center justify-center py-8">

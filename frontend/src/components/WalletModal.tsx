@@ -136,10 +136,10 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50">
-      <div className="bg-white rounded-t-xl p-6 w-full max-w-md mx-4">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 font-['Pixelify_Sans']">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-start justify-start">
+      <div className="bg-white h-full w-72 shadow-2xl flex flex-col">
+        <div className="flex justify-between items-center p-4 border-b border-gray-100">
+          <h2 className="text-xl font-bold text-gray-900 font-['Pixelify_Sans']">
             {t('wallet.connect')}
           </h2>
           <button
@@ -156,15 +156,16 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        <div className="space-y-3">
-          {isCheckingWallets ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="flex items-center space-x-3">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                <span className="text-gray-600 font-['Pixelify_Sans']">Checking for wallets...</span>
+        <div className="flex-1 overflow-y-auto p-4">
+          <div className="space-y-3">
+            {isCheckingWallets ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="flex items-center space-x-3">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                  <span className="text-gray-600 font-['Pixelify_Sans']">Checking for wallets...</span>
+                </div>
               </div>
-            </div>
-          ) : (
+            ) : (
             wallets.map((wallet) => (
               <button
                 key={wallet.name}
@@ -189,8 +190,7 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
                       'MetaMask': 'metamask',
                       'Trust Wallet': 'trust',
                       'Binance Wallet': 'binance',
-                      'Coinbase Wallet': 'coinbase',
-                      'WalletConnect': 'walletconnect'
+                      'Coinbase Wallet': 'coinbase'
                     };
                     
                     await connectWallet(walletTypeMap[wallet.name] || wallet.name.toLowerCase().replace(' ', ''), handleError);
@@ -201,7 +201,7 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
                   }
                 }}
                 disabled={!wallet.isInstalled || connectingWallet !== null}
-                className={`w-full flex items-center space-x-4 p-4 rounded-lg border-2 transition-all relative min-h-[80px] ${
+                className={`w-full flex items-center space-x-3 p-3 rounded-lg border-2 transition-all relative ${
                   wallet.isInstalled && connectingWallet !== wallet.name
                     ? connectingWallet ? 'border-gray-200 bg-gray-50 opacity-30 cursor-not-allowed' : 'border-gray-200 hover:border-blue-500 hover:bg-blue-50'
                     : 'border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed'
@@ -217,13 +217,13 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
                       <img 
                         src="/loading/binance-loading-img-black.gif" 
                         alt="Connecting..." 
-                        className="h-12 w-12 opacity-100"
+                        className="h-10 w-10 opacity-100"
                       />
                     </div>
                   </>
                 )}
                 
-                <div className={`w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden ${connectingWallet === wallet.name ? 'blur-sm' : ''}`}>
+                <div className={`w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0 ${connectingWallet === wallet.name ? 'blur-sm' : ''}`}>
                   <img
                     src={wallet.icon}
                     alt={wallet.name}
@@ -235,14 +235,14 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
                   />
                 </div>
                 <div className={`flex-1 text-left ${connectingWallet === wallet.name ? 'blur-sm' : ''}`}>
-                  <div className="font-medium text-gray-900 font-['Pixelify_Sans']">
+                  <div className="font-medium text-gray-900 font-['Pixelify_Sans'] whitespace-nowrap overflow-hidden text-ellipsis">
                     {wallet.name}
                   </div>
-                  <div className="text-sm text-gray-500">
+                  <div className="text-sm text-gray-500 font-['Pixelify_Sans']">
                     {wallet.isInstalled ? t('wallet.installed') : t('wallet.not_installed')}
                   </div>
                 </div>
-                <div className="w-5 h-5 flex items-center justify-center">
+                <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
                   {wallet.isInstalled && !connectingWallet && (
                     <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -258,14 +258,15 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
                 </div>
               </button>
             ))
-          )}
+            )}
+          </div>
         </div>
 
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600 font-['Pixelify_Sans']">
+        <div className="p-4 border-t border-gray-100 text-center">
+          <p className="text-xs text-gray-600 font-['Pixelify_Sans'] mb-1">
             {t('wallet.dont_have_wallet')}
           </p>
-          <p className="text-sm text-gray-600 font-['Pixelify_Sans']">
+          <p className="text-xs text-gray-600 font-['Pixelify_Sans']">
             {t('wallet.install_wallets').split('MetaMask or TrustWallet').map((part, index) => (
               <React.Fragment key={index}>
                 {part}

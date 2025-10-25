@@ -39,18 +39,6 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
               return true;
             }
             return false;
-          } else if (walletType === 'trust') {
-            if (window.ethereum && window.ethereum.isTrust) {
-              return true;
-            }
-            if (window.ethereum && window.ethereum.providers) {
-              for (const provider of window.ethereum.providers) {
-                if (provider.isTrust) {
-                  return true;
-                }
-              }
-            }
-            return false;
           } else if (walletType === 'coinbase') {
             if (window.ethereum && window.ethereum.isCoinbaseWallet) {
               return true;
@@ -84,12 +72,6 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => {
               icon: '/wallet-icons/MetaMaskIcon.png',
               connector: () => connectWallet('metamask'),
               isInstalled: checkWalletInstalled('metamask')
-            },
-            {
-              name: 'Trust Wallet',
-              icon: '/wallet-icons/TrustWalletIcon.png',
-              connector: () => connectWallet('trust'),
-              isInstalled: checkWalletInstalled('trust')
             },
             {
               name: 'Binance Wallet',

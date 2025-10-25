@@ -86,17 +86,6 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         hasBSCWallet = true;
       }
       
-      // Check for Trust Wallet
-      if (!hasBSCWallet && window.ethereum && window.ethereum.isTrust) {
-        hasBSCWallet = true;
-      } else if (!hasBSCWallet && window.ethereum && window.ethereum.providers) {
-        for (const provider of window.ethereum.providers) {
-          if (provider.isTrust) {
-            hasBSCWallet = true;
-            break;
-          }
-        }
-      }
       
       // Check for Coinbase Wallet
       if (!hasBSCWallet && window.ethereum && window.ethereum.isCoinbaseWallet) {
@@ -181,61 +170,17 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           };
           console.log('window.ethereum flags:', flags);
           
-          // CRITICAL: If both isMetaMask AND isTrust are true, it's Trust Wallet hijacking!
+          // Check if Trust Wallet is hijacking MetaMask
           if (flags.isMetaMask && flags.isTrust) {
-            console.warn('⚠️ Detected wallet conflict: both isMetaMask and isTrust are true');
-            console.warn('This usually means Trust Wallet is hijacking. Will attempt connection anyway.');
-            console.warn('Note: This will likely open Trust Wallet instead of MetaMask.');
-            // Still attempt to use it - the connection will fail validation later
-            // This gives users a chance to see what's happening
-            provider = window.ethereum;
+            console.error('❌ Trust Wallet is hijacking MetaMask');
+            console.error('Please disable Trust Wallet extension to use MetaMask');
+            // Don't set provider - this will trigger error below
           }
-          // Only use if it's ONLY MetaMask (not Trust Wallet)
-          else if (flags.isMetaMask && !flags.isTrust && !flags.isPhantom) {
+          // Only use if it's MetaMask (not Trust Wallet)
+          else if (flags.isMetaMask && !flags.isPhantom) {
             provider = window.ethereum;
             console.log('✅ Using window.ethereum as MetaMask (direct access)');
           }
-        }
-      } else if (walletType === 'trust') {
-        // Strategy: Find Trust Wallet with scoring
-        if (window.ethereum && window.ethereum.providers && Array.isArray(window.ethereum.providers)) {
-          console.log(`Searching ${window.ethereum.providers.length} providers for Trust Wallet...`);
-          
-          let bestMatch = null;
-          let bestScore = 0;
-          
-          for (let i = 0; i < window.ethereum.providers.length; i++) {
-            const p = window.ethereum.providers[i];
-            const flags = {
-              isMetaMask: p.isMetaMask || false,
-              isTrust: p.isTrust || false,
-              isCoinbaseWallet: p.isCoinbaseWallet || false
-            };
-            console.log(`Provider ${i} flags:`, flags);
-            
-            let score = 0;
-            if (flags.isTrust) score += 10;
-            if (flags.isMetaMask) score -= 5;
-            if (flags.isCoinbaseWallet) score -= 5;
-            
-            console.log(`Provider ${i} score:`, score);
-            
-            if (score > bestScore && score > 0) {
-              bestScore = score;
-              bestMatch = p;
-            }
-          }
-          
-          if (bestMatch) {
-            provider = bestMatch;
-            console.log('✅ Found best Trust Wallet provider with score:', bestScore);
-          }
-        }
-        
-        // Fallback: Check window.ethereum directly
-        if (!provider && window.ethereum && window.ethereum.isTrust) {
-          provider = window.ethereum;
-          console.log('✅ Using window.ethereum as Trust Wallet');
         }
       } else if (walletType === 'coinbase') {
         // Strategy: Find Coinbase Wallet with scoring
@@ -290,12 +235,12 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           if (window.ethereum.providers && Array.isArray(window.ethereum.providers)) {
             // Multiple wallets installed, find a BSC-compatible one
             for (const p of window.ethereum.providers) {
-              if (p.isMetaMask || p.isTrust || p.isCoinbaseWallet) {
+              if (p.isMetaMask || p.isCoinbaseWallet) {
                 provider = p;
                 break;
               }
             }
-          } else if (window.ethereum.isMetaMask || window.ethereum.isTrust || window.ethereum.isCoinbaseWallet) {
+          } else if (window.ethereum.isMetaMask || window.ethereum.isCoinbaseWallet) {
             provider = window.ethereum;
           }
         }
@@ -310,14 +255,14 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         
         // Check for Trust Wallet hijacking scenario
         if (walletType === 'metamask' && window.ethereum?.isMetaMask && window.ethereum?.isTrust) {
-          console.error('🚨 Trust Wallet is hijacking MetaMask detection!');
+          console.error('🚨 Trust Wallet extension is blocking MetaMask!');
           
           // Call the error callback to reset loading state in UI
           if (onError) {
             onError();
           }
           
-          toast.error('Trust Wallet is interfering with MetaMask. Try: 1) Disable Trust Wallet extension temporarily, or 2) Use WalletConnect, or 3) Connect via Trust Wallet instead.', {
+          toast.error('Trust Wallet extension is blocking MetaMask. Please disable Trust Wallet at chrome://extensions/ and refresh the page.', {
             duration: 8000,
             style: {
               background: '#EF4444',
@@ -378,21 +323,12 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           });
           return;
         }
-        // Special case: Detect Trust Wallet hijacking after connection
+        // Detect Trust Wallet hijacking after connection
         if (walletType === 'metamask' && providerCheck.isMetaMask && providerCheck.isTrust) {
           console.error('❌ Trust Wallet hijacking confirmed after connection');
           if (onError) onError();
-          toast.error('Trust Wallet is blocking MetaMask access. Solutions: 1) Temporarily disable Trust Wallet extension, 2) Use a different browser, or 3) Connect with Trust Wallet.', {
+          toast.error('Trust Wallet extension is blocking MetaMask. Please disable Trust Wallet at chrome://extensions/ and refresh.', {
             duration: 8000,
-            style: { background: '#EF4444', color: '#fff', fontFamily: 'Pixelify Sans, sans-serif' }
-          });
-          return;
-        }
-        if (walletType === 'trust' && !providerCheck.isTrust) {
-          console.error('❌ Expected Trust Wallet but got different wallet');
-          if (onError) onError();
-          toast.error('Failed to connect to Trust Wallet. Please try again.', {
-            duration: 3000,
             style: { background: '#EF4444', color: '#fff', fontFamily: 'Pixelify Sans, sans-serif' }
           });
           return;

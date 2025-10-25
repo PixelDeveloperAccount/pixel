@@ -63,17 +63,9 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   }, []);
 
-  // Check if wallet is already connected on mount
+  // Check wallet availability on mount (but don't auto-connect)
   useEffect(() => {
-    const initializeWallet = async () => {
-      // First check wallet availability
-      await checkWalletAvailability();
-      // Then check for existing connections (with a small delay to ensure hasWallet is set)
-      setTimeout(async () => {
-        await checkWalletConnection();
-      }, 100);
-    };
-    initializeWallet();
+    checkWalletAvailability();
   }, []);
 
   const checkWalletAvailability = async () => {
@@ -467,16 +459,6 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setWalletAddress(accounts[0]);
         setConnected(true);
         
-        // Store connection info in localStorage for persistence
-        localStorage.setItem('wallet-connection', JSON.stringify({
-          address: accounts[0],
-          connected: true,
-          timestamp: Date.now()
-        }));
-        
-        // Clear the manual disconnect flag since user is connecting again
-        localStorage.removeItem('wallet-manually-disconnected');
-        
         await fetchBalances(accounts[0]);
         
         toast.success(t('network.wallet_connected'), {
@@ -551,10 +533,6 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
     
     setCooldownTime(60);
-    localStorage.removeItem('wallet-connection');
-    
-    // Set a flag to prevent auto-reconnection after manual disconnect
-    localStorage.setItem('wallet-manually-disconnected', 'true');
     
     if (wasConnected) {
       toast.success(t('network.wallet_disconnected'), {

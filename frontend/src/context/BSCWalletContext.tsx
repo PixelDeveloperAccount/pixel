@@ -181,8 +181,17 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           };
           console.log('window.ethereum flags:', flags);
           
-          // If it claims to be MetaMask, use it (even if other flags are present)
-          if (flags.isMetaMask) {
+          // CRITICAL: If both isMetaMask AND isTrust are true, it's Trust Wallet hijacking!
+          if (flags.isMetaMask && flags.isTrust) {
+            console.warn('⚠️ Detected wallet conflict: both isMetaMask and isTrust are true');
+            console.warn('This usually means Trust Wallet is hijacking. Will attempt connection anyway.');
+            console.warn('Note: This will likely open Trust Wallet instead of MetaMask.');
+            // Still attempt to use it - the connection will fail validation later
+            // This gives users a chance to see what's happening
+            provider = window.ethereum;
+          }
+          // Only use if it's ONLY MetaMask (not Trust Wallet)
+          else if (flags.isMetaMask && !flags.isTrust && !flags.isPhantom) {
             provider = window.ethereum;
             console.log('✅ Using window.ethereum as MetaMask (direct access)');
           }
@@ -299,6 +308,26 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         console.error('window.ethereum.providers:', window.ethereum?.providers);
         console.error('window.BinanceChain:', window.BinanceChain);
         
+        // Check for Trust Wallet hijacking scenario
+        if (walletType === 'metamask' && window.ethereum?.isMetaMask && window.ethereum?.isTrust) {
+          console.error('🚨 Trust Wallet is hijacking MetaMask detection!');
+          
+          // Call the error callback to reset loading state in UI
+          if (onError) {
+            onError();
+          }
+          
+          toast.error('Trust Wallet is interfering with MetaMask. Try: 1) Disable Trust Wallet extension temporarily, or 2) Use WalletConnect, or 3) Connect via Trust Wallet instead.', {
+            duration: 8000,
+            style: {
+              background: '#EF4444',
+              color: '#fff',
+              fontFamily: 'Pixelify Sans, sans-serif',
+            },
+          });
+          return;
+        }
+        
         // Call the error callback to reset loading state in UI
         if (onError) {
           onError();
@@ -345,6 +374,16 @@ export const BSCWalletProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           if (onError) onError();
           toast.error('Failed to connect to MetaMask. Please try again.', {
             duration: 3000,
+            style: { background: '#EF4444', color: '#fff', fontFamily: 'Pixelify Sans, sans-serif' }
+          });
+          return;
+        }
+        // Special case: Detect Trust Wallet hijacking after connection
+        if (walletType === 'metamask' && providerCheck.isMetaMask && providerCheck.isTrust) {
+          console.error('❌ Trust Wallet hijacking confirmed after connection');
+          if (onError) onError();
+          toast.error('Trust Wallet is blocking MetaMask access. Solutions: 1) Temporarily disable Trust Wallet extension, 2) Use a different browser, or 3) Connect with Trust Wallet.', {
+            duration: 8000,
             style: { background: '#EF4444', color: '#fff', fontFamily: 'Pixelify Sans, sans-serif' }
           });
           return;

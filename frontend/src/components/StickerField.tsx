@@ -10,8 +10,6 @@ const stickerImages = [
   { src: '/stickers/sticker5.png', alt: 'Sticker 5' },
   { src: '/stickers/sticker6.png', alt: 'Sticker 6' },
   { src: '/stickers/sticker7.png', alt: 'Sticker 7' },
-  { src: '/stickers/sticker8.png', alt: 'Sticker 8' },
-  { src: '/stickers/sticker9.png', alt: 'Sticker 9' },
 ];
 
 // Generate random positions and rotations for stickers in world coordinates

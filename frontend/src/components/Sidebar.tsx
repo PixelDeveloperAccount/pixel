@@ -7,7 +7,7 @@ import { useModal } from '../context/ModalContext';
 import toast from 'react-hot-toast'; // Ensure toast is imported
 import { Link } from 'react-router-dom';
 
-const CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000"; // Replace with your BSC token contract address
+const CONTRACT_ADDRESS = "0xb2454a4d10971c5ebdf2e447891f4157ca094444"; // Replace with your BSC token contract address
 
 const Sidebar: React.FC = () => {
   const [isOpen, setIsOpen] = React.useState(false);

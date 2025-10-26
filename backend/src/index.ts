@@ -51,7 +51,7 @@ app.use(express.json());
 
 // BSC Configuration
 const BSC_RPC_URL = process.env.BSC_RPC_URL || 'https://bsc-dataseed.binance.org/';
-const TOKEN_CONTRACT_ADDRESS = process.env.TOKEN_CONTRACT_ADDRESS || '0x5fb39e4b3820db9c31346ff191a0f19997fb4444';
+const TOKEN_CONTRACT_ADDRESS = process.env.TOKEN_CONTRACT_ADDRESS || '0xb2454a4d10971c5ebdf2e447891f4157ca094444';
 
 // ERC-20 ABI for token balance checking
 const ERC20_ABI = [
